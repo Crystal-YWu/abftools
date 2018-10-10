@@ -9,7 +9,6 @@
 abf2_load <- function(filename) {
 
   fp <- file(filename, "rb")
-  abf <- list()
 
   #Read header
   header <- read_struct(fp, ABF2.Header.def)
@@ -82,7 +81,7 @@ abf2_load <- function(filename) {
   chan_num <- nrow(section$ADC)
   chan_name <- c()
   chan_unit <- c()
-  chan_name_plot <- c()
+  chan_desc <- c()
   for (i in seq(chan_num)) {
     #Get channel name
     idx <- 1 + i * 2
@@ -93,11 +92,11 @@ abf2_load <- function(filename) {
     #Compile a convenient plotting name from channel unit
     if (!is.na(chan_unit[i])) {
       if (endsWith(chan_unit[i], "V"))
-        chan_name_plot[i] <- "Voltage"
+        chan_desc[i] <- "Voltage"
       else if (endsWith(chan_unit[i], "A"))
-        chan_name_plot[i] <- "Current"
+        chan_desc[i] <- "Current"
       else
-        chan_name_plot[i] <- chan_name[i]
+        chan_desc[i] <- chan_name[i]
     }
   }
 
@@ -148,29 +147,20 @@ abf2_load <- function(filename) {
   lStart_tick <- section$SynchArray$lStart / tu_per_tick
   section$SynchArray <- cbind(section$SynchArray, lStart_tick)
 
+  #We've done all file reading
+  close(fp)
+
   #Now compile everything we've got into result
   op_mode <- section$Protocol$nOperationMode[1]
 
-  #First fields to records
-  abf$name <- filename
-  abf$mode <- op_mode
-
   if (op_mode == 1L) {
     #event-driven variable-length
-    close(fp)
     stop("Event-driven variable-length mode is not supported yet.")
 
     #For variable-length sweeps, we can't simply extract data into a 3d array
     #since sweep lengths (pts_per_chan) are different
 
-    #Reshape rawdata to 2d array
-    pts_per_chan <- section_info$Data$llNumEntries / chan_num
-    data <- array(data = rawdata, dim = c(chan_num, pts_per_chan))
-
-    #We should figure out a proper data representation of variable-length mode
-    #before enabling any features.
-
-    class(abf) <- "ABF2.Varlen"
+    #TODO: a proper data representation of variable-length mode
   }
   else if (op_mode == 2L | op_mode == 4L | op_mode == 5L) {
     #event-driven fixed-length (2), high-speed oscilloscope (4), waveform fixed-length (5)
@@ -181,7 +171,6 @@ abf2_load <- function(filename) {
     epi_per_run <- section$Protocol$lEpisodesPerRun[1]
     #check if data pts number match
     if (section_info$Data$llNumEntries != pts_per_chan * chan_per_epi * epi_per_run) {
-      close(fp)
       stop("Data section: recorded data points do not match protocol setting.")
     }
     data <- array(data = rawdata, dim = c(chan_per_epi, pts_per_chan, epi_per_run))
@@ -189,27 +178,6 @@ abf2_load <- function(filename) {
     if (rawdata_int)
       for (i in seq(chan_per_epi))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
-    #rearrange by channel
-    by_chan <- list()
-    for (i in seq(chan_per_epi)) {
-      by_chan[[i]] <- data.frame(data[i,,])
-      colnames(by_chan[[i]]) <- paste0("epi", seq(epi_per_run))
-    }
-    #rearrange by episode
-    #by_epi <- list()
-    #for (i in seq(epi_per_run)) {
-    #  by_epi[[i]] <- data.frame(t(data[,,i]))
-    #  colnames(by_epi[[i]]) <- paste0("ch", seq(chan_per_epi))
-    #}
-
-    #put together everything
-    abf$ByChannel <- by_chan
-
-    abf$PointsPerChannel <- pts_per_chan
-    abf$ChannelsPerEpisode <- chan_per_epi
-    abf$EpisodesPerRun <- epi_per_run
-
-    class(abf) <- "ABF2.Episodic"
   }
   else if (op_mode == 3L) {
     #Gap-free
@@ -219,7 +187,6 @@ abf2_load <- function(filename) {
     chan_per_run <- chan_num
     #check if data pts number match
     if (section_info$Data$llNumEntries != pts_per_chan * chan_per_run) {
-      close(fp)
       stop("Data section: Recorded data points do not match protocol setting.")
     }
     data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan))
@@ -227,38 +194,48 @@ abf2_load <- function(filename) {
     if (rawdata_int)
       for (i in seq(chan_per_run))
         data[i,] <- data[i,] * signal_resol * signal_scale[i] + signal_offset[i]
-
-    #rearrange by channel
-    by_chan <- data.frame(t(data))
-    colnames(by_chan) <- paste0("ch", seq(chan_per_run))
-
-    #put together everything
-    abf$ByChannel <- by_chan
-
-    abf$PointsPerChannel <- pts_per_chan
-    abf$ChannelsPerRun <- chan_per_run
-
-    class(abf) <- "ABF2.Gapfree"
   }
   else {
-    close(fp)
     stop(paste0("Protocol section: Unrecognised operation mode ", op_mode, "."))
   }
 
-  #Miscellaneous fields to record
-  abf$ChannelNum <- chan_num
-  abf$ChannelName <- chan_name
-  abf$ChannelUnit <- chan_unit
-  abf$ChannelNamePlot <- chan_name_plot
+  setattr(data, "class", "abf")
+  setattr(data, "name", filename)
+  setattr(data, "mode", op_mode)
 
-  abf$SampleInterval_s <- sample_interval_s
-  abf$SampleInterval_ms <- sample_interval_ms
-  abf$SampleInterval_us <- sample_interval_us
+  setattr(data, "ChannelNum", chan_num)
+  setattr(data, "ChannelName", chan_name)
+  setattr(data, "ChannelUnit", chan_unit)
+  setattr(data, "ChannelDesc", chan_desc)
+  setattr(data, "SamplingInterval", sample_interval_us)
 
-  abf$meta <- section
-  abf$meta$Header <- header
-  #abf$rawdata <- data
+  meta <- section
+  meta$Header <- header
+  setattr(data, "meta", meta)
 
-  close(fp)
-  return(abf)
+  return(data)
+}
+
+#' abf2_loadlist
+#'
+#' @param filelist
+#' @param folder
+#' @param attach_ext
+#'
+#' @return
+#' @export
+#'
+#' @examples
+abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE) {
+
+  if (folder != "") {
+    folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
+    filelist <- paste0(folder, filelist)
+  }
+  if (attach_ext)
+    filelist <- lapply(filelist, function(x) ifelse(endsWith(x, ".abf"), x, paste0(x, ".abf")))
+
+  abf_list <- lapply(filelist, abf2_load)
+
+  return(abf_list)
 }
