@@ -1,12 +1,13 @@
 #' abf2_load
 #'
 #' @param filename
+#' @param abf_title
 #'
 #' @return ABF2.Episodic, ABF2.Gapfree depending on file type.
 #' @export
 #'
 #' @examples
-abf2_load <- function(filename) {
+abf2_load <- function(filename, abf_title = NULL) {
 
   fp <- file(filename, "rb")
 
@@ -136,8 +137,6 @@ abf2_load <- function(filename) {
   }
 
   #sampling interval
-  sample_interval_s <- section$Protocol$fADCSequenceInterval[1] * 1e-6
-  sample_interval_ms <- section$Protocol$fADCSequenceInterval[1] * 1e-3
   sample_interval_us <- section$Protocol$fADCSequenceInterval[1]
 
   #parse synch array since sample_interval_us is resolved
@@ -189,7 +188,9 @@ abf2_load <- function(filename) {
     if (section_info$Data$llNumEntries != pts_per_chan * chan_per_run) {
       stop("Data section: Recorded data points do not match protocol setting.")
     }
-    data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan))
+    #Added 3rd dim so that we can treat a Gap-free like an episodic abf (with only
+    #episode).
+    data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan, 1))
     #scale data if needed
     if (rawdata_int)
       for (i in seq(chan_per_run))
@@ -199,19 +200,22 @@ abf2_load <- function(filename) {
     stop(paste0("Protocol section: Unrecognised operation mode ", op_mode, "."))
   }
 
-  setattr(data, "class", "abf")
-  setattr(data, "name", filename)
-  setattr(data, "mode", op_mode)
+  attr(data, "class") <- "abf"
+  if (is.null(abf_title))
+    attr(data, "title") <- filename
+  else
+    attr(data, "title") <- as.character(abf_title)
+  attr(data, "mode") <- op_mode
 
-  setattr(data, "ChannelNum", chan_num)
-  setattr(data, "ChannelName", chan_name)
-  setattr(data, "ChannelUnit", chan_unit)
-  setattr(data, "ChannelDesc", chan_desc)
-  setattr(data, "SamplingInterval", sample_interval_us)
+  attr(data, "ChannelNum") <- chan_num
+  attr(data, "ChannelName") <- chan_name
+  attr(data, "ChannelUnit") <- chan_unit
+  attr(data, "ChannelDesc") <- chan_desc
+  attr(data, "SamplingInterval") <- sample_interval_us
 
   meta <- section
   meta$Header <- header
-  setattr(data, "meta", meta)
+  attr(data, "meta") <- meta
 
   return(data)
 }
@@ -221,12 +225,13 @@ abf2_load <- function(filename) {
 #' @param filelist
 #' @param folder
 #' @param attach_ext
+#' @param titlelist
 #'
 #' @return
 #' @export
 #'
 #' @examples
-abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE) {
+abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist = NULL) {
 
   if (folder != "") {
     folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
@@ -236,6 +241,20 @@ abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE) {
     filelist <- lapply(filelist, function(x) ifelse(endsWith(x, ".abf"), x, paste0(x, ".abf")))
 
   abf_list <- lapply(filelist, abf2_load)
+  #set titles
+  if (!is.null(titlelist)) {
+    if (length(titlelist) == 1) {
+      for (i in seq_along(abf_list))
+        attr(abf_list[[i]], "title") <- as.character(titlelist)
+    } else {
+      if (length(titlelist) != length(abf_list)) {
+        warning("abf2_loadlist: length of titlelist mismatches filelist, ignored.")
+      } else {
+        for (i in seq_along(abf_list))
+          attr(abf_list[[i]], "title") <- as.character(titlelist[[i]])
+      }
+    }
+  }
 
   return(abf_list)
 }

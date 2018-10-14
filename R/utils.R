@@ -10,8 +10,8 @@
 colSds <- function(df, na.rm = FALSE) {
 
   n <- ifelse(na.rm, colSums(!is.na(df)), nrow(df))
-  #Custom implementation for the missing colSds, may not be most effective
-  ret <- colMeans(df * df, na.rm = na.rm) - colMeans(df, na.rm = na.rm)^2
+  #implementation for the missing colSds, may not be most effective
+  ret <- colMeans(df * df, na.rm) - colMeans(df, na.rm)^2
   ret <- sqrt(ret * n / (n - 1))
 
   return(ret)
@@ -45,10 +45,7 @@ colSems <- function(df, na.rm = FALSE) {
 EpisodesPerChannel <- function(abf) {
 
   d <- dim(abf)
-  if (length(d) == 2)
-    return(1L)
-  else
-    return(d[3])
+  return(d[3])
 }
 
 #' Title
@@ -75,9 +72,10 @@ PointsPerEpisode <- function(abf) {
 #' @export
 #'
 #' @examples
-MaskEpisodes <- function(abf, epi, value = NA) {
+MaskEpisodes <- function(abf, epi, value) {
 
-  if (length(dim(abf)) == 2)
+  d <- dim(abf)
+  if (d[3] == 1)
     stop("RemoveEpisodes: abf is not episodic.")
 
   abf[, , epi] <- value
@@ -109,9 +107,6 @@ RemoveEpisodes <- function(abf, epi) {
 #' @examples
 AvailEpisodes <- function(abf) {
 
-  if (length(dim(abf)) == 2)
-    stop("RemoveEpisodes: abf is not episodic.")
-
   epi = c()
   for (i in seq_len(EpisodesPerChannel(abf)))
     if (any(!is.na(abf[1, , i])))
@@ -119,4 +114,3 @@ AvailEpisodes <- function(abf) {
 
   return(epi)
 }
-

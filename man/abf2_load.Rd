@@ -4,10 +4,10 @@
 \alias{abf2_load}
 \title{abf2_load}
 \usage{
-abf2_load(filename)
+abf2_load(filename, abf_title = NULL)
 }
 \arguments{
-\item{filename}{}
+\item{abf_title}{}
 }
 \value{
 ABF2.Episodic, ABF2.Gapfree depending on file type.

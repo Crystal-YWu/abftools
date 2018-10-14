@@ -14,6 +14,9 @@ print.abf <- function(x, ...) {
 `[[.abf` <- function(x, channel) {
 
   d <- dim(x)
+  if (channel > d[1])
+    stop(paste0("Extract channel: channel ", channel, " not available."))
+
   if (length(d) == 2)
     return(x[channel, ])
 
@@ -23,6 +26,22 @@ print.abf <- function(x, ...) {
   colnames(df) <- paste0("epi", epi)
 
   return(df)
+}
+
+#' Title
+#'
+#' @param x
+#' @param channel
+#'
+#' @return
+#' @export
+#'
+#' @examples
+as.data.frame.abf <- function(x, channel = 1) {
+
+  df <- x[[channel]]
+
+  return(data.frame(df))
 }
 
 #' Title

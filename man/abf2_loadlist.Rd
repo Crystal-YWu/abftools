@@ -4,10 +4,11 @@
 \alias{abf2_loadlist}
 \title{abf2_loadlist}
 \usage{
-abf2_loadlist(filelist, folder = "", attach_ext = TRUE)
+abf2_loadlist(filelist, folder = "", attach_ext = TRUE,
+  titlelist = NULL)
 }
 \arguments{
-\item{attach_ext}{}
+\item{titlelist}{}
 }
 \description{
 abf2_loadlist
