@@ -152,7 +152,7 @@ MultiPlotChannel_Pub <- function(abf_list, channel = 1, time_unit = "s", title_l
 
   #first plot, with axes and units
   f <- function(x) sprintf("%.2f", x)
-  maxt <- TickToTime(abf_list[[1]], time_unit, dim(abf_list[[1]])[2])
+  maxt <- TickToTime(abf_list[[1]], time_unit, nPts(abf_list[[1]]))
   p[[1]] <- p[[1]] +
     scale_x_continuous(breaks = c(0, maxt), labels = f)
   #TODO: following plots are a bit mis-alined due to the removal of axes

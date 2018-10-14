@@ -4,7 +4,7 @@
 \alias{ChannelIntervalSds}
 \title{ChannelIntervalSds calculates interval standard deviations of a list of abf objects}
 \usage{
-ChannelIntervalSds(abf_list, intv_list, chan_id, na.rm = TRUE)
+ChannelIntervalSds(abf_list, intv_list, channel = 1, na.rm = TRUE)
 }
 \arguments{
 \item{na.rm}{}

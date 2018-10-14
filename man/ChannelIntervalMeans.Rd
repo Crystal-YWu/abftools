@@ -4,7 +4,7 @@
 \alias{ChannelIntervalMeans}
 \title{ChannelIntervalMeans calculates interval means of a list of abf objects}
 \usage{
-ChannelIntervalMeans(abf_list, intv_list, chan_id, na.rm = TRUE)
+ChannelIntervalMeans(abf_list, intv_list, channel = 1, na.rm = TRUE)
 }
 \arguments{
 \item{na.rm}{}

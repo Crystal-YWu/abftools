@@ -207,7 +207,7 @@ abf2_load <- function(filename, abf_title = NULL) {
     attr(data, "title") <- as.character(abf_title)
   attr(data, "mode") <- op_mode
 
-  attr(data, "ChannelNum") <- chan_num
+  #attr(data, "ChannelNum") <- chan_num
   attr(data, "ChannelName") <- chan_name
   attr(data, "ChannelUnit") <- chan_unit
   attr(data, "ChannelDesc") <- chan_desc

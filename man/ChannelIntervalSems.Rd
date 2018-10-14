@@ -4,7 +4,7 @@
 \alias{ChannelIntervalSems}
 \title{ChannelIntervalSems calculates interval SEM of a list of abf objects}
 \usage{
-ChannelIntervalSems(abf_list, intv_list, chan_id, na.rm = TRUE)
+ChannelIntervalSems(abf_list, intv_list, channel = 1, na.rm = TRUE)
 }
 \arguments{
 \item{na.rm}{}

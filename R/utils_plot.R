@@ -51,9 +51,8 @@ UniYLim <- function(abf_list, channel, intv_list = NULL) {
 melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NULL,
                      time_unit = "tick") {
 
-  d <- dim(abf)
-  n <- d[2]
-  nepi <- d[3]
+  n <- nPts(abf)
+  nepi <- nEpi(abf)
   chan_desc <- attr(abf, "ChannelDesc")[channel]
 
   data <- as.data.frame(abf, channel)

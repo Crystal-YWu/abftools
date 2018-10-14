@@ -1,0 +1,46 @@
+err <- function(func, msg) {
+
+  stop(paste0(func, ": ", msg))
+}
+
+err_abf_not_episodic <- function(func, msg) {
+
+  msg <- "abf object is not episodic."
+  err(func, msg)
+}
+
+err_class_abf <- function(func) {
+
+  msg <- "only support abf object."
+  err(func, msg)
+}
+
+err_class_abf_list <- function(func) {
+
+  msg <- "only support abf or a list of abf objects."
+  err(func, msg)
+}
+
+err_intv_pos <- function(func) {
+
+  msg <- "end position should be larger than start position."
+  err(func, msg)
+}
+
+err_id_current_chan <- function(func) {
+
+  msg <- "Failed to identify current channel id. Please provide manually."
+  err(func, msg)
+}
+
+err_id_voltage_chan <- function(func) {
+
+  msg <- "Failed to identify voltage channel id. Please provide manually."
+  err(func, msg)
+}
+
+err_epoch_name <- function(func) {
+
+  msg <- "Invalid epoch name."
+  err(func, msg)
+}

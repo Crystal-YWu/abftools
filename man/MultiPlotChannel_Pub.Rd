@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 MultiPlotChannel_Pub(abf_list, channel = 1, time_unit = "s",
-  title_label = FALSE, spacing = NULL, ...)
+  title_label = FALSE, spacing = 0, ...)
 }
 \arguments{
 \item{...}{}

@@ -20,14 +20,18 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
                                  backward_search = TRUE, strict_comp = TRUE) {
 
   #figure out current channel and voltage channel
-  if (current_channel == 0)
+  if (current_channel == 0) {
     current_channel <- GetFirstCurrentChan(abf)
-  if (voltage_channel == 0)
+  }
+  if (voltage_channel == 0) {
     voltage_channel <- GetFirstVoltageChan(abf)
-  if (is.na(current_channel))
-    stop("FindSamplingInterval: Failed to identify current channel id. Please provide manually.")
-  if (is.na(voltage_channel))
-    stop("FindSamplingInterval: Failed to identify voltage channel id. Please provide manually.")
+  }
+  if (is.na(current_channel)) {
+    err_id_current_chan("FindSamplingInterval")
+  }
+  if (is.na(voltage_channel)) {
+    err_id_voltage_chan("FindSamplingInterval")
+  }
 
   meta <- attr(abf, "meta")
   if (epoch_name == "auto") {
@@ -40,7 +44,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
     epoch <- GetEpochId(epoch_name)
   }
   if (is.na(epoch)) {
-    stop("FindSamplingInterval: Invalid epoch name.")
+    err_epoch_name("FindSamplingInterval")
   }
 
   #Default allowed voltage delta is 5% of voltage epoch level increment
@@ -50,7 +54,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
 
   #TODO: exclude intervals that are in irrelevant epochs
   #TODO: parse EpochPerDAC
-  pts_per_epi <- dim(abf)[2]
+  pts_per_epi <- nPts(abf)
   epoch_len <- meta$EpochPerDAC$lEpochInitDuration
   delta_pts <- pts_per_epi - sum(epoch_len)
   #pad extra pts to 1st epoch
@@ -128,10 +132,11 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
   f <- ifelse(strict_comp, score_all, score_mostly)
   best_score <- rep(Inf, nepi)
   best_idx <- 0
-  if (backward_search)
+  if (backward_search) {
     itr <- seq(nrow(intv), 1)
-  else
+  } else {
     itr <- seq_len(nrow(intv))
+  }
   for (i in itr) {
     mask <- seq(intv[i, 1], intv[i, 2])
     #in case only one episode is available
@@ -152,30 +157,17 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
 #' Title
 #'
 #' @param abf_list
-#' @param current_channel
-#' @param voltage_channel
-#' @param min_sampling_size
-#' @param max_sampling_size
-#' @param allowed_voltage_delta
-#' @param epoch_name
-#' @param backward_search
-#' @param strict_comp
+#' @param ...
 #'
 #' @return
 #' @export
 #'
 #' @examples
-FindAllSamplingInterval <- function(abf_list, current_channel = 0, voltage_channel = 0,
-                                    min_sampling_size = 0, max_sampling_size = 0,
-                                    allowed_voltage_delta = 0, epoch_name = "auto",
-                                    backward_search = TRUE, strict_comp = TRUE) {
+FindAllSamplingInterval <- function(abf_list, ...) {
 
   intv_list = list()
   for (i in seq_along(abf_list)) {
-    intv_list[[i]] <- FindSamplingInterval(abf_list[[i]], current_channel, voltage_channel,
-                                           min_sampling_size, max_sampling_size,
-                                           allowed_voltage_delta, epoch_name,
-                                           backward_search, strict_comp)
+    intv_list[[i]] <- FindSamplingInterval(abf_list[[i]], ...)
   }
 
   return(intv_list)
@@ -269,14 +261,18 @@ AllSamples_IVSummary <- function(abf_list, intv_list, current_channel = 0,
                                  voltage_channel = 0) {
 
   #figure out current channel and voltage channel
-  if (current_channel == 0)
+  if (current_channel == 0) {
     current_channel <- GetFirstCurrentChan(abf)
-  if (voltage_channel == 0)
+  }
+  if (voltage_channel == 0) {
     voltage_channel <- GetFirstVoltageChan(abf)
-  if (is.na(current_channel))
-    stop("AllSamples_IVSummary: Failed to identify current channel id. Please provide manually.")
-  if (is.na(voltage_channel))
-    stop("AllSamples_IVSummary: Failed to identify voltage channel id. Please provide manually.")
+  }
+  if (is.na(current_channel)) {
+    err_id_current_chan("AllSamples_IVSummary")
+  }
+  if (is.na(voltage_channel)) {
+    err_id_voltage_chan("AllSamples_IVSummary")
+  }
 
   current_means <- ChannelIntervalMeans(abf_list, intv_list, current_channel)
   voltage_means <- ChannelIntervalMeans(abf_list, intv_list, voltage_channel)

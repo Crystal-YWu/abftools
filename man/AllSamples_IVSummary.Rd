@@ -4,11 +4,11 @@
 \alias{AllSamples_IVSummary}
 \title{AllSamples_IVSummary calculates average current of a list of abf objects, within given intervals}
 \usage{
-AllSamples_IVSummary(abf_list, intv_list, current_chan_id = 0,
-  voltage_chan_id = 0)
+AllSamples_IVSummary(abf_list, intv_list, current_channel = 0,
+  voltage_channel = 0)
 }
 \arguments{
-\item{voltage_chan_id}{}
+\item{voltage_channel}{}
 }
 \description{
 AllSamples_IVSummary calculates average current of a list of abf objects, within given intervals

@@ -4,13 +4,10 @@
 \alias{FindAllSamplingInterval}
 \title{Title}
 \usage{
-FindAllSamplingInterval(abf_list, current_chan_id = 0,
-  voltage_chan_id = 0, min_sampling_size = 0, max_sampling_size = 0,
-  allowed_voltage_delta = 0, epoch_name = "auto",
-  backward_search = TRUE, strict_comp = TRUE)
+FindAllSamplingInterval(abf_list, ...)
 }
 \arguments{
-\item{strict_comp}{}
+\item{...}{}
 }
 \description{
 Title
