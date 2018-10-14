@@ -1,8 +1,8 @@
 #' FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object
 #'
 #' @param abf an abf object
-#' @param current_chan_id OPTIONAL, channel id for current data
-#' @param voltage_chan_id OPTIONAL, channel id for voltage data
+#' @param current_channel OPTIONAL, channel id for current data
+#' @param voltage_channel OPTIONAL, channel id for voltage data
 #' @param min_sampling_size OPTIONAL, min size in points of a sampling interval
 #' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage W.R.T epoch per DAC setting
 #' @param backward_search OPTIONAL, perform search along backward direction
@@ -14,19 +14,19 @@
 #' @export
 #'
 #' @examples
-FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
+FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
                                  min_sampling_size = 0, max_sampling_size = 0,
                                  allowed_voltage_delta = 0, epoch_name = "auto",
                                  backward_search = TRUE, strict_comp = TRUE) {
 
   #figure out current channel and voltage channel
-  if (current_chan_id == 0)
-    current_chan_id <- GetFirstCurrentChan(abf)
-  if (voltage_chan_id == 0)
-    voltage_chan_id <- GetFirstVoltageChan(abf)
-  if (is.na(current_chan_id))
+  if (current_channel == 0)
+    current_channel <- GetFirstCurrentChan(abf)
+  if (voltage_channel == 0)
+    voltage_channel <- GetFirstVoltageChan(abf)
+  if (is.na(current_channel))
     stop("FindSamplingInterval: Failed to identify current channel id. Please provide manually.")
-  if (is.na(voltage_chan_id))
+  if (is.na(voltage_channel))
     stop("FindSamplingInterval: Failed to identify voltage channel id. Please provide manually.")
 
   meta <- attr(abf, "meta")
@@ -82,13 +82,13 @@ FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
   v <- v_init + v_incr * (epi - 1L)
 
   #Find voltage windows that fit into allowed voltages
-  intv <- GetAllowedWindows(abf[voltage_chan_id, ,epi[1]], v[1], allowed_voltage_delta,
+  intv <- GetAllowedWindows(abf[voltage_channel, ,epi[1]], v[1], allowed_voltage_delta,
                             min_sampling_size)
   nepi <- length(epi)
   #in case only one episode is available
   if (nepi > 1) {
     for (i in 2:length(epi)) {
-      win <- GetAllowedWindows(abf[voltage_chan_id, ,epi[i]], v[i], allowed_voltage_delta,
+      win <- GetAllowedWindows(abf[voltage_channel, ,epi[i]], v[i], allowed_voltage_delta,
                                min_sampling_size)
       intv <- GetWindowsOverlap(intv, win)
     }
@@ -103,7 +103,7 @@ FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
     s <- sprintf("FindSamplingInterval: No stable voltage interval found. Returning NA.
     allowed_voltage_delta = %.3f %s
     min_sampling_size = %d pts",
-                 allowed_voltage_delta, attr(abf, "ChannelUnit")[voltage_chan_id], min_sampling_size)
+                 allowed_voltage_delta, attr(abf, "ChannelUnit")[voltage_channel], min_sampling_size)
     warning(s)
     return(rep(NA, 3))
   }
@@ -114,7 +114,7 @@ FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
       s <- sprintf("FindSamplingInterval: No stable voltage interval found. Returning NA.
     allowed_voltage_delta = %.3f %s
     min_sampling_size = %d pts",
-                   allowed_voltage_delta, attr(abf, "ChannelUnit")[voltage_chan_id], min_sampling_size)
+                   allowed_voltage_delta, attr(abf, "ChannelUnit")[voltage_channel], min_sampling_size)
       warning(s)
       return(rep(NA, 3))
     }
@@ -136,9 +136,9 @@ FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
     mask <- seq(intv[i, 1], intv[i, 2])
     #in case only one episode is available
     if (nepi > 1) {
-      score <- colSds(abf[current_chan_id, mask, epi], na.rm = TRUE)
+      score <- colSds(abf[current_channel, mask, epi], na.rm = TRUE)
     } else {
-      score <- sd(abf[current_chan_id, mask, epi], na.rm = TRUE)
+      score <- sd(abf[current_channel, mask, epi], na.rm = TRUE)
     }
     if (f(score, best_score)) {
       best_score <- score
@@ -152,8 +152,8 @@ FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
 #' Title
 #'
 #' @param abf_list
-#' @param current_chan_id
-#' @param voltage_chan_id
+#' @param current_channel
+#' @param voltage_channel
 #' @param min_sampling_size
 #' @param max_sampling_size
 #' @param allowed_voltage_delta
@@ -165,14 +165,14 @@ FindSamplingInterval <- function(abf, current_chan_id = 0, voltage_chan_id = 0,
 #' @export
 #'
 #' @examples
-FindAllSamplingInterval <- function(abf_list, current_chan_id = 0, voltage_chan_id = 0,
+FindAllSamplingInterval <- function(abf_list, current_channel = 0, voltage_channel = 0,
                                     min_sampling_size = 0, max_sampling_size = 0,
                                     allowed_voltage_delta = 0, epoch_name = "auto",
                                     backward_search = TRUE, strict_comp = TRUE) {
 
   intv_list = list()
   for (i in seq_along(abf_list)) {
-    intv_list[[i]] <- FindSamplingInterval(abf_list[[i]], current_chan_id, voltage_chan_id,
+    intv_list[[i]] <- FindSamplingInterval(abf_list[[i]], current_channel, voltage_channel,
                                            min_sampling_size, max_sampling_size,
                                            allowed_voltage_delta, epoch_name,
                                            backward_search, strict_comp)
@@ -185,82 +185,101 @@ FindAllSamplingInterval <- function(abf_list, current_chan_id = 0, voltage_chan_
 #'
 #' @param abf_list
 #' @param intv_list
-#' @param chan_id
+#' @param channel
 #' @param na.rm
 #'
 #' @return
 #' @export
 #'
 #' @examples
-ChannelIntervalMeans <- function(abf_list, intv_list, chan_id, na.rm = TRUE) {
+ChannelIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colMeans(x, na.rm)
 
-  return(ChannelInterval_f(abf_list, intv_list, chan_id, f))
+  #na.rm is problematic here since na.rm make colX functions return NaN for removed
+  #episodes, so we replace those with NA
+
+  mx <- ChannelInterval_f(abf_list, intv_list, channel, f)
+  if (na.rm)
+    mx[is.nan(mx)] <- NA
+
+  return(mx)
 }
 
 #' ChannelIntervalSds calculates interval standard deviations of a list of abf objects
 #'
 #' @param abf_list
 #' @param intv_list
-#' @param chan_id
+#' @param channel
 #' @param na.rm
 #'
 #' @return
 #' @export
 #'
 #' @examples
-ChannelIntervalSds <- function(abf_list, intv_list, chan_id, na.rm = TRUE) {
+ChannelIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colSds(x, na.rm)
 
-  return(ChannelInterval_f(abf_list, intv_list, chan_id, f))
+  #na.rm is problematic here since na.rm make colX functions return NaN for removed
+  #episodes, so we replace those with NA
+  mx <- ChannelInterval_f(abf_list, intv_list, channel, f)
+  if (na.rm)
+    mx[is.nan(mx)] <- NA
+
+  return(mx)
 }
 
 #' ChannelIntervalSems calculates interval SEM of a list of abf objects
 #'
 #' @param abf_list
 #' @param intv_list
-#' @param chan_id
+#' @param channel
 #' @param na.rm
 #'
 #' @return
 #' @export
 #'
 #' @examples
-ChannelIntervalSems <- function(abf_list, intv_list, chan_id, na.rm = TRUE) {
+ChannelIntervalSems <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colSems(x, na.rm)
 
-  return(ChannelInterval_f(abf_list, intv_list, chan_id, f))
+  #na.rm is problematic here since na.rm make colX functions return NaN for removed
+  #episodes, so we replace those with NA
+  mx <- ChannelInterval_f(abf_list, intv_list, channel, f)
+  if (na.rm)
+    mx[is.nan(mx)] <- NA
+
+  return(mx)
 }
 
 #' AllSamples_IVSummary calculates average current of a list of abf objects, within given intervals
 #'
 #' @param abf_list
 #' @param intv_list
-#' @param current_chan_id
-#' @param voltage_chan_id
+#' @param current_channel
+#' @param voltage_channel
 #'
 #' @return
 #' @export
 #'
 #' @examples
-AllSamples_IVSummary <- function(abf_list, intv_list, current_chan_id = 0,
-                                 voltage_chan_id = 0) {
+AllSamples_IVSummary <- function(abf_list, intv_list, current_channel = 0,
+                                 voltage_channel = 0) {
 
   #figure out current channel and voltage channel
-  if (current_chan_id == 0)
-    current_chan_id <- GetFirstCurrentChan(abf)
-  if (voltage_chan_id == 0)
-    voltage_chan_id <- GetFirstVoltageChan(abf)
-  if (is.na(current_chan_id))
+  if (current_channel == 0)
+    current_channel <- GetFirstCurrentChan(abf)
+  if (voltage_channel == 0)
+    voltage_channel <- GetFirstVoltageChan(abf)
+  if (is.na(current_channel))
     stop("AllSamples_IVSummary: Failed to identify current channel id. Please provide manually.")
-  if (is.na(voltage_chan_id))
+  if (is.na(voltage_channel))
     stop("AllSamples_IVSummary: Failed to identify voltage channel id. Please provide manually.")
 
-  current_means <- ChannelIntervalMeans(abf_list, intv_list, current_chan_id)
-  voltage_means <- ChannelIntervalMeans(abf_list, intv_list, voltage_chan_id)
+  current_means <- ChannelIntervalMeans(abf_list, intv_list, current_channel)
+  voltage_means <- ChannelIntervalMeans(abf_list, intv_list, voltage_channel)
 
   mean_current_means <- colMeans(current_means, na.rm = TRUE)
   mean_voltage_means <- colMeans(voltage_means, na.rm = TRUE)
@@ -372,11 +391,18 @@ SplitLargeWindow <- function(windows, max_window_size) {
   win <- cbind(idx_start, idx_end, win_length)
   return(win)
 }
-ChannelInterval_f <- function(abf_list, intv_list, chan_id, f) {
+
+#This function applies episodic values in given by the intv_list to function f
+#and returns a matrix of the results of f. f should accept na.rm
+ChannelInterval_f <- function(abf_list, intv_list, channel, f) {
 
   n <- length(abf_list)
-  nepi <- EpisodesPerChannel(abf_list[[1]])
-
+  nepi <- 0L
+  #nepi of every abf object in an abf_list is supposed to be the same
+  #In case of different sizes, we use the largest nepi as ncol
+  for (i in seq_along(abf_list)) {
+    nepi <- max(nepi, EpisodesPerChannel(abf_list[[i]]))
+  }
   m <- matrix(NA, nrow = n, ncol = nepi)
   colnames(m) <- paste0("epi", seq_len(nepi))
 
@@ -385,7 +411,11 @@ ChannelInterval_f <- function(abf_list, intv_list, chan_id, f) {
       next
     } else {
       mask <- seq(intv_list[[i]][1], intv_list[[i]][2])
-      ret <- f(abf_list[[i]][chan_id, mask, ])
+      #Do not use AvailEpisode to extract channel info, so we always have correct
+      #episodic order
+      ret <- f(abf_list[[i]][channel, mask, ])
+      #Results are padded to left
+      nepi <- EpisodesPerChannel(abf_list[[i]])
       for (j in seq(nepi))
         m[i, j] <- ret[j]
     }
@@ -397,11 +427,13 @@ ChannelInterval_f <- function(abf_list, intv_list, chan_id, f) {
 #Is this possible to optimise?
 within_interval <- function(x, intv) intv[1] <= x && x <= intv[2]
 
+#strict compare: all of s1 are smaller than best_s
 score_all <- function(s1, best_s) {
 
   return(all(s1 < best_s))
 }
-
+#fuzzy compare: most of s1 are smaller than best_s and the worst of s1 is smaller
+#than corresponding element of best_s
 score_mostly <- function(s1, best_s) {
 
   x <- (s1 < best_s)
