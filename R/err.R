@@ -5,25 +5,31 @@ err <- function(func, msg) {
 
 err_abf_not_episodic <- function(func, msg) {
 
-  msg <- "abf object is not episodic."
+  msg <- "The abf object is not episodic."
   err(func, msg)
 }
 
 err_class_abf <- function(func) {
 
-  msg <- "only support abf object."
+  msg <- "Only abf object is supported."
   err(func, msg)
 }
 
 err_class_abf_list <- function(func) {
 
-  msg <- "only support abf or a list of abf objects."
+  msg <- "Only abf or a list of abf objects are supported"
+  err(func, msg)
+}
+
+err_class_abf_protocol <- function(func) {
+
+  msg <- "Only abf or abf protocol object are supported."
   err(func, msg)
 }
 
 err_intv_pos <- function(func) {
 
-  msg <- "end position should be larger than start position."
+  msg <- "End position should be larger than start position."
   err(func, msg)
 }
 
