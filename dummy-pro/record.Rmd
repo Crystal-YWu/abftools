@@ -1,0 +1,65 @@
+---
+title: "Protocol Probe"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Fast rate: 10000 Hz <---> Protocol$fADCSequenceInterval: 100 (us)
+
+First holding : 1/64 floor total sample points per episode
+Last holding : 1/64 floor total sample points per episode
+(Not sure if 1/64 is related to Protocol$nLevelHysteresis, which is always set to 64)
+Epoch arragement:
+[First holding][Actual epochs][Last holding][Remaining samples (irrelevant)]
+
+---------------------WAVEFORM---------------------
+Type:
+Step 1
+Ramp 2
+Pulse 3
+Trngl 4
+Cos 5
+Biphsc 7
+
+fEpochInitLevel <---> Vhi 1st episode
+fEpochLevelInc <---> delta voltage of Vhi per episode
+lEpochInitDuration <---> total length of epoch (pts) 1st episode
+lEpochDurationInc <---> delta pts of lEpochInitDuration per episode
+previous epoch end level <---> Vprev
+
+Step:
+step cycle: Vhi
+
+Ramp:
+ramp cycle: Vprev-(linear)-Vhi
+
+Pulse:
+lEpochPulsePeriod <---> length per pulse cycle (pts)
+lEpochPulseWidth <---> length per pulse Vhi (pts)
+pulse cycle: Vhi-Vprev
+
+Biphsc:
+Vlo = 2Vprev - hi (min/max at instrument range)
+lEpochPulsePeriod <---> length per biphsc cycle (pts)
+lEpochPulseWidth <---> length per biphsc Vhi-Vlo (pts)
+biphsc cycle: Vhi-Vlo-Vprev
+              
+
+Trng:
+fEpochInitLevel <---> Vhi
+previous epoch end level <---> Vprev
+lEpochPulsePeriod <---> length per trng cycle (pts)
+lEpochPulseWidth <---> length Vprev-(linear)-Vhi cycle (pts)
+trng cycle: Vprev----(linear)----Vhi----(linear)----Vprev
+            |---lEpochPulseWidth---|---Remaining Pts----|
+            |--------------lEpochPulseWidth-------------|
+
+Cos:
+cos cycle: Vprev--(cos)--Vhi--(cos)--Vprev
+
+
+---------------------MISC---------------------
