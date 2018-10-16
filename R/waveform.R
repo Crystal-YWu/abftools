@@ -109,6 +109,66 @@ GetWaveform <- function(abf, episodes = 0) {
   return(mx)
 }
 
+#' Title
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+AttachWaveform <- function(abf) {
+
+  wf <- GetWaveform(abf)
+
+  #craft data
+  d <- dim(abf)
+  #add extra channel
+  d[1] <- d[1] + 1L
+  new_abf <- array(NA, dim = d)
+
+  #copy abf data
+  nchan <- nChan(abf)
+  new_abf[1:nchan, ,] <- abf
+  new_abf[nchan + 1, ,] <- wf
+  #craft fake meta
+  meta <- get_meta(abf)
+  #add an extra ADC record to fake a channel.
+  meta$ADC <- rbind(meta$ADC, meta$ADC[nchan, ])
+  nchan <- nchan + 1
+
+  #fill some infomation, make the meta a bit more robust
+  meta$ADC$nADCNum[nchan] <- nchan - 1
+  #actual ADC instrument settings don't matter since all data is already processed
+  #after loading
+  #figure out waveform unit
+  dac <- GetWaveformDAC(abf)
+  idx_name <- meta$DAC$lDACChannelNameIndex[dac]
+  idx_unit <- meta$DAC$lDACChannelUnitsIndex[dac]
+  dac_name <- meta$Strings[idx_name]
+  dac_unit <- meta$Strings[idx_unit]
+
+  meta$ADC$lADCChannelNameIndex <- idx_name
+  meta$ADC$lADCUnitsIndex <- idx_unit
+
+  npts <- nPts(abf)
+  meta$Protocol$lNumSamplesPerEpisode <- npts * nchan
+
+  #copy attr
+  attr(new_abf, "class") <- "abf"
+  attr(new_abf, "title") <- GetTitle(abf)
+  attr(new_abf, "mode") <- GetMode(abf)
+
+  attr(new_abf, "ChannelName") <- c(GetChannelName(abf), dac_name)
+  attr(new_abf, "ChannelUnit") <- c(GetChannelUnit(abf), dac_unit)
+  attr(new_abf, "ChannelDesc") <- c(GetChannelDesc(abf), "Waveform")
+  attr(new_abf, "SamplingInterval") <- GetSamplingIntv(abf)
+
+  attr(new_abf, "meta") <- meta
+
+  return(new_abf)
+}
+
 wf_step <- function(len, Vhi) {
   #waveform 1
 
