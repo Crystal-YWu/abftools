@@ -83,9 +83,13 @@ abf2_load <- function(filename, abf_title = NULL) {
       chan_name[i] <- section$Strings[[idx]]
       idx <- section$ADC$lADCUnitsIndex[i]
       chan_unit[i] <- section$Strings[[idx]]
-      if (endsWith(chan_unit[i], "V")) {
+      if (endsWith(chan_unit[i], "V") ||
+          stri_detect_fixed(chan_unit[i], "vol") ||
+          stri_detect_fixed(chan_unit[i], "Vol")) {
         chan_desc[i] <- "Voltage"
-      } else if (endsWith(chan_unit[i], "A")) {
+      } else if (endsWith(chan_unit[i], "A") ||
+                 stri_detect_fixed(chan_unit[i], "amp") ||
+                 stri_detect_fixed(chan_unit[i], "Amp")) {
         chan_desc[i] <- "Current"
       } else {
         chan_desc[i] <- chan_name[i]
