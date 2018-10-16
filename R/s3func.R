@@ -14,22 +14,18 @@ print.abf <- function(x, ...) {
 `[[.abf` <- function(x, channel) {
 
   d <- dim(x)
-  if (length(channel) > 1L)
+  if (length(channel) > 1)
     stop("Extract channel: you can only select one channel.")
-  if (channel > d[1L])
+  if (channel > d[1])
     stop(paste0("Extract channel: channel ", channel, " not available."))
-
-  #when using [[ to extract, we use 0 based index so the channel matches that was
-  #set in pClamp software
-  channel <- channel + 1L
 
   epi <- GetAvailEpisodes(x)
   #in case of only one episode
-  if (length(epi) == 1L) {
+  if (length(epi) == 1) {
     #1d vector
     df <- x[channel, ,epi]
     #2d matrix
-    df <- matrix(df, ncol = 1L)
+    df <- matrix(df, ncol = 1)
   } else {
     #2d matrix
     df <- x[channel, , epi]
@@ -48,7 +44,7 @@ print.abf <- function(x, ...) {
 #' @export
 #'
 #' @examples
-as.data.frame.abf <- function(x, channel = 0L) {
+as.data.frame.abf <- function(x, channel = 1) {
 
   df <- x[[channel]]
 
