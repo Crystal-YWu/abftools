@@ -53,28 +53,26 @@ GetWaveformEpdac <- function(abf, wf_dac) {
 #' Title
 #'
 #' @param abf
-#' @param epi
 #' @param wf_dac
 #'
 #' @return
 #' @export
 #'
 #' @examples
-GetEpochIdx <- function(abf, episodes, wf_dac = 0) {
+GetEpochWindows <- function(abf, wf_dac = 0) {
 
-  if (wf_dac == 0) {
+  if (wf_dac[1] == 0) {
     wf_dac <- GetWaveformDAC(abf)
   }
   if (length(wf_dac) == 0L) {
-    err_wf_dac("GetEpochIdx")
+    err_wf_dac("GetEpochWindows")
   }
-  #only use first DAC channel
-  wf_dac <- wf_dac[1]
+  wf_dac <- first_elem(wf_dac)
 
   #EpochPerDAC table
   epdac <- GetWaveformEpdac(abf, wf_dac)
   if (nrow(epdac) == 0) {
-    err_wf_dac("GetEpochIdx")
+    err_wf_dac("GetEpochWindows_epoch")
   }
 
   #length of first holding
@@ -84,16 +82,31 @@ GetEpochIdx <- function(abf, episodes, wf_dac = 0) {
   #length of each epoch
   init_len <- epdac$lEpochInitDuration
   incr_len <- epdac$lEpochDurationInc
-  epoch_len <- init_len + incr_len * (episodes - 1L)
-  #shift epoch end idx accroding to first holding length
-  epoch_end <- cumsum(epoch_len) + holding_len
-  epoch_start <- epoch_end - epoch_len + 1
 
-  ret <- cbind(epoch_start, epoch_end, epoch_len)
-  return(ret)
+  #pre-allocate win
+  nepi <- nEpi(abf)
+  nepoch <- nrow(epdac)
+  win <- array(0L, dim = c(nepi, nepoch, 3L))
+
+  for (epi in seq.int(nepi)) {
+
+    epoch_len <- init_len + incr_len * (epi - 1L)
+    #shift epoch end idx accroding to first holding length
+    epoch_end <- cumsum(epoch_len) + holding_len
+    epoch_start <- epoch_end - epoch_len + 1L
+
+    win[epi, , 1L] <- epoch_start
+    win[epi, , 2L] <- epoch_end
+    win[epi, , 3L] <- epoch_len
+
+  }
+
+  return(win)
 }
 
-CmpEpoch_c <- function(abf, episodes, const, delta, abs_delta = T)
+CmpEpoch_c <- function(abf, episodes, const, delta, abs_delta = T) {
+
+}
 
 CmpEpoch_wf <- function(abf, episodes, wf_dac, delta, abs_delta = T) {
 

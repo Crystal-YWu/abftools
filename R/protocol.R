@@ -43,7 +43,7 @@ GetPointsPerEpisode <- function(abf) {
 
   mode <- GetMode(abf)
   if (mode == 3L) {
-    ret <- dim(abf)[2L]
+    ret <- dim(abf)[2]
   } else {
     meta <- get_meta(abf)
     ret <- meta$Protocol$lNumSamplesPerEpisode %/% GetNumOfChannel(abf)

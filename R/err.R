@@ -86,3 +86,9 @@ err_epi <- function(func) {
   msg <- "Invalid episode number."
   err(func, msg)
 }
+
+err_wrong_arg_num <- function(func, additional = "") {
+
+  msg <- paste0("Wrong number of arguments. ", additional)
+  err(func, msg)
+}

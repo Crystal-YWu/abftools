@@ -344,6 +344,17 @@ SetIntv <- function(intv, startPos, endPos) {
   }))
 }
 
+first_elem <- function(x) {
+
+  x_name <- deparse(substitute(x))
+  if (length(x) > 1L) {
+    warning(paste0(x_name,
+                   " has length > 1 and only the first element will be used."))
+  }
+
+  return(x[1])
+}
+
 copy_paste_place_holder <- function() {
   if (class(abf) == "abf") {
   } else if (AllAbf(abf)) {
