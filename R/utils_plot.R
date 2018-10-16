@@ -59,7 +59,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
   ctick <- seq(from = 1, to = n, by = sampling_ratio)
   ctime <- TickToTime(abf, time_unit, ctick)
   #select rows by ticks
-  df <- data[ctick, ]
+  df <- data[ctick, , drop = FALSE]
   if ((sampling_ratio > 1L) && !is.null(sampling_func)) {
     #apply sampling function
     for (i in 1:(length(ctick) - 1)) {

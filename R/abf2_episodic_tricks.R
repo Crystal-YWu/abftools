@@ -79,7 +79,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
     max_sampling_size = max(s1, s2)
 
   #Collect available episodes
-  epi <- AvailEpisodes(abf)
+  epi <- GetAvailEpisodes(abf)
   #Calculate corresponding target voltage for each episode
   v_init <- meta$EpochPerDAC$fEpochInitLevel[epoch]
   v_incr <- meta$EpochPerDAC$fEpochLevelInc[epoch]
@@ -397,7 +397,7 @@ ChannelInterval_f <- function(abf_list, intv_list, channel, f) {
   #nepi of every abf object in an abf_list is supposed to be the same
   #In case of different sizes, we use the largest nepi as ncol
   for (i in seq_along(abf_list)) {
-    nepi <- max(nepi, EpisodesPerChannel(abf_list[[i]]))
+    nepi <- max(nepi, nEpi(abf_list[[i]]))
   }
   m <- matrix(NA, nrow = n, ncol = nepi)
   colnames(m) <- paste0("epi", seq_len(nepi))
@@ -411,7 +411,7 @@ ChannelInterval_f <- function(abf_list, intv_list, channel, f) {
       #episodic order
       ret <- f(abf_list[[i]][channel, mask, ])
       #Results are padded to left
-      nepi <- EpisodesPerChannel(abf_list[[i]])
+      nepi <- nEpi(abf_list[[i]])
       for (j in seq(nepi))
         m[i, j] <- ret[j]
     }

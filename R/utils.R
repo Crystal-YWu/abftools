@@ -34,88 +34,6 @@ colSems <- function(df, na.rm = FALSE) {
   return(sds / sqn)
 }
 
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-NumOfChannel <- function(abf) {
-
-  d <- dim(abf)
-
-  return(d[1])
-}
-
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-EpisodesPerChannel <- function(abf) {
-
-  d <- dim(abf)
-  return(d[3])
-}
-
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-PointsPerEpisode <- function(abf) {
-
-  d <- dim(abf)
-  return(d[2])
-}
-
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-nChan <- function(abf) {
-
-  return(NumOfChannel(abf))
-}
-
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-nEpi <- function(abf) {
-
-  return(EpisodesPerChannel(abf))
-}
-
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-nPts <- function(abf) {
-
-  return(PointsPerEpisode(abf))
-}
-
 AllAbf <- function(x) {
 
   if (class(x) != "list")
@@ -243,11 +161,11 @@ RemoveEpisodes <- function(abf, epi) {
 #' @export
 #'
 #' @examples
-AvailEpisodes <- function(abf) {
+GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {
     epi = c()
-    for (i in seq_len(EpisodesPerChannel(x)))
+    for (i in seq.int(nEpi(x)))
       if (any(!is.na(x[1, , i])))
         epi = c(epi, i)
 
@@ -259,7 +177,7 @@ AvailEpisodes <- function(abf) {
   } else if (AllAbf(abf)) {
     return(lapply(abf, f))
   } else {
-    err_class_abf_list("AvailEpisodes")
+    err_class_abf_list("GetAvailEpisodes")
   }
 
 }

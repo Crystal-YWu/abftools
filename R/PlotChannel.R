@@ -98,7 +98,7 @@ PeekChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, ratio = 50,
 CollectAllChannel <- function(abf, colour, ...) {
 
   p <- list()
-  n <- attr(abf, "ChannelNum")
+  n <- nChan(abf)
 
   for (i in seq(n)) {
     p[[i]] <- PlotChannel(abf, i, colour, ...)
@@ -172,7 +172,7 @@ PeekAllChannel_V <- function(abf, colour = FALSE, ratio = 50, ...) {
 CollectAllChannel_Intv <- function(abf, intv, colour, ...) {
 
   p <- list()
-  n <- attr(abf, "ChannelNum")
+  n <- nChan(abf)
 
   for (i in seq(n)) {
     p[[i]] <- PlotChannel_Intv(abf, intv, i, colour, ...)
