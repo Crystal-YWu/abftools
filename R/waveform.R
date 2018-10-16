@@ -38,7 +38,6 @@ GetWaveform <- function(abf, episodes = 0) {
   #values at the moment.
   #throw a warning at this stage
   wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac]
-  warning("GetWaveform: Instrument holding is assumed in the generated waveform.")
   npts <- nPts(abf)
   if (nepi == 1L) {
     mx <- rep(wf_holding, npts)
