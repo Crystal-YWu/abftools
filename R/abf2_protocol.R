@@ -2,13 +2,13 @@
 
 #' Title
 #'
-#' @param fname
+#' @param filename
 #'
 #' @return
 #' @export
 #'
 #' @examples
-abf2_load_pro <- function(filename) {
+abf2_load_protocol <- function(filename) {
 
   fp <- file(filename, "rb")
 
