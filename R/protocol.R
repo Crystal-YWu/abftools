@@ -41,7 +41,7 @@ GetEpisodesPerChannel <- function(abf) {
 #' @examples
 GetPointsPerEpisode <- function(abf) {
 
-  mode <- attr(abf, "mode")
+  mode <- GetMode(abf)
   if (mode == 3L) {
     ret <- dim(abf)[2L]
   } else {

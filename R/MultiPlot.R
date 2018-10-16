@@ -15,7 +15,7 @@ MultiPlotP <- function(abf_list, channel, colour, time_unit,
   if (has_title) {
     for (i in seq(abf_list)) {
       title_s <- paste0(ifelse(num_label, paste0(i, ". "), ""),
-                        ifelse(title_label, attr(abf_list[[i]], "title"), ""))
+                        ifelse(title_label, GetTitle(abf_list[[i]]), ""))
       p[[i]] <- p[[i]] + ggtitle(title_s)
     }
   }

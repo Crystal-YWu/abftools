@@ -65,7 +65,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
 
   #Default minimal sampling size is 10ms/10000us scan
   if (min_sampling_size == 0) {
-    min_sampling_size <- floor(10000.0 / attr(abf, "SamplingInterval"))
+    min_sampling_size <- floor(10000.0 / GetSamplingIntv(abf))
   }
   #Force min sampling size to 3, so that sd makes sense
   if (min_sampling_size < 3) {
@@ -107,7 +107,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
     s <- sprintf("FindSamplingInterval: No stable voltage interval found. Returning NA.
     allowed_voltage_delta = %.3f %s
     min_sampling_size = %d pts",
-                 allowed_voltage_delta, attr(abf, "ChannelUnit")[voltage_channel], min_sampling_size)
+                 allowed_voltage_delta, GetChannelUnit(abf)[voltage_channel], min_sampling_size)
     warning(s)
     return(rep(NA, 3))
   }
@@ -118,7 +118,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
       s <- sprintf("FindSamplingInterval: No stable voltage interval found. Returning NA.
     allowed_voltage_delta = %.3f %s
     min_sampling_size = %d pts",
-                   allowed_voltage_delta, attr(abf, "ChannelUnit")[voltage_channel], min_sampling_size)
+                   allowed_voltage_delta, GetChannelUnit(abf)[voltage_channel], min_sampling_size)
       warning(s)
       return(rep(NA, 3))
     }
@@ -295,8 +295,8 @@ GetEpochId <- function(epoch_name) {
 
   return(epoch)
 }
-GetFirstVoltageChan <- function(abf) match("Voltage", attr(abf,"ChannelDesc"))
-GetFirstCurrentChan <- function(abf) match("Current", attr(abf,"ChannelDesc"))
+GetFirstVoltageChan <- function(abf) match("Voltage", GetChannelDesc(abf))
+GetFirstCurrentChan <- function(abf) match("Current", GetChannelDesc(abf))
 GetAllowedWindows <- function(x, target, delta, min_window_size) {
 
   t_range <- c(target - abs(delta), target + abs(delta))

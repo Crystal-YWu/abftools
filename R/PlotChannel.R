@@ -1,7 +1,7 @@
 GetChannelP <- function(abf, channel, ...) {
 
   df <- melt(abf, channel, ...)
-  chan_desc <- attr(abf, "ChannelDesc")[channel]
+  chan_desc <- GetChannelDesc(abf)[channel]
 
   p <- ggplot(df, aes_string("time", chan_desc)) + theme_bw()
 
@@ -29,8 +29,8 @@ PlotChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ..
     p <- p + geom_line(aes_string(group = "Episode"))
   }
 
-  ydesc <- attr(abf, "ChannelDesc")[channel]
-  yunit <- attr(abf, "ChannelUnit")[channel]
+  ydesc <- GetChannelDesc(abf)[channel]
+  yunit <- GetChannelUnit(abf)[channel]
   ylabel <- paste0(ydesc, " (", yunit, ")")
   xdesc <- "Time"
   xunit <- time_unit

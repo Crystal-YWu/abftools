@@ -243,6 +243,71 @@ SetTitle <- function(abf, title) {
 
 #' Title
 #'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetChannelName <- function(abf) {
+
+  return(attr(abf, "ChannelName"))
+}
+
+#' Title
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetChannelUnit <- function(abf) {
+
+  return(attr(abf, "ChannelUnit"))
+}
+
+#' Title
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetChannelDesc <- function(abf) {
+
+  return(attr(abf, "ChannelDesc"))
+}
+
+#' Title
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetSamplingIntv <- function(abf) {
+
+  return(attr(abf, "SamplingInterval"))
+}
+
+#' Title
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetMode <- function(abf) {
+
+  return(attr(abf, "mode"))
+}
+
+#' Title
+#'
 #' @param intv
 #' @param startPos
 #' @param endPos

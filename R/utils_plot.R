@@ -53,7 +53,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
 
   n <- nPts(abf)
   nepi <- nEpi(abf)
-  chan_desc <- attr(abf, "ChannelDesc")[channel]
+  chan_desc <- GetChannelDesc(abf)[channel]
 
   data <- as.data.frame(abf, channel)
   ctick <- seq(from = 1, to = n, by = sampling_ratio)
@@ -83,9 +83,9 @@ TickToTime <- function(abf, time_unit, ctick) {
 
   ctime <- switch(time_unit,
                   tick = ctick,
-                  us = ctick * attr(abf, "SamplingInterval"),
-                  ms = ctick * attr(abf, "SamplingInterval") / 1000,
-                  s  = ctick * attr(abf, "SamplingInterval") / 1000 / 1000,
+                  us = ctick * GetSamplingIntv(abf),
+                  ms = ctick * GetSamplingIntv(abf) / 1000,
+                  s  = ctick * GetSamplingIntv(abf) / 1000 / 1000,
                   stop("Convert sampling tick to time scale: time_unit can only be tick, us, ms or s."))
 
   return(ctime)
