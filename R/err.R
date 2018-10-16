@@ -44,3 +44,27 @@ err_epoch_name <- function(func) {
   msg <- "Invalid epoch name."
   err(func, msg)
 }
+
+err_wf_mode <- function(func) {
+
+  msg <- "Episodic stimulation (mode 5) abf object requied."
+  err(func, msg)
+}
+
+err_wf_dac <- function(func) {
+
+  msg <- "Waveform DAC channel not found."
+  err(func, msg)
+}
+
+err_wf_support <- function(func) {
+
+  msg <- "Waveform source not supported."
+  err(func, msg)
+}
+
+err_wf_type <- function(func) {
+
+  msg <- "Unsupported waveform type."
+  err(func, msg)
+}
