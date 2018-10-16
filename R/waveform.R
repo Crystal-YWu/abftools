@@ -11,25 +11,20 @@ GetWaveform <- function(abf, episodes = 0) {
 
   if (class(abf) != "abf") {
     err_class_abf("GetWaveform")
-  } else if (attr(abf, "mode") != 5) {
+  } else if (attr(abf, "mode") != 5L) {
     err_wf_mode("GetWaveform")
   }
 
   meta <- get_meta(abf)
+  #Check DAC channel and DAC source
   wf_dac <- GetWaveformDAC(abf)
   wf_src <- meta$DAC$nWaveformSource[wf_dac]
   if (wf_src != 1L) {
     err_wf_support("GetWaveform")
   }
-  wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac]
 
-  #get epi and pts from protocol, so this function also works for loaded Protocol
-  #along instead of a full abf
-  nepi <- meta$Protocol$lEpisodesPerRun
-  npts <- meta$Protocol$lNumSamplesPerEpisode
-  epdac <- GetWaveformEpdac(abf, wf_dac)
-  nepoch <- nrow(epdac)
-
+  #Parse episodes
+  nepi <- nEpi(abf)
   if (episodes[1] == 0) {
     episodes = seq.int(nepi)
   }
@@ -42,15 +37,21 @@ GetWaveform <- function(abf, episodes = 0) {
   #Assume instrument holding. Because I don't know where to extract exact holding
   #values at the moment.
   #throw a warning at this stage
+  wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac]
   warning("GetWaveform: Instrument holding is assumed in the generated waveform.")
+  npts <- nPts(abf)
   if (nepi == 1L) {
     mx <- rep(wf_holding, npts)
   } else {
     mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
   }
-  idx_1stpts <- npts %/% 64 + 1L
+
+  #Extract epoch settings
+  epdac <- GetWaveformEpdac(abf, wf_dac)
+  nepoch <- nrow(epdac)
 
   #Now simulate waveforms
+  idx_1stpts <- npts %/% 64L + 1L
   mx_epi_idx <- 0L
   for (epi in episodes) {
     idx <- idx_1stpts
