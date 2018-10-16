@@ -2,7 +2,7 @@
 % Please edit documentation in R/s3func.R
 \name{[[.abf}
 \alias{[[.abf}
-\title{Title}
+\title{Extract channel data from an abf object.}
 \usage{
 \method{[[}{abf}(x, channel)
 }
@@ -10,5 +10,10 @@
 \item{channel}{}
 }
 \description{
-Title
+In an abf object, channel id is one-based instead of zero-based as in pClamp
+software. The decision is made to maintain programming consistency since R data
+is one-based. The significance is you may find ADC channel names not correspond
+to channel id i.e. channel 1 is "IN 0", channel 2 is "IN 1" instead. This may
+also apply to other properties such as DAC num, Epoch num etc which have
+internal numbered indices.
 }

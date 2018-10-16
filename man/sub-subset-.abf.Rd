@@ -4,7 +4,7 @@
 \alias{[[<-.abf}
 \title{Title}
 \usage{
-\method{[[}{abf}(x, channel, ...) <- value
+\method{[[}{abf}(x, ...) <- value
 }
 \arguments{
 \item{...}{}
