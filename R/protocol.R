@@ -73,15 +73,9 @@ abf2_load_pro <- function(filename) {
 #' @export
 #'
 #' @examples
-NumOfChannel <- function(abf) {
+GetNumOfChannel <- function(abf) {
 
-  if (class(abf) == "abf") {
-    meta <- attr(abf, "meta")
-  } else if (class(abf) == "abf_protocol") {
-    meta <- abf
-  } else {
-    err_class_abf_protocol("NumOfChannel")
-  }
+  meta <- get_meta(abf)
   #Every observation of table ADC is a channel
   ret <- nrow(meta$ADC)
 
@@ -96,15 +90,9 @@ NumOfChannel <- function(abf) {
 #' @export
 #'
 #' @examples
-EpisodesPerChannel <- function(abf) {
+GetEpisodesPerChannel <- function(abf) {
 
-  if (class(abf) == "abf") {
-    meta <- attr(abf, "meta")
-  } else if (class(abf) == "abf_protocol") {
-    meta <- abf
-  } else {
-    err_class_abf_protocol("NumOfChannel")
-  }
+  meta <- get_meta(abf)
   ret <- meta$Protocol$lEpisodesPerRun
 
   return(ret)
@@ -118,15 +106,9 @@ EpisodesPerChannel <- function(abf) {
 #' @export
 #'
 #' @examples
-PointsPerEpisode <- function(abf) {
+GetPointsPerEpisode <- function(abf) {
 
-  if (class(abf) == "abf") {
-    meta <- attr(abf, "meta")
-  } else if (class(abf) == "abf_protocol") {
-    meta <- abf
-  } else {
-    err_class_abf_protocol("NumOfChannel")
-  }
+  meta <- get_meta(abf)
   ret <- meta$Protocol$lNumSamplesPerEpisode
 
   return(ret)
@@ -142,7 +124,7 @@ PointsPerEpisode <- function(abf) {
 #' @examples
 nChan <- function(abf) {
 
-  return(NumOfChannel(abf))
+  return(GetNumOfChannel(abf))
 }
 
 #' Title
@@ -155,7 +137,7 @@ nChan <- function(abf) {
 #' @examples
 nPts <- function(abf) {
 
-  return(PointsPerEpisode(abf))
+  return(GetPointsPerEpisode(abf))
 }
 
 #' Title
@@ -168,7 +150,7 @@ nPts <- function(abf) {
 #' @examples
 nEpi <- function(abf) {
 
-  return(EpisodesPerChannel(abf))
+  return(GetEpisodesPerChannel(abf))
 }
 
 #' Title
@@ -182,4 +164,60 @@ nEpi <- function(abf) {
 nPts <- function(abf) {
 
   return(PointsPerEpisode(abf))
+}
+
+get_meta <- function(abf) {
+
+  if (class(abf) == "abf") {
+    meta <- attr(abf, "meta")
+  } else if (class(abf) == "abf_protocol") {
+    meta <- abf
+  } else {
+    err_class_abf_protocol("get_meta")
+  }
+
+  return(meta)
+}
+#' Title
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetProtocol <- function(abf) {
+
+  return(get_meta(abf))
+}
+
+#' Title
+#'
+#' @param abf
+#' @param epi
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetEpochIdx <- function(abf, epi) {
+
+  #EpochPerDAC table
+  meta <- get_meta(abf)
+  epdac <- meta$EpochPerDAC
+
+  #length of first holding
+  npts <- nPts(abf)
+  holding_len <- npts %/% 64L
+
+  #length of each epoch
+  init_len <- epdac$lEpochInitDuration
+  incr_len <- epdac$lEpochDurationInc
+  epoch_len <- init_len + incr_len * (epi - 1L)
+  #shift epoch end idx accroding to first holding length
+  epoch_end <- cumsum(epoch_len) + holding_len
+  epoch_start <- epoch_end - epoch_len + 1
+
+  ret <- cbind(epoch_start, epoch_end, epoch_len)
+  return(ret)
 }

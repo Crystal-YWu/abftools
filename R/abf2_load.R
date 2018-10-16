@@ -190,7 +190,7 @@ abf2_load <- function(filename, abf_title = NULL) {
       stop("Data section: Recorded data points do not match protocol setting.")
     }
     #Added 3rd dim so that we can treat a Gap-free like an episodic abf (with only
-    #episode).
+    #one episode).
     data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan, 1))
     #scale data if needed
     if (rawdata_int)

@@ -17,12 +17,9 @@ print.abf <- function(x, ...) {
   if (channel > d[1])
     stop(paste0("Extract channel: channel ", channel, " not available."))
 
-  if (length(d) == 2)
-    return(x[channel, ])
-
   #episodic
-  epi <- AvailEpisodes(x)
-  df <- x[channel, , epi]
+  epi <- GetAvailEpisodes(x)
+  df <- x[channel, , epi, drop = FALSE]
   colnames(df) <- paste0("epi", epi)
 
   return(df)

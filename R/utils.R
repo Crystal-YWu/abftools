@@ -161,11 +161,11 @@ RemoveEpisodes <- function(abf, epi) {
 #' @export
 #'
 #' @examples
-AvailEpisodes <- function(abf) {
+GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {
     epi = c()
-    for (i in seq_len(EpisodesPerChannel(x)))
+    for (i in seq.int(nEpi(x)))
       if (any(!is.na(x[1, , i])))
         epi = c(epi, i)
 
@@ -177,7 +177,7 @@ AvailEpisodes <- function(abf) {
   } else if (AllAbf(abf)) {
     return(lapply(abf, f))
   } else {
-    err_class_abf_list("AvailEpisodes")
+    err_class_abf_list("GetAvailEpisodes")
   }
 
 }
