@@ -51,6 +51,12 @@ err_epoch_name <- function(func) {
   err(func, msg)
 }
 
+err_epoch <- function(func) {
+
+  msg <- "Invalid epoch number."
+  err(func, msg)
+}
+
 err_wf_mode <- function(func) {
 
   msg <- "Episodic stimulation (mode 5) abf object requied."
@@ -72,5 +78,11 @@ err_wf_support <- function(func) {
 err_wf_type <- function(func) {
 
   msg <- "Unsupported waveform type."
+  err(func, msg)
+}
+
+err_epi <- function(func) {
+
+  msg <- "Invalid episode number."
   err(func, msg)
 }

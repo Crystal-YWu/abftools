@@ -43,7 +43,7 @@ GetWaveformEpdac <- function(abf, wf_dac) {
 #' @export
 #'
 #' @examples
-GetEpochIdx <- function(abf, epi, wf_dac = 0) {
+GetEpochIdx <- function(abf, episodes, wf_dac = 0) {
 
   if (wf_dac == 0) {
     wf_dac <- GetWaveformDAC(abf)
@@ -67,7 +67,7 @@ GetEpochIdx <- function(abf, epi, wf_dac = 0) {
   #length of each epoch
   init_len <- epdac$lEpochInitDuration
   incr_len <- epdac$lEpochDurationInc
-  epoch_len <- init_len + incr_len * (epi - 1L)
+  epoch_len <- init_len + incr_len * (episodes - 1L)
   #shift epoch end idx accroding to first holding length
   epoch_end <- cumsum(epoch_len) + holding_len
   epoch_start <- epoch_end - epoch_len + 1
@@ -76,3 +76,8 @@ GetEpochIdx <- function(abf, epi, wf_dac = 0) {
   return(ret)
 }
 
+CmpEpoch_c <- function(abf, episodes, const, delta, abs_delta = T)
+
+CmpEpoch_wf <- function(abf, episodes, wf_dac, delta, abs_delta = T) {
+
+}

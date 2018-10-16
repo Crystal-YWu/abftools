@@ -34,6 +34,20 @@ colSems <- function(df, na.rm = FALSE) {
   return(sds / sqn)
 }
 
+LogiRleIdx <- function(v) {
+
+  r <- rle(v)
+  idx_end <- cumsum(r$lengths)
+  idx_start <- idx_end - r$lengths + 1
+  #exploit that v is logical
+  idx_start <- idx_start[r$values]
+  idx_end <- idx_end[r$values]
+  win_length <- idx_length[r$values]
+
+  win <- cbind(idx_start, idx_end, win_length)
+  return(win)
+}
+
 AllAbf <- function(x) {
 
   if (class(x) != "list")
@@ -46,19 +60,19 @@ AllAbf <- function(x) {
 #'
 #' @param abf
 #' @param channel
-#' @param epi
+#' @param episodes
 #' @param value
 #' @return
 #' @export
 #'
 #' @examples
-MskEpi <- function(abf, channel, epi, value) {
+MskEpi <- function(abf, channel, episodes, value) {
 
   d <- dim(abf)
   if (d[3] == 1)
     err_abf_not_episodic("MskEpi")
 
-  abf[channel, , epi] <- value
+  abf[channel, , episodes] <- value
 
   return(abf)
 }
@@ -66,19 +80,19 @@ MskEpi <- function(abf, channel, epi, value) {
 #'
 #' @param abf
 #' @param channel
-#' @param epi
+#' @param episodes
 #' @param value
 #'
 #' @return
 #' @export
 #'
 #' @examples
-MaskEpisodes <- function(abf, channel, epi, value) {
+MaskEpisodes <- function(abf, channel, episodes, value) {
 
   if (class(abf) == "abf") {
     return(
       eval.parent(substitute({
-        abf <- MskEpi(abf, channel, epi, value)
+        abf <- MskEpi(abf, channel, episodes, value)
       }))
     )
   } else if (AllAbf(abf)) {
@@ -86,7 +100,7 @@ MaskEpisodes <- function(abf, channel, epi, value) {
     return(
       eval.parent(substitute({
         for (i_____ in seq_along(abf)) {
-          abf[[i_____]] <- MskEpi(abf[[i_____]], channel, epi, value)
+          abf[[i_____]] <- MskEpi(abf[[i_____]], channel, episodes, value)
         }
         rm(i_____)
         #invisible so this function still "returns" a value
@@ -102,37 +116,37 @@ MaskEpisodes <- function(abf, channel, epi, value) {
 #' Title
 #'
 #' @param abf
-#' @param epi
+#' @param episodes
 #'
 #' @return
 #' @export
 #'
 #' @examples
-RmEpi <- function(abf, epi) {
+RmEpi <- function(abf, episodes) {
 
   d <- dim(abf)
   if (d[3] == 1)
     err_abf_not_episodic("RmEpi")
 
-  abf[, , epi] <- NA
+  abf[, , episodes] <- NA
 
   return(abf)
 }
 #' Title
 #'
 #' @param abf
-#' @param epi
+#' @param episodes
 #'
 #' @return
 #' @export
 #'
 #' @examples
-RemoveEpisodes <- function(abf, epi) {
+RemoveEpisodes <- function(abf, episodes) {
 
   if (class(abf) == "abf") {
     return(
       eval.parent(substitute({
-        abf <- RmEpi(abf, epi)
+        abf <- RmEpi(abf, episodes)
       }))
     )
   } else if (AllAbf(abf)) {
@@ -140,7 +154,7 @@ RemoveEpisodes <- function(abf, epi) {
     return(
       eval.parent(substitute({
         for (i_____ in seq_along(abf)) {
-          abf[[i_____]] <- RmEpi(abf[[i_____]], epi)
+          abf[[i_____]] <- RmEpi(abf[[i_____]], episodes)
         }
         rm(i_____)
         #invisible so this function still "returns" a value

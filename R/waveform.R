@@ -1,12 +1,13 @@
 #' Title
 #'
 #' @param abf
+#' @param episodes
 #'
 #' @return
 #' @export
 #'
 #' @examples
-GetWaveform <- function(abf) {
+GetWaveform <- function(abf, episodes = 0) {
 
   if (class(abf) != "abf") {
     err_class_abf("GetWaveform")
@@ -14,6 +15,7 @@ GetWaveform <- function(abf) {
     err_wf_mode("GetWaveform")
   }
 
+  meta <- get_meta(abf)
   wf_dac <- GetWaveformDAC(abf)
   wf_src <- meta$DAC$nWaveformSource[wf_dac]
   if (wf_src != 1L) {
@@ -23,22 +25,36 @@ GetWaveform <- function(abf) {
 
   #get epi and pts from protocol, so this function also works for loaded Protocol
   #along instead of a full abf
-  meta <- get_meta(abf)
   nepi <- meta$Protocol$lEpisodesPerRun
   npts <- meta$Protocol$lNumSamplesPerEpisode
   epdac <- GetWaveformEpdac(abf, wf_dac)
   nepoch <- nrow(epdac)
 
+  if (episodes[1] == 0) {
+    episodes = seq.int(nepi)
+  }
+  if (max(episodes) > nepi) {
+    err_epi("GetWaveform")
+  }
+  #update nepi according to selected episodes
+  nepi <- length(episodes)
+
   #Assume instrument holding. Because I don't know where to extract exact holding
   #values at the moment.
   #throw a warning at this stage
   warning("GetWaveform: Instrument holding is assumed in the generated waveform.")
-  mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
-  idx_epi1 <- npts %/% 64 + 1L
+  if (nepi == 1L) {
+    mx <- rep(wf_holding, npts)
+  } else {
+    mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
+  }
+  idx_1stpts <- npts %/% 64 + 1L
 
   #Now simulate waveforms
-  for (epi in seq.int(nepi)) {
-    idx <- idx_epi1
+  mx_epi_idx <- 0L
+  for (epi in episodes) {
+    idx <- idx_1stpts
+    mx_epi_idx <- mx_epi_idx + 1L
     for (epoch in seq.int(nepoch)) {
 
       #extract epoch settings
@@ -50,7 +66,7 @@ GetWaveform <- function(abf) {
       p_width <- epdac$lEpochPulseWidth[epoch]
       wf_type <- epdac$nEpochType[epoch]
 
-      Vin <- mx[idx - 1L, epi]
+      Vin <- ifelse(nepi > 1L, mx[idx - 1L, mx_epi_idx], mx[idx - 1L])
       Vhi <- init_level + incr_level * (epi - 1L)
       len <- init_len + incr_len * (epi - 1L)
 
@@ -75,11 +91,20 @@ GetWaveform <- function(abf) {
 
       #copy tmp to mx
       mask <- seq.int(from = idx, length.out = len)
-      mx[mask, epi] <- tmp
+      #performance bottleneck is not this if, no need to move out from loop.
+      if (nepi > 1L) {
+        mx[mask, mx_epi_idx] <- tmp
+      } else {
+        mx[mask] <- tmp
+      }
       idx <- idx + len
     }
   }
 
+  #set colnames
+  if (nepi > 1L) {
+    colnames(mx) <- paste0("epi", episodes)
+  }
   return(mx)
 }
 
