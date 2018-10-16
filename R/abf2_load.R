@@ -68,6 +68,7 @@ abf2_load <- function(filename, abf_title = NULL) {
 
   #TODO: Support all relevant sections defined in ABF2.SectionInfoList
 
+  section$String <- NA
   #Read strings section
   if (section_info$Strings$llNumEntries > 0)
     section$Strings <- read_str_section(fp, section_info$Strings)
@@ -76,28 +77,28 @@ abf2_load <- function(filename, abf_title = NULL) {
   #Throw warning if read strings do not match llNumEntries.
   if (length(section$Strings) != section_info$String$llNumEntries)
     warning("Strings section: llNumEntries and actual entries read do not match.")
-  #Now extract info from strings section
-  n <- length(section$Strings)
-  #Calculate channel number
+
   chan_num <- nrow(section$ADC)
-  chan_name <- c()
-  chan_unit <- c()
-  chan_desc <- c()
-  for (i in seq(chan_num)) {
-    #Get channel name
-    idx <- 1 + i * 2
-    if (n >= idx) chan_name[i] <- section$String[[idx]]
-    #Get channel unit
-    idx <- 2 + i * 2
-    if (n >= idx) chan_unit[i] <- section$String[[idx]]
-    #Compile a convenient plotting name from channel unit
-    if (!is.na(chan_unit[i])) {
-      if (endsWith(chan_unit[i], "V"))
+  if (is.na(section$Strings)) {
+    chan_name <- rep(chan_num, "")
+    chan_unit <- rep(chan_num, "")
+    chan_desc <- rep(chan_num, "")
+  } else {
+    chan_name <- c()
+    chan_unit <- c()
+    chan_desc <- c()
+    for (i in seq(chan_num)) {
+      idx <- section$ADC$lADCChannelNameIndex[i]
+      chan_name[i] <- section$Strings[[idx]]
+      idx <- section$ADC$lADCUnitsIndex[i]
+      chan_unit[i] <- section$Strings[[idx]]
+      if (endsWith(chan_unit[i], "V")) {
         chan_desc[i] <- "Voltage"
-      else if (endsWith(chan_unit[i], "A"))
+      } else if (endsWith(chan_unit[i], "A")) {
         chan_desc[i] <- "Current"
-      else
+      } else {
         chan_desc[i] <- chan_name[i]
+      }
     }
   }
 
