@@ -6,11 +6,11 @@
 #' @export
 #'
 #' @examples
-WaveformDAC <- function(abf) {
+GetWaveformDAC <- function(abf) {
 
   meta <- get_meta(abf)
 
-  ret <- which(meta$DAC$nWaveformEnable)
+  ret <- which(as.logical(meta$DAC$nWaveformEnable))
   if (length(ret) > 1) {
     #not sure if this could really happen in real life
     warning("WaveformDAC: Multiple waveform DAC enabled.")
@@ -19,21 +19,46 @@ WaveformDAC <- function(abf) {
   return(ret)
 }
 
+#I don't think we need to export this
+GetWaveformEpdac <- function(abf, wf_dac) {
+
+  meta <- get_meta(abf)
+  epdac <- meta$EpochPerDAC
+  #nDACNum is 0-based
+  mask <- epdac$nDACNum == (wf_dac - 1L)
+  #sort epdac by nEpochNum just in case
+  ret <- epdac[mask, ]
+  ret <- ret[order(ret$nEpochNum), ]
+
+  return(ret)
+}
+
 #' Title
 #'
 #' @param abf
 #' @param epi
-#' @param dac
+#' @param wf_dac
 #'
 #' @return
 #' @export
 #'
 #' @examples
-GetEpochIdx <- function(abf, epi, dac = 0) {
+GetEpochIdx <- function(abf, epi, wf_dac = 0) {
+
+  if (wf_dac == 0) {
+    wf_dac <- GetWaveformDAC(abf)
+  }
+  if (length(wf_dac) == 0L) {
+    err_wf_dac("GetEpochIdx")
+  }
+  #only use first DAC channel
+  wf_dac <- wf_dac[1]
 
   #EpochPerDAC table
-  meta <- get_meta(abf)
-  epdac <- meta$EpochPerDAC
+  epdac <- GetWaveformEpdac(abf, wf_dac)
+  if (nrow(epdac) == 0) {
+    err_wf_dac("GetEpochIdx")
+  }
 
   #length of first holding
   npts <- nPts(abf)

@@ -14,23 +14,20 @@ GetWaveform <- function(abf) {
     err_wf_mode("GetWaveform")
   }
 
-  #get epi and pts from protocol, so this function also works for loaded Protocol
-  #along instead of a full abf
-  meta <- get_meta(abf)
-  epdac <- meta$EpochPerDAC
-  nepi <- meta$Protocol$lEpisodesPerRun
-  npts <- meta$Protocol$lNumSamplesPerEpisode
-  nepoch <- nrow(epdac)
-
-  wf_dac <- match(1L, meta$DAC$nWaveformEnable)
-  if (is.na(wf_dac)) {
-    err_wf_dac("GetWaveform")
-  }
+  wf_dac <- GetWaveformDAC(abf)
   wf_src <- meta$DAC$nWaveformSource[wf_dac]
   if (wf_src != 1L) {
     err_wf_support("GetWaveform")
   }
   wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac]
+
+  #get epi and pts from protocol, so this function also works for loaded Protocol
+  #along instead of a full abf
+  meta <- get_meta(abf)
+  nepi <- meta$Protocol$lEpisodesPerRun
+  npts <- meta$Protocol$lNumSamplesPerEpisode
+  epdac <- GetWaveformEpdac(abf, wf_dac)
+  nepoch <- nrow(epdac)
 
   #Assume instrument holding. Because I don't know where to extract exact holding
   #values at the moment.
@@ -72,7 +69,7 @@ GetWaveform <- function(abf) {
                     #waveform 6
                     err_wf_type("GetWaveform"),
                     #waveform 7
-                    wf_biphsc(len, Vin, Vhi, Vlo, p_period, p_width),
+                    wf_biphsc(len, Vin, Vhi, p_period, p_width),
                     #other
                     err_wf_type("GetWaveform"))
 
@@ -130,8 +127,10 @@ wf_cos <- function(len, Vin, Vhi, period) {
   ret <- rep(win, length.out = len)
   return(ret)
 }
-wf_biphsc <- function(len, Vin, Vhi, Vlo, period, width) {
+wf_biphsc <- function(len, Vin, Vhi, period, width) {
   #waveform 7
+
+  Vlo <- 2 * Vin - Vhi
 
   win <- rep(Vin, period)
   hwidth <- (width + 1) %/% 2
