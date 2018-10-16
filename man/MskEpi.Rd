@@ -4,7 +4,7 @@
 \alias{MskEpi}
 \title{Title}
 \usage{
-MskEpi(abf, channel, epi, value)
+MskEpi(abf, channel, episodes, value)
 }
 \description{
 Title

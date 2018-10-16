@@ -1,5 +1,22 @@
 #' Title
 #'
+#' @param epoch_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetEpochId <- function(epoch_name) {
+
+  epoch <- 0
+  epoch_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
+  epoch <- match(epoch_name, epoch_names)
+
+  return(epoch)
+}
+
+#' Title
+#'
 #' @param abf
 #'
 #' @return

@@ -4,10 +4,10 @@
 \alias{RemoveEpisodes}
 \title{Title}
 \usage{
-RemoveEpisodes(abf, epi)
+RemoveEpisodes(abf, episodes)
 }
 \arguments{
-\item{epi}{}
+\item{episodes}{}
 }
 \description{
 Title

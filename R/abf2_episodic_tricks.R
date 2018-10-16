@@ -287,14 +287,6 @@ AllSamples_IVSummary <- function(abf_list, intv_list, current_channel = 0,
   return(df)
 }
 
-GetEpochId <- function(epoch_name) {
-
-  epoch <- 0
-  epoch_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
-  epoch <- match(epoch_name, epoch_names)
-
-  return(epoch)
-}
 GetFirstVoltageChan <- function(abf) match("Voltage", GetChannelDesc(abf))
 GetFirstCurrentChan <- function(abf) match("Current", GetChannelDesc(abf))
 GetAllowedWindows <- function(x, target, delta, min_window_size) {

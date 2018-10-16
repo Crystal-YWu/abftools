@@ -4,10 +4,10 @@
 \alias{GetWaveform}
 \title{Title}
 \usage{
-GetWaveform(abf)
+GetWaveform(abf, episodes = 0)
 }
 \arguments{
-\item{abf}{}
+\item{episodes}{}
 }
 \description{
 Title

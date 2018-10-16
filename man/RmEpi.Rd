@@ -4,10 +4,10 @@
 \alias{RmEpi}
 \title{Title}
 \usage{
-RmEpi(abf, epi)
+RmEpi(abf, episodes)
 }
 \arguments{
-\item{epi}{}
+\item{episodes}{}
 }
 \description{
 Title

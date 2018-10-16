@@ -4,7 +4,7 @@
 \alias{MaskEpisodes}
 \title{Title}
 \usage{
-MaskEpisodes(abf, channel, epi, value)
+MaskEpisodes(abf, channel, episodes, value)
 }
 \arguments{
 \item{value}{}
