@@ -108,8 +108,13 @@ GetEpisodesPerChannel <- function(abf) {
 #' @examples
 GetPointsPerEpisode <- function(abf) {
 
-  meta <- get_meta(abf)
-  ret <- meta$Protocol$lNumSamplesPerEpisode
+  mode <- attr(abf, "mode")
+  if (mode == 3L) {
+    ret <- dim(abf)[2L]
+  } else {
+    meta <- get_meta(abf)
+    ret <- meta$Protocol$lNumSamplesPerEpisode %/% GetNumOfChannel(abf)
+  }
 
   return(ret)
 }
@@ -151,19 +156,6 @@ nPts <- function(abf) {
 nEpi <- function(abf) {
 
   return(GetEpisodesPerChannel(abf))
-}
-
-#' Title
-#'
-#' @param abf
-#'
-#' @return
-#' @export
-#'
-#' @examples
-nPts <- function(abf) {
-
-  return(PointsPerEpisode(abf))
 }
 
 get_meta <- function(abf) {

@@ -30,43 +30,34 @@ abf2_load <- function(filename, abf_title = NULL) {
   #Read all supported sections
   section <- list()
   #These sections are quite important, if not presented throw a warning.
-  if (section_info$Protocol$llNumEntries > 0)
+  if (section_info$Protocol$llNumEntries > 0) {
     section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def)
-  else {
+  } else {
     close(fp)
     stop("Protocol section: no entries recorded.")
   }
-  if (section_info$ADC$llNumEntries > 0)
+  if (section_info$ADC$llNumEntries > 0) {
     section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def)
-  else {
+  } else {
     close(fp)
     stop("ADC section: no entries recorded.")
   }
   if (section_info$DAC$llNumEntries > 0)
     section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def)
-  else
-    warning("DAC section: no entries recorded.")
   if (section_info$Epoch$llNumEntries > 0)
     section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def)
-  else
-    warning("Epoch section: no entries recorded.")
   if (section_info$EpochPerDAC$llNumEntries > 0)
     section$EpochPerDAC <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
-  else
-    warning("EpochPerDAC section: no entries recorded.")
   if (section_info$SynchArray$llNumEntries > 0)
     section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
-  else
-    warning("SynchArray section: no entries recorded.")
-  #These sections are not that critical, just quietly ignore if not presented.
-  if (section_info$Math$llNumEntries > 0)
-    section$Math <- read_section(fp, section_info$Math, ABF2.Math.def)
-  if (section_info$StatsRegion$llNumEntries > 0)
-    section$StatsRegion <- read_section(fp, section_info$StatsRegion, ABF2.StatsRegion.def)
-  if (section_info$UserList$llNumEntries > 0)
-    section$UserList <- read_section(fp, section_info$UserList, ABF2.UserList.def)
 
-  #TODO: Support all relevant sections defined in ABF2.SectionInfoList
+  #We do not need these miscellaneous sections
+  #if (section_info$Math$llNumEntries > 0)
+  #  section$Math <- read_section(fp, section_info$Math, ABF2.Math.def)
+  #if (section_info$StatsRegion$llNumEntries > 0)
+  #  section$StatsRegion <- read_section(fp, section_info$StatsRegion, ABF2.StatsRegion.def)
+  #if (section_info$UserList$llNumEntries > 0)
+  #  section$UserList <- read_section(fp, section_info$UserList, ABF2.UserList.def)
 
   section$String <- NA
   #Read strings section
@@ -79,10 +70,10 @@ abf2_load <- function(filename, abf_title = NULL) {
     warning("Strings section: llNumEntries and actual entries read do not match.")
 
   chan_num <- nrow(section$ADC)
-  if (section_info$Strings$llNumEntries > 0) {
-    chan_name <- rep(chan_num, "")
-    chan_unit <- rep(chan_num, "")
-    chan_desc <- rep(chan_num, "")
+  if (section_info$Strings$llNumEntries == 0) {
+    chan_name <- rep("", chan_num)
+    chan_unit <- rep("", chan_num)
+    chan_desc <- rep("", chan_num)
   } else {
     chan_name <- c()
     chan_unit <- c()
@@ -178,24 +169,23 @@ abf2_load <- function(filename, abf_title = NULL) {
     if (rawdata_int)
       for (i in seq(chan_per_epi))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
+
   }
   else if (op_mode == 3L) {
     #Gap-free
 
     #resolve 2d array from rawdata
-    pts_per_chan <- section$Protocol$lNumSamplesPerEpisode[1] / chan_num
+    #Can't resolve values from protocol any more
+    pts_per_chan <- section_info$Data$llNumEntries %/% 2L
     chan_per_run <- chan_num
-    #check if data pts number match
-    if (section_info$Data$llNumEntries != pts_per_chan * chan_per_run) {
-      stop("Data section: Recorded data points do not match protocol setting.")
-    }
     #Added 3rd dim so that we can treat a Gap-free like an episodic abf (with only
     #one episode).
     data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan, 1))
     #scale data if needed
     if (rawdata_int)
       for (i in seq(chan_per_run))
-        data[i,] <- data[i,] * signal_resol * signal_scale[i] + signal_offset[i]
+        data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
+
   }
   else {
     stop(paste0("Protocol section: Unrecognised operation mode ", op_mode, "."))
