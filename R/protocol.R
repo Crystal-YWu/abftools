@@ -54,6 +54,10 @@ abf2_load_pro <- function(filename) {
     section$EpochPerDAC <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
   else
     warning("EpochPerDAC section: no entries recorded.")
+  if (section_info$Strings$llNumEntries > 0)
+    section$Strings <- read_str_section(fp, section_info$Strings)
+  else
+    warning("Strings section: no entries recorded.")
 
   attr(section, "class") <- "abf_protocol"
 
