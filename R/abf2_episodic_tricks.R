@@ -33,7 +33,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
     err_id_voltage_chan("FindSamplingInterval")
   }
 
-  meta <- attr(abf, "meta")
+  meta <- get_meta(abf)
   if (epoch_name == "auto") {
     n_epoch <- nrow(meta$EpochPerDAC)
     if (n_epoch > 3) {

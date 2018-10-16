@@ -16,7 +16,7 @@ GetWaveform <- function(abf) {
 
   #get epi and pts from protocol, so this function also works for loaded Protocol
   #along instead of a full abf
-  meta <- attr(abf, "meta")
+  meta <- get_meta(abf)
   epdac <- meta$EpochPerDAC
   nepi <- meta$Protocol$lEpisodesPerRun
   npts <- meta$Protocol$lNumSamplesPerEpisode
