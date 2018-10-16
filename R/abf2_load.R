@@ -79,7 +79,7 @@ abf2_load <- function(filename, abf_title = NULL) {
     warning("Strings section: llNumEntries and actual entries read do not match.")
 
   chan_num <- nrow(section$ADC)
-  if (is.na(section$Strings)) {
+  if (section_info$Strings$llNumEntries > 0) {
     chan_name <- rep(chan_num, "")
     chan_unit <- rep(chan_num, "")
     chan_desc <- rep(chan_num, "")
