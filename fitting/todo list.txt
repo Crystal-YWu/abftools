@@ -1,0 +1,49 @@
+Fitting TODO:
+
+----What Clampfit provides---- [comment]
+Analyze:
+  Quick Graph: I-V, Trace v Trace [? not sure what Trace v Trace does ?]
+  Histogram [R built-in]
+  Fitting to various pre-def function [easy to implement w/ extern package]
+  Power spectrum [easy to implement w/ extern package]
+  Statistic: [mostly R built-in]
+    peak amp
+    time of peak
+    antipeak amp
+    time of antipeak
+    mean
+    sd
+    area
+    half-w [need def]
+    max rise slope
+    time max rise slope
+    max decay slope
+    time max decay slope
+    slope
+    baseline
+    rise slope [need def]
+    rise time
+    decay slope [need def]
+    decay time
+  Resistance [IV summary]
+  Average: [R built-in]
+    episodes
+    files
+  Concatenate files [? what's the point ?]
+  Normalisation [R built-in]
+  Various arithmetic [array]
+  Adjust:
+    baseline
+    leak subtraction [need lit. on methodology]
+    waveform
+  Data reduction: [alt. to melt.abf]
+    sampling
+    avg
+    minmax
+  Force values [MskEpi]
+
+Event Detection:
+  [may need to design a convenient data structure]
+
+Freq filter:
+  [??? abf data is not in freq domain, how to filter ???]
