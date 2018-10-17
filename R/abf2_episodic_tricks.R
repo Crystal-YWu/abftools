@@ -287,8 +287,7 @@ AllSamples_IVSummary <- function(abf_list, intv_list, current_channel = 0,
   return(df)
 }
 
-GetFirstVoltageChan <- function(abf) match("Voltage", GetChannelDesc(abf))
-GetFirstCurrentChan <- function(abf) match("Current", GetChannelDesc(abf))
+
 GetAllowedWindows <- function(x, target, delta, min_window_size) {
 
   t_range <- c(target - abs(delta), target + abs(delta))
