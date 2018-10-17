@@ -174,6 +174,7 @@ abf2_load <- function(filename, abf_title = NULL) {
       for (i in seq(chan_per_epi))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
 
+    attr(data, "EpisodeAvail") <- rep(TRUE, epi_per_run)
   }
   else if (op_mode == 3L) {
     #Gap-free

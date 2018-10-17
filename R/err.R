@@ -1,6 +1,7 @@
 err <- function(func, msg) {
 
-  stop(paste0(func, ": ", msg))
+  err_msg <- paste0(func, ": ", msg)
+  stop(err_msg)
 }
 
 err_abf_not_episodic <- function(func, msg) {
@@ -97,5 +98,17 @@ err_time_unit <- function(func) {
 
   msg <- paste("Invalid time unit, which can only be:",
                 "tick, us, ms, s, min or hr.")
+  err(func, msg)
+}
+
+err_wrong_dim <- function(func) {
+
+  msg <- "Dimensions do not match."
+  err(func, msg)
+}
+
+err_mask_na <- function(func) {
+
+  msg <- "You can't mask an episode with NA."
   err(func, msg)
 }

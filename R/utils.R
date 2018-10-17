@@ -34,7 +34,7 @@ colSems <- function(df, na.rm = FALSE) {
   return(sds / sqn)
 }
 
-LogiRleIdx <- function(v) {
+LogiRleWin <- function(v) {
 
   r <- rle(v)
   idx_end <- cumsum(r$lengths)
@@ -42,7 +42,7 @@ LogiRleIdx <- function(v) {
   #exploit that v is logical
   idx_start <- idx_start[r$values]
   idx_end <- idx_end[r$values]
-  win_length <- idx_length[r$values]
+  win_length <- r$lengths[r$values]
 
   win <- cbind(idx_start, idx_end, win_length)
   return(win)
@@ -68,8 +68,12 @@ AllAbf <- function(x) {
 #' @examples
 MskEpi <- function(abf, channel, episodes, value) {
 
+  if (is.na(value)) {
+    err_mask_na("MskEpi")
+  }
+
   d <- dim(abf)
-  if (d[3] == 1)
+  if (d[3] == 1L)
     err_abf_not_episodic("MskEpi")
 
   abf[channel, , episodes] <- value
@@ -88,6 +92,10 @@ MskEpi <- function(abf, channel, episodes, value) {
 #'
 #' @examples
 MaskEpisodes <- function(abf, channel, episodes, value) {
+
+  if (is.na(value)) {
+    err_mask_na("MaskEpisodes")
+  }
 
   if (class(abf) == "abf") {
     return(
@@ -125,10 +133,12 @@ MaskEpisodes <- function(abf, channel, episodes, value) {
 RmEpi <- function(abf, episodes) {
 
   d <- dim(abf)
-  if (d[3] == 1)
+  if (d[3] == 1L)
     err_abf_not_episodic("RmEpi")
 
-  abf[, , episodes] <- NA
+  epi_avail <- attr(abf, "EpisodeAvail")
+  epi_avail[episodes] <- FALSE
+  attr(abf, "EpisodeAvail") <- epi_avail
 
   return(abf)
 }
@@ -178,12 +188,10 @@ RemoveEpisodes <- function(abf, episodes) {
 GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {
-    epi = c()
-    for (i in seq.int(nEpi(x)))
-      if (any(!is.na(x[1, , i])))
-        epi = c(epi, i)
+    all_epi <- seq.int(nEpi(x))
+    avail_epi <- attr(x, "EpisodeAvail")
 
-      return(epi)
+    return(all_epi[avail_epi])
   }
 
   if (class(abf) == "abf") {
