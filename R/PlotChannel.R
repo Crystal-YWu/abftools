@@ -7,6 +7,7 @@ GetChannelP <- function(abf, channel, ...) {
 
   return(p)
 }
+
 #' Title
 #'
 #' @param abf
@@ -39,6 +40,7 @@ PlotChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ..
 
   return(p)
 }
+
 #' Title
 #'
 #' @param abf
@@ -61,6 +63,30 @@ PlotChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, time_unit =
 
   return(p)
 }
+
+#' Title
+#'
+#' @param abf
+#' @param cursor
+#' @param channel
+#' @param colour
+#' @param time_unit
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PlotChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, time_unit = "tick", ...) {
+
+  p <- PlotChannel(abf, channel, colour, time_unit, ...)
+  #Convert cursors to desired time_unit
+  cursor <- TickToTime(abf, time_unit, cursor)
+  p <- p + geom_vline(xintercept = cursor, linetype = "dashed")
+
+  return(p)
+}
+
 #' Title
 #'
 #' @param abf
@@ -77,6 +103,7 @@ PeekChannel <- function(abf, channel = 1, colour = FALSE, ratio = 50, ...) {
 
   return(PlotChannel(abf, channel, colour, sampling_ratio = ratio, ...))
 }
+
 #' Title
 #'
 #' @param abf
@@ -93,6 +120,24 @@ PeekChannel <- function(abf, channel = 1, colour = FALSE, ratio = 50, ...) {
 PeekChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, ratio = 50, ...) {
 
   return(PlotChannel_Intv(abf, intv, channel, colour, sampling_ratio = ratio, ...))
+}
+
+#' Title
+#'
+#' @param abf
+#' @param cursor
+#' @param channel
+#' @param colour
+#' @param ratio
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PeekChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, ratio = 50, ...) {
+
+  return(PlotChannel_Cursor(abf, cursor, channel, colour, sampling_ratio = ratio, ...))
 }
 
 CollectAllChannel <- function(abf, colour, ...) {
