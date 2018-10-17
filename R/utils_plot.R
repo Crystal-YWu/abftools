@@ -13,7 +13,7 @@ UniYLim <- function(abf_list, channel, intv_list = NULL) {
       val <- sort(as.vector(abf_list[[i]][channel, focus, ]))
       lower <- val[1] - abs(val[1] - val[2]) * 0.5
       n <- length(val)
-      upper <- val[n] + abs(val[n] - val[n - 1]) * 0.5
+      upper <- val[n] + abs(val[n] - val[n - 1L]) * 0.5
     }
 
     ret <- range(ret, lower, upper)
@@ -51,25 +51,28 @@ UniYLim <- function(abf_list, channel, intv_list = NULL) {
 melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NULL,
                      time_unit = "tick") {
 
-  n <- nPts(abf)
+  npts <- nPts(abf)
   nepi <- nEpi(abf)
   chan_desc <- GetChannelDesc(abf)[channel]
 
+  #extract channel data
   data <- as.data.frame(abf, channel)
-  ctick <- seq(from = 1, to = n, by = sampling_ratio)
+  #channel index tick
+  ctick <- seq(from = 1L, to = npts, by = sampling_ratio)
+  #convert to time
   ctime <- TickToTime(abf, time_unit, ctick)
-  #select rows by ticks
+  #sample data by sampling_ratio
   df <- data[ctick, , drop = FALSE]
   if ((sampling_ratio > 1L) && !is.null(sampling_func)) {
     #apply sampling function
-    for (i in 1:(length(ctick) - 1)) {
-      mask <- ctick[i]:(ctick[i + 1] - 1)
-      sampling_value <- sapply(seq(nepi), function(x) sampling_func(data[mask, x]))
+    for (i in 1L:(length(ctick) - 1L)) {
+      mask <- ctick[i]:(ctick[i + 1L] - 1L)
+      sampling_value <- sapply(seq.int(nepi), function(x) sampling_func(data[mask, x]))
       df[i, ] <- sampling_value
     }
     i <- length(ctick)
-    mask <- ctick[i]:n
-    sampling_value <- sapply(seq(nepi), function(x) sampling_func(data[mask, x]))
+    mask <- ctick[i]:npts
+    sampling_value <- sapply(seq.int(nepi), function(x) sampling_func(data[mask, x]))
     df[i, ] <- sampling_value
   }
   #bind time column
@@ -86,7 +89,9 @@ TickToTime <- function(abf, time_unit, ctick) {
                   us = ctick * GetSamplingIntv(abf),
                   ms = ctick * GetSamplingIntv(abf) / 1000,
                   s  = ctick * GetSamplingIntv(abf) / 1000 / 1000,
-                  stop("Convert sampling tick to time scale: time_unit can only be tick, us, ms or s."))
+                  min = ctick * GetSamplingIntv(abf) / 1000 / 1000 / 60,
+                  hr = ctick * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60,
+                  err_time_unit("TickToTime"))
 
   return(ctime)
 }

@@ -20,9 +20,9 @@ print.abf <- function(x, ...) {
 #' @examples
 `[[.abf` <- function(x, channel) {
 
+  channel <- first_elem(channel)
+
   d <- dim(x)
-  if (length(channel) > 1)
-    stop("Extract channel: you can only select one channel.")
   if (channel > d[1])
     stop(paste0("Extract channel: channel ", channel, " not available."))
 

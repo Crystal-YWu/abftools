@@ -92,3 +92,10 @@ err_wrong_arg_num <- function(func, additional = "") {
   msg <- paste0("Wrong number of arguments. ", additional)
   err(func, msg)
 }
+
+err_time_unit <- function(func) {
+
+  msg <- paste("Invalid time unit, which can only be:",
+                "tick, us, ms, s, min or hr.")
+  err(func, msg)
+}
