@@ -33,13 +33,20 @@ print.abf <- function(x, ...) {
     df <- x[channel, ,epi]
     #2d matrix
     df <- matrix(df, ncol = 1)
-  } else {
+  } else if (AllEpisodesAvail(x)) {
     #2d matrix
+    df <- x[channel, , ]
+  } else {
     df <- x[channel, , epi]
   }
   colnames(df) <- paste0("epi", epi)
 
   return(df)
+}
+
+AllEpisodesAvail <- function(abf) {
+
+  return(all(attr(abf, "EpisodeAvail")))
 }
 
 #' Title

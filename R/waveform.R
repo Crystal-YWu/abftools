@@ -49,6 +49,15 @@ GetWaveform <- function(abf, episodes = 0) {
   epdac <- GetWaveformEpdac(abf, wf_dac)
   nepoch <- nrow(epdac)
 
+  #extract epoch settings
+  init_level <- epdac$fEpochInitLevel
+  incr_level <- epdac$fEpochLevelInc
+  init_len <- epdac$lEpochInitDuration
+  incr_len <- epdac$lEpochDurationInc
+  p_period <- epdac$lEpochPulsePeriod
+  p_width <- epdac$lEpochPulseWidth
+  wf_type <- epdac$nEpochType
+
   #Now simulate waveforms
   idx_1stpts <- npts %/% 64L + 1L
   mx_epi_idx <- 0L
@@ -57,35 +66,26 @@ GetWaveform <- function(abf, episodes = 0) {
     mx_epi_idx <- mx_epi_idx + 1L
     for (epoch in seq.int(nepoch)) {
 
-      #extract epoch settings
-      init_level <- epdac$fEpochInitLevel[epoch]
-      incr_level <- epdac$fEpochLevelInc[epoch]
-      init_len <- epdac$lEpochInitDuration[epoch]
-      incr_len <- epdac$lEpochDurationInc[epoch]
-      p_period <- epdac$lEpochPulsePeriod[epoch]
-      p_width <- epdac$lEpochPulseWidth[epoch]
-      wf_type <- epdac$nEpochType[epoch]
-
       Vin <- ifelse(nepi > 1L, mx[idx - 1L, mx_epi_idx], mx[idx - 1L])
-      Vhi <- init_level + incr_level * (epi - 1L)
-      len <- init_len + incr_len * (epi - 1L)
+      Vhi <- init_level[epoch] + incr_level[epoch] * (epi - 1L)
+      len <- init_len[epoch] + incr_len[epoch] * (epi - 1L)
 
       #calculate simulated waveforms
-      tmp <- switch(wf_type,
+      tmp <- switch(wf_type[epoch],
                     #waveform 1
                     wf_step(len, Vhi),
                     #waveform 2
                     wf_ramp(len, Vin, Vhi),
                     #waveform 3
-                    wf_pulse(len, Vin, Vhi, p_period, p_width),
+                    wf_pulse(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
                     #waveform 4
-                    wf_trng(len, Vin, Vhi, p_period, p_width),
+                    wf_trng(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
                     #waveform 5
-                    wf_cos(len, Vin, Vhi, p_period),
+                    wf_cos(len, Vin, Vhi, p_period[epoch]),
                     #waveform 6
                     err_wf_type("GetWaveform"),
                     #waveform 7
-                    wf_biphsc(len, Vin, Vhi, p_period, p_width),
+                    wf_biphsc(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
                     #other
                     err_wf_type("GetWaveform"))
 

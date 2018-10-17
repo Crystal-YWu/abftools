@@ -103,11 +103,3 @@ GetEpochWindows <- function(abf, wf_dac = 0) {
 
   return(win)
 }
-
-CmpEpoch_c <- function(abf, episodes, const, delta, abs_delta = T) {
-
-}
-
-CmpEpoch_wf <- function(abf, episodes, wf_dac, delta, abs_delta = T) {
-
-}
