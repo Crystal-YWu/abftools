@@ -262,10 +262,10 @@ AllSamples_IVSummary <- function(abf_list, intv_list, current_channel = 0,
 
   #figure out current channel and voltage channel
   if (current_channel == 0) {
-    current_channel <- GetFirstCurrentChan(abf_list)
+    current_channel <- GetFirstCurrentChan(abf_list[[1]])
   }
   if (voltage_channel == 0) {
-    voltage_channel <- GetFirstVoltageChan(abf_list)
+    voltage_channel <- GetFirstVoltageChan(abf_list[[1]])
   }
   if (is.na(current_channel)) {
     err_id_current_chan("AllSamples_IVSummary")
@@ -400,7 +400,7 @@ ChannelInterval_f <- function(abf_list, intv_list, channel, f) {
       mask <- seq(intv_list[[i]][1], intv_list[[i]][2])
       #Do not use AvailEpisode to extract channel info, so we always have correct
       #episodic order
-      ret <- f(abf_list[[i]][channel, mask, ])
+      ret <- f(abf_list[[i]][mask, , channel])
       #Results are padded to left
       nepi <- nEpi(abf_list[[i]])
       for (j in seq(nepi))
