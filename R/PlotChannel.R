@@ -3,7 +3,7 @@ GetChannelP <- function(abf, channel, ...) {
   df <- melt(abf, channel, ...)
   chan_desc <- GetChannelDesc(abf)[channel]
 
-  p <- ggplot(df, aes_string("time", chan_desc)) + theme_bw()
+  p <- ggplot(df, aes_string("time", as.name(chan_desc))) + theme_bw()
 
   return(p)
 }
