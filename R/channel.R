@@ -22,18 +22,18 @@ AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc)
   #old dimension
   d <- dim(abf)
   dchan <- dim(new_channel)
-  if ((length(dchan) != 2L) || (!all(dchan == d[2:3]))) {
+  if ((length(dchan) != 2L) || (!all(dchan == d[1:2]))) {
     err_wrong_dim("AttachChannel")
   }
   #new dimension
-  d[1] <- d[1] + 1L
+  d[3] <- d[3] + 1L
   new_abf <- array(NA, dim = d)
 
   #copy to data
   nchan_old <- nChan(abf)
   nchan_new <- nchan_old + 1L
-  new_abf[1:nchan_old, ,] <- abf
-  new_abf[nchan_new, ,] <- new_channel
+  new_abf[, , 1:nchan_old] <- abf
+  new_abf[, , nchan_new] <- new_channel
 
   #copy meta information
   meta <- get_meta(abf)
@@ -80,7 +80,7 @@ AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc)
   attr(new_abf, "ChannelUnit") <- c(GetChannelUnit(abf), channel_unit)
   attr(new_abf, "ChannelDesc") <- c(GetChannelDesc(abf), channel_desc)
   attr(new_abf, "SamplingInterval") <- GetSamplingIntv(abf)
-  attr(new_abf, "EpisodeAvail") <- attr(abf, "EpisodeAvail")
+  attr(new_abf, "EpiAvail") <- attr(abf, "EpiAvail")
 
   attr(new_abf, "meta") <- meta
 
@@ -124,7 +124,7 @@ RpclChan <- function(abf, channel, channel_data) {
     err_class_abf("RpclChan")
   }
 
-  abf[channel, ,] <- channel_data
+  abf[, , channel] <- channel_data
 
   return(abf)
 }

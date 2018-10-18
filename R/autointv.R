@@ -42,7 +42,7 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
   ret <- list()
   for (i in seq.int(episodes)) {
 
-    win <- epoch_win[episodes[i], epoch, ]
+    win <- epoch_win[, epoch, episodes[i]]
 
     mask <- win[1]:win[2]
     v <- wf_delta[mask, i] <= wf_allowed[mask, i]

@@ -86,13 +86,13 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
   v <- v_init + v_incr * (epi - 1L)
 
   #Find voltage windows that fit into allowed voltages
-  intv <- GetAllowedWindows(abf[voltage_channel, ,epi[1]], v[1], allowed_voltage_delta,
+  intv <- GetAllowedWindows(abf[, epi[1], voltage_channel], v[1], allowed_voltage_delta,
                             min_sampling_size)
   nepi <- length(epi)
   #in case only one episode is available
   if (nepi > 1) {
     for (i in 2:length(epi)) {
-      win <- GetAllowedWindows(abf[voltage_channel, ,epi[i]], v[i], allowed_voltage_delta,
+      win <- GetAllowedWindows(abf[, epi[i], voltage_channel], v[i], allowed_voltage_delta,
                                min_sampling_size)
       intv <- GetWindowsOverlap(intv, win)
     }
@@ -141,9 +141,9 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
     mask <- seq(intv[i, 1], intv[i, 2])
     #in case only one episode is available
     if (nepi > 1) {
-      score <- colSds(abf[current_channel, mask, epi], na.rm = TRUE)
+      score <- colSds(abf[mask, epi, current_channel], na.rm = TRUE)
     } else {
-      score <- sd(abf[current_channel, mask, epi], na.rm = TRUE)
+      score <- sd(abf[mask, epi, current_channel], na.rm = TRUE)
     }
     if (f(score, best_score)) {
       best_score <- score
@@ -262,10 +262,10 @@ AllSamples_IVSummary <- function(abf_list, intv_list, current_channel = 0,
 
   #figure out current channel and voltage channel
   if (current_channel == 0) {
-    current_channel <- GetFirstCurrentChan(abf)
+    current_channel <- GetFirstCurrentChan(abf_list)
   }
   if (voltage_channel == 0) {
-    voltage_channel <- GetFirstVoltageChan(abf)
+    voltage_channel <- GetFirstVoltageChan(abf_list)
   }
   if (is.na(current_channel)) {
     err_id_current_chan("AllSamples_IVSummary")

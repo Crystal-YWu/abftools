@@ -23,31 +23,28 @@ print.abf <- function(x, ...) {
   channel <- first_elem(channel)
 
   d <- dim(x)
-  if (channel > d[1])
+  if (channel > d[3])
     stop(paste0("Extract channel: channel ", channel, " not available."))
 
   epi <- GetAvailEpisodes(x)
   #in case of only one episode
   if (length(epi) == 1) {
     #1d vector
-    df <- x[channel, ,epi]
+    df <- x[, epi, channel]
     #2d matrix
     df <- matrix(df, ncol = 1)
   } else if (AllEpisodesAvail(x)) {
     #2d matrix
-    df <- x[channel, , ]
+    df <- x[, , channel]
   } else {
-    df <- x[channel, , epi]
+    #2d matrix
+    df <- x[, epi, channel]
   }
   colnames(df) <- paste0("epi", epi)
 
   return(df)
 }
-
-AllEpisodesAvail <- function(abf) {
-
-  return(all(attr(abf, "EpisodeAvail")))
-}
+AllEpisodesAvail <- function(abf) all(attr(abf, "EpiAvail"))
 
 #' Title
 #'

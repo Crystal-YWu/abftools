@@ -17,7 +17,11 @@ GetWaveform <- function(abf, episodes = 0) {
 
   meta <- get_meta(abf)
   #Check DAC channel and DAC source
-  wf_dac <- GetWaveformDAC(abf)
+  wf_dac <- GetWaveformEnabledDAC(abf)
+  if (length(wf_dac) == 0L) {
+    err_wf_dac("GetWaveform")
+  }
+  wf_dac <- first_elem(wf_dac)
   wf_src <- meta$DAC$nWaveformSource[wf_dac]
   if (wf_src != 1L) {
     err_wf_support("GetWaveform")
@@ -122,7 +126,7 @@ AttachWaveform <- function(abf) {
   wf <- GetWaveform(abf)
   #figure out waveform unit
   meta <- get_meta(abf)
-  dac <- GetWaveformDAC(abf)
+  dac <- GetWaveformEnabledDAC(abf)
   idx_name <- meta$DAC$lDACChannelNameIndex[dac]
   idx_unit <- meta$DAC$lDACChannelUnitsIndex[dac]
   dac_name <- meta$Strings[idx_name]

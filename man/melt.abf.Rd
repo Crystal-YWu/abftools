@@ -16,7 +16,7 @@ melt.abf(abf, channel = 1L, sampling_ratio = 1L,
 
 \item{sampling_func}{a function, default to null so no processing sampled points}
 
-\item{time_unit}{time unit of the sampled data, can be tick, us, ms or s}
+\item{time_unit}{time unit of the sampled data, can be tick, us, ms, s, min or hr}
 }
 \description{
 For easier melting abf channel data, sampling time (by given time unit) is
