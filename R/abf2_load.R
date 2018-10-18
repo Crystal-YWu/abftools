@@ -174,7 +174,9 @@ abf2_load <- function(filename, abf_title = NULL) {
       for (i in seq(chan_per_epi))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
 
-    attr(data, "EpisodeAvail") <- rep(TRUE, epi_per_run)
+    #data in memory is ordered in (chan, pts, epi) since we usually access
+    #episodic data by channel, a more efficient order should be (pts, epi, chan)
+    data <- aperm(data, c(2, 3, 1))
   }
   else if (op_mode == 3L) {
     #Gap-free
@@ -191,6 +193,7 @@ abf2_load <- function(filename, abf_title = NULL) {
       for (i in seq(chan_per_run))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
 
+    data <- aperm(data, c(2, 3, 1))
   }
   else {
     stop(paste0("Protocol section: Unrecognised operation mode ", op_mode, "."))
@@ -208,6 +211,9 @@ abf2_load <- function(filename, abf_title = NULL) {
   attr(data, "ChannelUnit") <- chan_unit
   attr(data, "ChannelDesc") <- chan_desc
   attr(data, "SamplingInterval") <- sample_interval_us
+
+  nepi <- dim(data)[2]
+  attr(data, "EpiAvail") <- rep(TRUE, nepi)
 
   meta <- section
   meta$Header <- header

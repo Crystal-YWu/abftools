@@ -76,7 +76,7 @@ MskEpi <- function(abf, channel, episodes, value) {
   if (d[3] == 1L)
     err_abf_not_episodic("MskEpi")
 
-  abf[channel, , episodes] <- value
+  abf[, episodes, channel] <- value
 
   return(abf)
 }
@@ -136,9 +136,9 @@ RmEpi <- function(abf, episodes) {
   if (d[3] == 1L)
     err_abf_not_episodic("RmEpi")
 
-  epi_avail <- attr(abf, "EpisodeAvail")
+  epi_avail <- attr(abf, "EpiAvail")
   epi_avail[episodes] <- FALSE
-  attr(abf, "EpisodeAvail") <- epi_avail
+  attr(abf, "EpiAvail") <- epi_avail
 
   return(abf)
 }
@@ -189,7 +189,7 @@ GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {
     all_epi <- seq.int(nEpi(x))
-    avail_epi <- attr(x, "EpisodeAvail")
+    avail_epi <- attr(x, "EpiAvail")
 
     return(all_epi[avail_epi])
   }

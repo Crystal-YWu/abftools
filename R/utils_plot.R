@@ -38,7 +38,7 @@ UniYLim <- function(abf_list, channel, intv_list = NULL) {
 #' @param channel the channel to melt, default to 1
 #' @param sampling_ratio sampling ratio, default to 1 so that no sampling at all
 #' @param sampling_func a function, default to null so no processing sampled points
-#' @param time_unit time unit of the sampled data, can be tick, us, ms or s
+#' @param time_unit time unit of the sampled data, can be tick, us, ms, s, min or hr
 #'
 #' @return
 #' @export

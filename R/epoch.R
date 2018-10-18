@@ -23,7 +23,7 @@ GetEpochId <- function(epoch_name) {
 #' @export
 #'
 #' @examples
-GetWaveformDAC <- function(abf) {
+GetWaveformEnabledDAC <- function(abf) {
 
   meta <- get_meta(abf)
 
@@ -62,7 +62,7 @@ GetWaveformEpdac <- function(abf, wf_dac) {
 GetEpochWindows <- function(abf, wf_dac = 0) {
 
   if (wf_dac[1] == 0) {
-    wf_dac <- GetWaveformDAC(abf)
+    wf_dac <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac) == 0L) {
     err_wf_dac("GetEpochWindows")
@@ -71,9 +71,6 @@ GetEpochWindows <- function(abf, wf_dac = 0) {
 
   #EpochPerDAC table
   epdac <- GetWaveformEpdac(abf, wf_dac)
-  if (nrow(epdac) == 0) {
-    err_wf_dac("GetEpochWindows_epoch")
-  }
 
   #length of first holding
   npts <- nPts(abf)
@@ -86,7 +83,7 @@ GetEpochWindows <- function(abf, wf_dac = 0) {
   #pre-allocate win
   nepi <- nEpi(abf)
   nepoch <- nrow(epdac)
-  win <- array(0L, dim = c(nepi, nepoch, 3L))
+  win <- array(0L, dim = c(3L, nepoch, nepi))
 
   for (epi in seq.int(nepi)) {
 
@@ -95,9 +92,9 @@ GetEpochWindows <- function(abf, wf_dac = 0) {
     epoch_end <- cumsum(epoch_len) + holding_len
     epoch_start <- epoch_end - epoch_len + 1L
 
-    win[epi, , 1L] <- epoch_start
-    win[epi, , 2L] <- epoch_end
-    win[epi, , 3L] <- epoch_len
+    win[1L, , epi] <- epoch_start
+    win[2L, , epi] <- epoch_end
+    win[3L, , epi] <- epoch_len
 
   }
 

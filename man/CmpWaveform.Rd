@@ -4,7 +4,7 @@
 \alias{CmpWaveform}
 \title{Title}
 \usage{
-CmpWaveform(abf, channel, epoch, delta, relative)
+CmpWaveform(abf, channel, epoch, delta, relative, min_win, max_win)
 }
 \arguments{
 \item{relative}{}
