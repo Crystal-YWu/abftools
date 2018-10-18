@@ -1,12 +1,15 @@
 Package: abftools
 Type: Package
-Title: What the Package Does (Title Case)
+Title: ABF Tools: Toolbox for Visualising and Analysing Eletrophysiology ABF2 Data
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Yue Wu <yue.wu@adelaide.edu.au>
+Maintainer: Jun <imlijunda@gmail.com>
+Description: A toolbox provide data structure and functions to manipulate and
+    analyse ABF (Axon Binary File) data. Special funcions are created specially
+    for episodic multi-channel data analysis and visualisation.
+Imports: cowplot, ggplot2, reshape2, stringi, stats
+License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
+BugReports: https://github.com/Crystal-YWu/abftools/issues
 RoxygenNote: 6.1.0

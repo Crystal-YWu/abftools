@@ -4,7 +4,7 @@
 \alias{melt.abf}
 \title{Melt channel data of an abf object into a data frame by sampling ratio.}
 \usage{
-melt.abf(abf, channel = 1L, sampling_ratio = 1L,
+\method{melt}{abf}(abf, channel = 1L, sampling_ratio = 1L,
   sampling_func = NULL, time_unit = "tick")
 }
 \arguments{

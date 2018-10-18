@@ -2,4 +2,5 @@
 ##' @import reshape2
 ##' @import cowplot
 ##' @import stringi
+##' @import stats
 NULL
