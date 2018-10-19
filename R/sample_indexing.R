@@ -27,10 +27,15 @@ SelectSample <- function(sample_index, ...) {
   idx <- rep(TRUE, nrow(df))
   for (i in names(cvalue)) {
     if (i == "") {
-      warning(paste0("Unnamed value ", cvalue[[i]], " ignored."))
-      next
+      nvpair <- cvalue[[i]]
+      if (length(nvpair) != 2L) {
+        warning(paste0("Unnamed value ", nvpair, " ignored."))
+        next
+      }
+      idx <- idx & (df[nvpair[1]] %in% nvpair[2])
+    } else {
+      idx <- idx & (df[i] %in% cvalue[[i]])
     }
-    idx <- idx & (df[i] %in% cvalue[[i]])
   }
 
   return(sample_index[idx, ])
@@ -65,10 +70,15 @@ ExcludeSample <- function(sample_index, ...) {
   idx <- rep(FALSE, nrow(df))
   for (i in names(cvalue)) {
     if (i == "") {
-      warning(paste0("Unnamed value ", cvalue[[i]], " ignored."))
-      next
+      nvpair <- cvalue[[i]]
+      if (length(nvpair) != 2L) {
+        warning(paste0("Unnamed value ", nvpair, " ignored."))
+        next
+      }
+      idx <- idx | (df[nvpair[1]] %in% nvpair[2])
+    } else {
+      idx <- idx | (df[i] %in% cvalue[[i]])
     }
-    idx <- idx | (df[i] %in% cvalue[[i]])
   }
 
   return(sample_index[idx, ])
