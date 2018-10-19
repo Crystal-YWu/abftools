@@ -111,9 +111,9 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
     warning(s)
     return(rep(NA, 3))
   }
-  tmp <- FilterMinWindowSize(intv, min_sampling_size)
+  tmp <- FilterMinIntervalSize(intv, min_sampling_size)
   if (nrow(tmp) == 0) {
-    tmp <- FilterMinWindowSize(intv, 3)
+    tmp <- FilterMinIntervalSize(intv, 3)
     if (nrow(tmp) == 0) {
       s <- sprintf("FindSamplingInterval: No stable voltage interval found. Returning NA.
     allowed_voltage_delta = %.3f %s
@@ -300,7 +300,7 @@ GetAllowedWindows <- function(x, target, delta, min_window_size) {
   win_length <- r$lengths[r$values]
   win <- cbind(idx_start, idx_end, win_length)
 
-  return(FilterMinWindowSize(win, min_window_size))
+  return(FilterMinIntervalSize(win, min_window_size))
 }
 GetWindowsOverlap <- function(w1, w2) {
 
@@ -321,30 +321,7 @@ GetWindowsOverlap <- function(w1, w2) {
 
   return(ret)
 }
-FilterMinWindowSize <- function(windows, min_window_size) {
 
-  mask <- windows[, 3] >= min_window_size
-
-  return(windows[mask, , drop = FALSE])
-}
-FilterMaxWindowSize <- function(windows, max_window_size) {
-
-  mask <- windows[, 3] <= max_window_size
-
-  return(windows[mask, , drop = FALSE])
-}
-FilterMinWindowPos <- function(windows, min_window_pos) {
-
-  mask <- windows[, 2] >= min_window_pos
-
-  return(windows[mask, , drop = FALSE])
-}
-FilterMaxWindowPos <- function(windows, max_window_pos) {
-
-  mask <- windows[, 1] <= max_window_pos
-
-  return(windows[mask, , drop = FALSE])
-}
 SplitLargeWindow <- function(windows, max_window_size) {
 
   idx <- 0
@@ -410,9 +387,6 @@ ChannelInterval_f <- function(abf_list, intv_list, channel, f) {
 
   return(m)
 }
-
-#Is this possible to optimise?
-within_interval <- function(x, intv) intv[1] <= x && x <= intv[2]
 
 #strict compare: all of s1 are smaller than best_s
 score_all <- function(s1, best_s) {

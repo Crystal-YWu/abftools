@@ -59,13 +59,13 @@ GetWaveformEpdac <- function(abf, wf_dac) {
 #' @export
 #'
 #' @examples
-GetEpochWindows <- function(abf, wf_dac = 0) {
+GetEpochIntervals <- function(abf, wf_dac = 0) {
 
   if (wf_dac[1] == 0) {
     wf_dac <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac) == 0L) {
-    err_wf_dac("GetEpochWindows")
+    err_wf_dac("GetEpochIntervals")
   }
   wf_dac <- first_elem(wf_dac)
 

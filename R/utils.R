@@ -44,7 +44,7 @@ LogiRleWin <- function(v) {
   idx_end <- idx_end[r$values]
   win_length <- r$lengths[r$values]
 
-  win <- cbind(idx_start, idx_end, win_length)
+  win <- rbind(idx_start, idx_end, win_length)
   return(win)
 }
 

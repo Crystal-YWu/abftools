@@ -27,7 +27,7 @@ allowed_delta_rel <- function(channel_data, delta) {
 #' @examples
 CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) {
 
-  epoch_win <- GetEpochWindows(abf)
+  epoch_intv <- GetEpochIntervals(abf)
   epoch <- first_elem(epoch)
 
   episodes <- GetAvailEpisodes(abf)
@@ -42,25 +42,25 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
   ret <- list()
   for (i in seq.int(episodes)) {
 
-    win <- epoch_win[, epoch, episodes[i]]
+    intv <- epoch_intv[, epoch, episodes[i]]
 
-    mask <- win[1]:win[2]
+    mask <- MaskIntv(intv)
     v <- wf_delta[mask, i] <= wf_allowed[mask, i]
 
     tmp <- LogiRleWin(v)
 
     if (nrow(tmp) > 0L) {
       #shift according to position of win
-      tmp[, 1] <- tmp[, 1] + win[1] - 1L
-      tmp[, 2] <- tmp[, 2] + win[1] - 1L
+      tmp[1, ] <- tmp[1, ] + intv[1] - 1L
+      tmp[2, ] <- tmp[2, ] + intv[1] - 1L
       #filter length
       if (!missing(min_win)) {
-        tmp_idx <- tmp[, 3] >= min_win
-        tmp <- tmp[tmp_idx, ]
+        tmp_idx <- min_win <= tmp[3, ]
+        tmp <- tmp[, tmp_idx, drop = FALSE]
       }
       if (!missing(max_win)) {
-        tmp_idx <- tmp[, 3] <= max_win
-        tmp <- tmp[tmp_idx, ]
+        tmp_idx <- tmp[3, ] <= max_win
+        tmp <- tmp[, tmp_idx, drop = FALSE]
       }
     }
 
@@ -69,5 +69,4 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 
   return(ret)
 }
-
 
