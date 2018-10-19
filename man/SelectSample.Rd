@@ -2,13 +2,30 @@
 % Please edit documentation in R/sample_indexing.R
 \name{SelectSample}
 \alias{SelectSample}
-\title{Title}
+\title{Select samples conditionally}
 \usage{
-SelectSample(data_index, ...)
+SelectSample(sample_index, ...)
 }
 \arguments{
-\item{...}{}
+\item{sample_index}{a data frame like object with descriptions of samples}
+
+\item{...}{a list of conditions composed of name = value pairs.}
+}
+\value{
+selected rows of sample_index
 }
 \description{
-Title
+This function provides a naïve yet simple way to select desired samples provided
+in sample_index. A sample_index should have named columns which descpribes
+properties of your samples, any unnamed columns or conditions will be ignored.
+Be noticed that all names are case-sensitive.
+}
+\examples{
+
+records <- read.csv("experiment_record.csv")
+selected_oocyte <- SelectSample(records, gene = c("B", "N1"), type = "gapfree")
+#you can also select empty elements by using NA
+selected_oocyte <- SelectSample(records, OocyteId = 5, remakes = NA)
+#for columns with special names, use a back quote
+selected_oocyte <- SelectSample(records, `funny behave ?~` = c(NA, "no"))
 }

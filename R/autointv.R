@@ -69,3 +69,5 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 
   return(ret)
 }
+
+
