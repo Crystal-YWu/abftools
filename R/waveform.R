@@ -23,7 +23,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
   if (length(wf_dac) == 0L) {
     err_wf_dac("GetWaveform")
   }
-  wf_dac <- first_elem(wf_dac)
+  wf_dac <- FirstElement(wf_dac)
   #Stimulus file is not supported yet
   wf_src <- meta$DAC$nWaveformSource[wf_dac]
   if (wf_src != 1L) {

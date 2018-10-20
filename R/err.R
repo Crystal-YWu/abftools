@@ -4,7 +4,7 @@ err <- function(func, msg) {
   stop(err_msg)
 }
 
-err_abf_not_episodic <- function(func, msg) {
+err_abf_not_episodic <- function(func) {
 
   msg <- "The abf object is not episodic."
   err(func, msg)

@@ -67,7 +67,7 @@ GetEpochIntervals <- function(abf, wf_dac = 0) {
   if (length(wf_dac) == 0L) {
     err_wf_dac("GetEpochIntervals")
   }
-  wf_dac <- first_elem(wf_dac)
+  wf_dac <- FirstElement(wf_dac)
 
   #EpochPerDAC table
   epdac <- GetWaveformEpdac(abf, wf_dac)

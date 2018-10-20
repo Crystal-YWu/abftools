@@ -20,7 +20,7 @@ print.abf <- function(x, ...) {
 #' @examples
 `[[.abf` <- function(x, channel) {
 
-  channel <- first_elem(channel)
+  channel <- FirstElement(channel)
 
   d <- dim(x)
   if (channel > d[3])

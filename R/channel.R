@@ -118,7 +118,7 @@ AttachChannel <- function(abf, new_channel, channel_name, channel_unit, channel_
 #' @export
 #'
 #' @examples
-RpclChan <- function(abf, channel, channel_data) {
+RplcChan <- function(abf, channel, channel_data) {
 
   if (class(abf) != "abf") {
     err_class_abf("RpclChan")
@@ -143,7 +143,7 @@ ReplaceChannel <- function(abf, channel, channel_data) {
 
   return(
     eval.parent(substitute({
-      abf <- RpclChan(abf, channel, channel_data)
+      abf <- RplcChan(abf, channel, channel_data)
     }))
   )
 }

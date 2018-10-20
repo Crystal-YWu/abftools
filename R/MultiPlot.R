@@ -1,28 +1,3 @@
-MultiPlotP <- function(abf_list, channel, colour, time_unit,
-                       num_label, title_label, unify_y, ...) {
-
-  p <- list()
-  if (unify_y) {
-    ylimit <- UniYLim(abf_list, channel)
-    for (i in seq(abf_list))
-      p[[i]] <- PlotChannel(abf_list[[i]], channel, colour, time_unit, ...) + ylim(ylimit)
-  } else {
-    for (i in seq(abf_list))
-      p[[i]] <- PlotChannel(abf_list[[i]], channel, colour, time_unit, ...)
-  }
-
-  has_title <- num_label || title_label
-  if (has_title) {
-    for (i in seq(abf_list)) {
-      title_s <- paste0(ifelse(num_label, paste0(i, ". "), ""),
-                        ifelse(title_label, GetTitle(abf_list[[i]]), ""))
-      p[[i]] <- p[[i]] + ggtitle(title_s)
-    }
-  }
-
-  return(p)
-}
-
 #' Title
 #'
 #' @param abf_list
@@ -47,6 +22,7 @@ MultiPlotChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = 
   n <- ceiling(sqrt(length(abf_list)))
   return(plot_grid(plotlist = p, ncol = n))
 }
+
 #' Title
 #'
 #' @param abf_list
@@ -96,7 +72,7 @@ MultiPlotChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FAL
                   unify_y, ...)
   for (i in seq_along(p)) {
     #convert intv to time_unit
-    intv <- TickToTime(abf[[i]], time_unit, intv_list[[i]])
+    intv <- TickToTime(abf_list[[i]], time_unit, intv_list[[i]])
     p[[i]] <- p[[i]] +
       geom_vline(xintercept = intv[1:2], linetype = "dashed")
   }
@@ -104,6 +80,7 @@ MultiPlotChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FAL
   n <- ceiling(sqrt(length(abf_list)))
   return(plot_grid(plotlist = p, ncol = n))
 }
+
 #' Title
 #'
 #' @param abf_list
@@ -126,6 +103,65 @@ MultiPeekChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FAL
                                   unify_y = TRUE, ratio = 100, ...) {
 
   p <- MultiPlotChannel_Intv(abf_list, intv_list, channel, colour, time_unit,
+                             num_label, title_label, unify_y, sampling_ratio = ratio, ...)
+  return(p)
+}
+
+#' Title
+#'
+#' @param abf_list
+#' @param cursor_list
+#' @param channel
+#' @param colour
+#' @param time_unit
+#' @param num_label
+#' @param title_label
+#' @param unify_y
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+MultiPlotChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour = FALSE,
+                                  time_unit = "tick", num_label = FALSE, title_label = TRUE,
+                                  unify_y = TRUE, ...) {
+
+  p <- MultiPlotP(abf_list, channel, colour, time_unit, num_label, title_label,
+                  unify_y, ...)
+  for (i in seq_along(p)) {
+    #convert intv to time_unit
+    cursor <- TickToTime(abf_list[[i]], time_unit, cursor_list[[i]])
+    p[[i]] <- p[[i]] +
+      geom_vline(xintercept = cursor, linetype = "dashed")
+  }
+
+  n <- ceiling(sqrt(length(abf_list)))
+  return(plot_grid(plotlist = p, ncol = n))
+}
+
+#' Title
+#'
+#' @param abf_list
+#' @param cursor_list
+#' @param channel
+#' @param colour
+#' @param time_unit
+#' @param num_label
+#' @param title_label
+#' @param unify_y
+#' @param ratio
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+MultiPeekChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour = FALSE,
+                                  time_unit = "tick", num_label = FALSE, title_label = TRUE,
+                                  unify_y = TRUE, ratio = 100, ...) {
+
+  p <- MultiPlotChannel_Cursor(abf_list, cursor_list, channel, colour, time_unit,
                              num_label, title_label, unify_y, sampling_ratio = ratio, ...)
   return(p)
 }

@@ -1,13 +1,3 @@
-GetChannelP <- function(abf, channel, ...) {
-
-  df <- melt(abf, channel, ...)
-  chan_desc <- GetChannelDesc(abf)[channel]
-
-  p <- ggplot(df, aes_string("time", as.name(chan_desc))) + theme_bw()
-
-  return(p)
-}
-
 #' Title
 #'
 #' @param abf
@@ -140,17 +130,6 @@ PeekChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, ratio =
   return(PlotChannel_Cursor(abf, cursor, channel, colour, sampling_ratio = ratio, ...))
 }
 
-CollectAllChannel <- function(abf, colour, ...) {
-
-  p <- list()
-  n <- nChan(abf)
-
-  for (i in seq(n)) {
-    p[[i]] <- PlotChannel(abf, i, colour, ...)
-  }
-
-  return(p)
-}
 #' Title
 #'
 #' @param abf
@@ -167,6 +146,7 @@ PlotAllChannel_H <- function(abf, colour = FALSE, ...) {
 
   return(plot_grid(plotlist = p, nrow = 1))
 }
+
 #' Title
 #'
 #' @param abf
@@ -183,6 +163,7 @@ PlotAllChannel_V <- function(abf, colour = FALSE, ...) {
 
   return(plot_grid(plotlist = p, ncol = 1))
 }
+
 #' Title
 #'
 #' @param abf
@@ -198,6 +179,7 @@ PeekAllChannel_H <- function(abf, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_H(abf, colour, sampling_ratio = ratio, ...))
 }
+
 #' Title
 #'
 #' @param abf
@@ -214,17 +196,6 @@ PeekAllChannel_V <- function(abf, colour = FALSE, ratio = 50, ...) {
   return(PlotAllChannel_V(abf, colour, sampling_ratio = ratio, ...))
 }
 
-CollectAllChannel_Intv <- function(abf, intv, colour, ...) {
-
-  p <- list()
-  n <- nChan(abf)
-
-  for (i in seq(n)) {
-    p[[i]] <- PlotChannel_Intv(abf, intv, i, colour, ...)
-  }
-
-  return(p)
-}
 #' Title
 #'
 #' @param abf
@@ -242,6 +213,7 @@ PlotAllChannel_Intv_H <- function(abf, intv, colour = FALSE, ...) {
 
   return(plot_grid(plotlist = p, nrow = 1))
 }
+
 #' Title
 #'
 #' @param abf
@@ -259,6 +231,7 @@ PlotAllChannel_Intv_V <- function(abf, intv, colour = FALSE, ...) {
 
   return(plot_grid(plotlist = p, ncol = 1))
 }
+
 #' Title
 #'
 #' @param abf
@@ -275,6 +248,7 @@ PeekAllChannel_Intv_H <- function(abf, intv, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_Intv_H(abf, intv, colour, sampling_ratio = ratio, ...))
 }
+
 #' Title
 #'
 #' @param abf
@@ -290,4 +264,74 @@ PeekAllChannel_Intv_H <- function(abf, intv, colour = FALSE, ratio = 50, ...) {
 PeekAllChannel_Intv_V <- function(abf, intv, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_Intv_V(abf, intv, colour, sampling_ratio = ratio, ...))
+}
+
+#' Title
+#'
+#' @param abf
+#' @param cursor
+#' @param colour
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PlotAllChannel_Cursor_H <- function(abf, cursor, colour = FALSE, ...) {
+
+  p <- CollectAllChannel_Cursor(abf, cursor, colour, ...)
+
+  return(plot_grid(plotlist = p, nrow = 1))
+}
+
+#' Title
+#'
+#' @param abf
+#' @param cursor
+#' @param colour
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PlotAllChannel_Cursor_V <- function(abf, cursor, colour = FALSE, ...) {
+
+  p <- CollectAllChannel_Cursor(abf, cursor, colour, ...)
+
+  return(plot_grid(plotlist = p, ncol = 1))
+}
+
+#' Title
+#'
+#' @param abf
+#' @param cursor
+#' @param colour
+#' @param ratio
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PeekAllChannel_Cursor_H <- function(abf, cursor, colour = FALSE, ratio = 50, ...) {
+
+  return(PlotAllChannel_Cursor_H(abf, cursor, colour, sampling_ratio = ratio, ...))
+}
+
+#' Title
+#'
+#' @param abf
+#' @param cursor
+#' @param colour
+#' @param ratio
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PeekAllChannel_Cursor_V <- function(abf, cursor, colour = FALSE, ratio = 50, ...) {
+
+  return(PlotAllChannel_Cursor_V(abf, cursor, colour, sampling_ratio = ratio, ...))
 }

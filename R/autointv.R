@@ -1,18 +1,3 @@
-allowed_delta_abs <- function(channel_data, delta) {
-
-  d <- dim(channel_data)
-  ret <- array(data = abs(delta), dim = d)
-
-  return(ret)
-}
-
-allowed_delta_rel <- function(channel_data, delta) {
-
-  ret <- abs(channel_data * delta)
-
-  return(ret)
-}
-
 #' Title
 #'
 #' @param abf
@@ -25,11 +10,11 @@ allowed_delta_rel <- function(channel_data, delta) {
 #' @export
 #'
 #' @examples
-CmpWaveform <- function(abf, channel, epoch, delta, relative,
-                        min_win = 0 , max_win = 0) {
+CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win = 0 ,
+                        max_win = 0) {
 
   epoch_intv <- GetEpochIntervals(abf)
-  epoch <- first_elem(epoch)
+  epoch <- FirstElement(epoch)
 
   episodes <- GetAvailEpisodes(abf)
   wf <- GetWaveform(abf, episodes)
@@ -56,12 +41,10 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative,
       tmp[2, ] <- tmp[2, ] + intv[1] - 1L
       #filter length
       if (min_win != 0L) {
-        tmp_idx <- min_win <= tmp[3, ]
-        tmp <- tmp[, tmp_idx, drop = FALSE]
+        tmp <- FilterMinIntervalSize(tmp, min_win)
       }
       if (max_win != 0L) {
-        tmp_idx <- tmp[3, ] <= max_win
-        tmp <- tmp[, tmp_idx, drop = FALSE]
+        tmp <- FilterMaxIntervalSize(tmp, max_win)
       }
     }
 
@@ -144,8 +127,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
 
   npts <- nPts(abf)
   ovlp <- OverlapEpisodicIntv(episodic_intv, episodes, npts)
-  mask <- min_sampling_size <= ovlp[3, ]
-  ovlp <- ovlp[ , mask, drop = FALSE]
+  ovlp <- FilterMinIntervalSize(ovlp, min_sampling_size)
   if (ncol(ovlp) == 0L) {
     fmt_str <- paste0("In %s, no common stable voltage interval found for all episodes. ",
                       "Returning NA.")
@@ -173,50 +155,21 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
   return(best_intv)
 }
 
-OverlapEpisodicIntv <- function(episodic_intv, episodes, npts) {
+#' Title
+#'
+#' @param abf_list
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+FindAllSamplingInterval <- function(abf_list, ...) {
 
-  ret <- rep(TRUE, npts)
-  for (epi in episodes) {
-    ret <- ret & IntvToLogi(episodic_intv[[epi]], npts)
+  intv_list = list()
+  for (i in seq_along(abf_list)) {
+    intv_list[[i]] <- FindSamplingInterval(abf_list[[i]], ...)
   }
 
-  return(LogiToIntv(ret))
-}
-
-BinSearchIntv <- function(channel_data, intv, min_intv, f) {
-
-  mask <- MaskIntv(intv)
-  ret <- list()
-  ret$score <- colSds(channel_data[mask, ])
-  ret$intv <- intv
-
-  if (intv[3] %/% 2L <= min_intv) {
-    return(ret)
-  }
-
-  mid_idx <- (intv[1] + intv[2]) %/% 2L
-  intv_l <- c(intv[1], mid_idx, mid_idx - intv[1] + 1L)
-  intv_r <- c(mid_idx, intv[2], intv[2] - mid_idx + 1L)
-
-  ret_r <- BinSearchIntv(channel_data, intv_r, min_intv , f)
-  if (f(ret_r$score, ret$score)) {
-    return(ret_r)
-  } else {
-    ret_l <- BinSearchIntv(channel_data, intv_l, min_intv, f)
-    if (f(ret_l$score, ret$score)) {
-      return(ret_l)
-    } else {
-      return(ret)
-    }
-  }
-}
-
-score_worst_half <- function(s1, best_s) {
-
-  #half length + 1
-  n <- length(best_s) %/% 2L + 1L
-  o <- order(best_s, decreasing = TRUE)
-  mask <- o[seq.int(n)]
-
-  return(all(s1[mask] < best_s[mask]))
+  return(intv_list)
 }
