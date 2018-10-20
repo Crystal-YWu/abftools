@@ -4,7 +4,7 @@
 \alias{GetWaveform}
 \title{Title}
 \usage{
-GetWaveform(abf, episodes = 0)
+GetWaveform(abf, episodes = 0, wf_dac = 0)
 }
 \arguments{
 \item{episodes}{}

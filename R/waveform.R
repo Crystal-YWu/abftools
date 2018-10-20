@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-GetWaveform <- function(abf, episodes = 0) {
+GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
 
   if (class(abf) != "abf") {
     err_class_abf("GetWaveform")
@@ -17,11 +17,14 @@ GetWaveform <- function(abf, episodes = 0) {
 
   meta <- get_meta(abf)
   #Check DAC channel and DAC source
-  wf_dac <- GetWaveformEnabledDAC(abf)
+  if (wf_dac[1] == 0) {
+    wf_dac <- GetWaveformEnabledDAC(abf)
+  }
   if (length(wf_dac) == 0L) {
     err_wf_dac("GetWaveform")
   }
   wf_dac <- first_elem(wf_dac)
+  #Stimulus file is not supported yet
   wf_src <- meta$DAC$nWaveformSource[wf_dac]
   if (wf_src != 1L) {
     err_wf_support("GetWaveform")
@@ -52,6 +55,9 @@ GetWaveform <- function(abf, episodes = 0) {
   #Extract epoch settings
   epdac <- GetWaveformEpdac(abf, wf_dac)
   nepoch <- nrow(epdac)
+  if (nepoch == 0L) {
+    err_wf_dac("GetWaveform")
+  }
 
   #extract epoch settings
   init_level <- epdac$fEpochInitLevel
@@ -188,9 +194,9 @@ wf_biphsc <- function(len, Vin, Vhi, period, width) {
   Vlo <- 2 * Vin - Vhi
 
   win <- rep(Vin, period)
-  hwidth <- (width + 1) %/% 2
+  hwidth <- (width + 1L) %/% 2L
   win[1:hwidth] <- Vhi
-  win[(hwidth + 1):width] <- Vlo
+  win[(hwidth + 1L):width] <- Vlo
 
   ret <- rep(win, length.out = len)
 

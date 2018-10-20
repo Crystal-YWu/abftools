@@ -28,7 +28,7 @@ GetWaveformEnabledDAC <- function(abf) {
   meta <- get_meta(abf)
 
   ret <- which(as.logical(meta$DAC$nWaveformEnable))
-  if (length(ret) > 1) {
+  if (length(ret) > 1L) {
     #not sure if this could really happen in real life
     warning("WaveformDAC: Multiple waveform DAC enabled.")
   }

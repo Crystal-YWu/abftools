@@ -1,20 +1,4 @@
-#' FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object
-#'
-#' @param abf an abf object
-#' @param current_channel OPTIONAL, channel id for current data
-#' @param voltage_channel OPTIONAL, channel id for voltage data
-#' @param min_sampling_size OPTIONAL, min size in points of a sampling interval
-#' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage W.R.T epoch per DAC setting
-#' @param backward_search OPTIONAL, perform search along backward direction
-#' @param strict_comp OPTIONAL, use strict compare mode, if set to FALSE, a fuzzy "mostly" compare is used instead
-#' @param max_sampling_size
-#' @param epoch_name
-#'
-#' @return a named vector of 3 numeric: interval start position, end position, length
-#' @export
-#'
-#' @examples
-FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
+FindSamplingInterval_OLD <- function(abf, current_channel = 0, voltage_channel = 0,
                                  min_sampling_size = 0, max_sampling_size = 0,
                                  allowed_voltage_delta = 0, epoch_name = "auto",
                                  backward_search = TRUE, strict_comp = TRUE) {

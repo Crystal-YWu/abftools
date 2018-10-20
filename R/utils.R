@@ -34,18 +34,29 @@ colSems <- function(df, na.rm = FALSE) {
   return(sds / sqn)
 }
 
-LogiRleWin <- function(v) {
+LogiToIntv <- function(logi) {
 
-  r <- rle(v)
+  r <- rle(logi)
   idx_end <- cumsum(r$lengths)
   idx_start <- idx_end - r$lengths + 1
-  #exploit that v is logical
+  #exploit that logi is logical
   idx_start <- idx_start[r$values]
   idx_end <- idx_end[r$values]
   win_length <- r$lengths[r$values]
 
   win <- rbind(idx_start, idx_end, win_length)
   return(win)
+}
+
+IntvToLogi <- function(intv, full_length) {
+
+  ret <- rep(FALSE, full_length)
+  for (i in seq.int(ncol(intv))) {
+    mask <- MaskIntv(intv[, i])
+    ret[mask] <- TRUE
+  }
+
+  return(ret)
 }
 
 AllAbf <- function(x) {
