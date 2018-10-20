@@ -48,7 +48,7 @@ GetPointsPerEpisode <- function(abf) {
 
   mode <- GetMode(abf)
   if (mode == 3L) {
-    return(dim(abf)[2])
+    return(dim(abf)[1])
   }
 
   meta <- get_meta(abf)
