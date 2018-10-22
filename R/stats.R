@@ -36,3 +36,115 @@ IVSummary <- function(abf_list, intv_list, current_channel = 0, voltage_channel 
   colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current")
   return(df)
 }
+
+#' Average a list of abf objects.
+#'
+#' @param abf_list a list of abf objects.
+#' @param w a vector of weights for weighted average, leave 0 for arithmetic mean.
+#'
+#' @return an averaged abf object, of which the protocol settings follow first element in abf_list.
+#' @export
+#'
+AverageAbf <- function(abf_list, w = 0) {
+
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list("MeanABF")
+  }
+  if (class(abf_list) == "abf") {
+    return(abf_list)
+  }
+
+  if (w[1] == 0) {
+    n <- length(abf_list)
+    ret <- abf_list[[1]]
+    for (i in 2:n) {
+      ret <- ret + abf_list[[i]]
+    }
+    ret <- ret / n
+  } else {
+    n <- length(abf_list)
+    if (n != length(w)) {
+      err_wrong_dim("AverageABF")
+    }
+    ret <- abf_list[[1]] * w[1]
+    for (i in 2:n) {
+      ret <- ret + abf_list[[i]] * w[i]
+    }
+    ret <- ret / sum(w)
+  }
+
+
+  return(ret)
+}
+
+#' Sampling abf object to reduce data points.
+#'
+#' @param abf an abf object.
+#' @param sampling_ratio the sampling ratio. See melt.abf for more details.
+#' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
+#'
+#' @return
+#' @export
+#'
+SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
+
+  nch <- nChan(abf)
+  nepi <- nEpi(abf)
+  npts_abf <- nPts(abf)
+
+  #indices of the sampled points
+  idx_smpl <- seq.int(from = 1L, to = npts_abf, by = sampling_ratio)
+  #npts for sampled abf
+  npts <- length(idx_smpl)
+  #copy sampled points to data
+  data <- array(abf[idx_smpl, , ], dim = c(npts, nepi, nch))
+  #TODO: this is super SLOW, optimisation needed.
+  #Solution 1. restrict sampling_func to a function that applies data by column,
+  #and provide high performance colXX functions to users. Should consider
+  #consistency with sampling_func of melt.abf
+  #Solution 2. convert this part to Rcpp.
+  if (!is.null(sampling_func)) {
+    for (chan in seq.int(nch)) {
+      #for (epi in seq.int(nepi)) {
+      #  for (i in seq.int(npts - 1L)) {
+      #    mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
+      #    data[i, epi, chan] <- sampling_func(abf[mask, epi, chan])
+      #  }
+      #  mask <- seq.int(idx_smpl[npts], npts_abf)
+      #  data[npts, epi, chan] <- sampling_func(abf[mask, epi, chan])
+      #}
+      #sapply sees speed degrade. use loop instead.
+      #for (i in seq.int(npts - 1L)) {
+      #  mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
+      #  tmp_values <- sapply(seq.int(nepi), function(x) sampling_func(abf[mask, x, chan]))
+      #  data[i, , chan] <- tmp_values
+      #}
+      #mask <- seq.int(idx_smpl[npts], npts_abf)
+      #tmp_values <- sapply(seq.int(nepi), function(x) sampling_func(abf[mask, x, chan]))
+      #data[npts, , chan] <- tmp_values
+      for (i in seq.int(npts - 1L)) {
+        mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
+        data[i, , chan] <- sampling_func(abf[mask, , chan])
+      }
+      mask <- seq.int(idx_smpl[npts], npts_abf)
+      data[npts, , chan] <- sampling_func(abf[mask, , chan])
+    }
+  }
+
+  #copy meta
+  attr(data, "class") <- "abf"
+  attr(data, "title") <- GetTitle(abf)
+  attr(data, "mode") <- GetMode(abf)
+  attr(data, "ChannelName") <- GetChannelName(abf)
+  attr(data, "ChannelUnit") <- GetChannelUnit(abf)
+  attr(data, "ChannelDesc") <- GetChannelDesc(abf)
+  attr(data, "SamplingInterval") <- GetSamplingIntv(abf)
+  attr(data, "EpiAvail") <- attr(abf, "EpiAvail")
+
+  #alter meta
+  meta <- get_meta(abf)
+  meta$Protocol$lNumSamplesPerEpisode <- npts * nch
+  attr(data, "meta") <- meta
+
+  return(data)
+}
