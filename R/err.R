@@ -28,6 +28,12 @@ err_class_abf_protocol <- function(func) {
   err(func, msg)
 }
 
+err_class_vec_list <- function(func) {
+
+  msg <- "Only vector or list are supported."
+  err(func, msg)
+}
+
 err_intv_pos <- function(func) {
 
   msg <- "End position should be larger than start position."

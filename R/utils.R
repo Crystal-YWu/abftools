@@ -55,3 +55,34 @@ SetIntv <- function(intv, startPos, endPos) {
     intv <- c(startPos, endPos, endPos - startPos + 1L)
   }))
 }
+
+push <- function(x, items) {
+
+  if (is.vector(x) || is.list(x)) {
+    eval.parent(substitute({
+      x <- append(x, items)
+    }))
+  } else {
+    err_class_vec_list("push")
+  }
+}
+
+pop <- function(x) {
+
+  #this contaminates parent's env, need better solution
+  if (is.vector(x)) {
+    eval.parent(substitute({
+      item <- x[length(x)]
+      x <- x[-length(x)]
+      item
+    }))
+  } else if (is.list(x)) {
+    eval.parent(substitute({
+      item <- x[[length(x)]]
+      x <- x[[-length(x)]]
+      item
+    }))
+  } else {
+    err_class_vec_list("pop")
+  }
+}
