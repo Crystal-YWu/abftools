@@ -1,15 +1,16 @@
-#' Title
+#' Compare epoch waveform setting to a channel data.
 #'
-#' @param abf
-#' @param channel
-#' @param epoch
-#' @param delta
-#' @param relative
+#' @param abf an abf object.
+#' @param channel the channel to compare, channel id is 1-based.
+#' @param epoch the epoch to compare.
+#' @param delta allowed deviation.
+#' @param relative delta is given in relative value or absolute value.
+#' @param min_win minimum interval window size of the result.
+#' @param max_win maximum interval window size of the result.
 #'
-#' @return
+#' @return a list of intervals of which pass comparison.
 #' @export
 #'
-#' @examples
 CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win = 0 ,
                         max_win = 0) {
 
@@ -54,20 +55,27 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win = 0 ,
   return(ret)
 }
 
-#' FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object
+#' FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.
 #'
-#' @param abf an abf object
-#' @param current_channel OPTIONAL, channel id for current data
-#' @param voltage_channel OPTIONAL, channel id for voltage data
-#' @param min_sampling_size OPTIONAL, min size in points of a sampling interval
-#' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage W.R.T epoch per DAC setting
-#' @param epoch_name OPTIONAL, the epoch to search, defaults to B (second epoch)
-#' @param backward_search OPTIONAL, perform search along backward direction
+#' FindSamplingInterval is a convenient alternative to CmpWaveform, best suited
+#' to locate sampling intervals when using step voltage cmd waveform. Some common
+#' assumptions are made:
+#' 1. Waveform Cmd is outputing voltage command.
+#' 2. The function is looking for most stable voltage AND current channel.
+#' 3. The function prefers stability to the size of interval.
+#' 4. Intervals closer to the end of the epoch are preferred.
+#'
+#' @param abf an abf object.
+#' @param current_channel OPTIONAL, channel id for current data, channel id is 1-based.
+#' @param voltage_channel OPTIONAL, channel id for voltage data, channel id is 1-based.
+#' @param min_sampling_size OPTIONAL, min size in points of a sampling interval.
+#' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage.
+#' @param epoch_name OPTIONAL, the epoch to search, defaults to B (second epoch).
+#' @param backward_search OPTIONAL, perform search along backward direction.
 #'
 #' @return a named vector of 3 numeric: interval start position, end position, length
 #' @export
 #'
-#' @examples
 FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
                                  min_sampling_size = 0, allowed_voltage_delta = 0,
                                  epoch_name = "B", backward_search = TRUE) {
@@ -155,15 +163,14 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
   return(best_intv)
 }
 
-#' Title
+#' Call FindSamplingInterval for a list of abf objects.
 #'
-#' @param abf_list
+#' @param abf_list a list of abf objects.
 #' @param ...
 #'
-#' @return
+#' @return a list of found intervals.
 #' @export
 #'
-#' @examples
 FindAllSamplingInterval <- function(abf_list, ...) {
 
   intv_list = list()

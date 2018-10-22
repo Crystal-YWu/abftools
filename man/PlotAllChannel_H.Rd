@@ -2,13 +2,20 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotAllChannel_H}
 \alias{PlotAllChannel_H}
-\title{Title}
+\title{Plot all channels horizontally}
 \usage{
 PlotAllChannel_H(abf, colour = FALSE, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot all channels horizontally
 }

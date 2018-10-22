@@ -2,13 +2,27 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PeekChannel}
 \alias{PeekChannel}
-\title{Title}
+\title{Fast plot a channel.}
 \usage{
-PeekChannel(abf, channel = 1, colour = FALSE, ratio = 50, ...)
+PeekChannel(abf, channel = 1, colour = FALSE, time_unit = "tick",
+  ratio = 50, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{channel}{channel to plot, channel id is 1-based.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{time_unit}{time unit for the plot.}
+
+\item{ratio}{sampling ratio.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Fast plot a channel.
 }

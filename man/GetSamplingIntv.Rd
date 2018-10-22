@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetSamplingIntv}
 \alias{GetSamplingIntv}
-\title{Title}
+\title{Get sampling interval in us.}
 \usage{
 GetSamplingIntv(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+the sampling interval in unit us.
 }
 \description{
-Title
+Get sampling interval in us.
 }

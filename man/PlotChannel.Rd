@@ -2,14 +2,25 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotChannel}
 \alias{PlotChannel}
-\title{Title}
+\title{Plot a channel.}
 \usage{
 PlotChannel(abf, channel = 1, colour = FALSE, time_unit = "tick",
   ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{channel}{channel to plot, channel id is 1-based.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{time_unit}{time unit for the plot.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot a channel.
 }

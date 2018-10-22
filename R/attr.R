@@ -1,11 +1,10 @@
-#' Title
+#' Get title of an abf object.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return the title of the abf object.
 #' @export
 #'
-#' @examples
 GetTitle <- function(abf) {
 
   if (class(abf) == "abf") {
@@ -18,15 +17,21 @@ GetTitle <- function(abf) {
 
 }
 
-#' Title
+#' Set title of an abf object, by-ref behaviour.
 #'
-#' @param abf
-#' @param title
+#' In order to mimic the by-ref behaviour, when setting titles for a list of abf
+#' objects, a temp variable "i_____" in caller's scope is used an then removed.
+#' This may cause some trouble if you use i_____ in your code.
 #'
-#' @return
+#' @param abf an abf object, a list of abf objects are also supported.
+#' @param title the title to be set.
+#'
+#' @return an abf object
 #' @export
 #'
 #' @examples
+#' #abf itself is changed, no need to assign
+#' SetTitle(abf, "new title")
 SetTitle <- function(abf, title) {
 
   if (class(abf) == "abf") {
@@ -58,79 +63,73 @@ SetTitle <- function(abf, title) {
 }
 
 
-#' Title
+#' Get names of channels.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return a character vector of channel names.
 #' @export
 #'
-#' @examples
 GetChannelName <- function(abf) {
 
   return(attr(abf, "ChannelName"))
 }
 
-#' Title
+#' Get units of channels.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return a character vector of channel units.
 #' @export
 #'
-#' @examples
 GetChannelUnit <- function(abf) {
 
   return(attr(abf, "ChannelUnit"))
 }
 
-#' Title
+#' Get descriptions of channels.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return a character vector of channel descriptions.
 #' @export
 #'
-#' @examples
 GetChannelDesc <- function(abf) {
 
   return(attr(abf, "ChannelDesc"))
 }
 
-#' Title
+#' Get sampling interval in us.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return the sampling interval in unit us.
 #' @export
 #'
-#' @examples
 GetSamplingIntv <- function(abf) {
 
   return(attr(abf, "SamplingInterval"))
 }
 
-#' Title
+#' Get mode of the abf object.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return the mode of the recording.
 #' @export
 #'
-#' @examples
 GetMode <- function(abf) {
 
   return(attr(abf, "mode"))
 }
 
-#' Title
+#' Get number of channels.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return number of channels.
 #' @export
 #'
-#' @examples
 GetNumOfChannel <- function(abf) {
 
   meta <- get_meta(abf)
@@ -140,14 +139,18 @@ GetNumOfChannel <- function(abf) {
   return(ret)
 }
 
-#' Title
+#' Get number of episodes/sweeps per channel.
 #'
-#' @param abf
+#' The returned number may be different to the result of dim(abf[[chan_id]]) if
+#' you have removed episodes from the abf object. GetEpisodesPerChannel / nEpi
+#' always return the original number of episodes per channel setting in the
+#' abf2 protocol.
 #'
-#' @return
+#' @param abf an abf object.
+#'
+#' @return number of episodes/sweeps per channel.
 #' @export
 #'
-#' @examples
 GetEpisodesPerChannel <- function(abf) {
 
   mode <- GetMode(abf)
@@ -161,14 +164,13 @@ GetEpisodesPerChannel <- function(abf) {
   return(ret)
 }
 
-#' Title
+#' Get number of recorded points per episode/sweep.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return number of recorded points per episode/sweep.
 #' @export
 #'
-#' @examples
 GetPointsPerEpisode <- function(abf) {
 
   mode <- GetMode(abf)
@@ -182,40 +184,42 @@ GetPointsPerEpisode <- function(abf) {
   return(ret)
 }
 
-#' Title
+#' Get number of channels.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return number of channels.
 #' @export
 #'
-#' @examples
 nChan <- function(abf) {
 
   return(GetNumOfChannel(abf))
 }
 
-#' Title
+#' Get number of recorded points per episode/sweep.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return number of recorded points per episode/sweep.
 #' @export
 #'
-#' @examples
 nPts <- function(abf) {
 
   return(GetPointsPerEpisode(abf))
 }
 
-#' Title
+#' Get number of episodes/sweeps per channel.
 #'
-#' @param abf
+#' The returned number may be different to the result of dim(abf[[chan_id]]) if
+#' you have removed episodes from the abf object. GetEpisodesPerChannel / nEpi
+#' always return the original number of episodes per channel setting in the
+#' abf2 protocol.
 #'
-#' @return
+#' @param abf an abf object.
+#'
+#' @return number of episodes/sweeps per channel.
 #' @export
 #'
-#' @examples
 nEpi <- function(abf) {
 
   return(GetEpisodesPerChannel(abf))

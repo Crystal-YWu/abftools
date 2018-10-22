@@ -2,14 +2,29 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PeekChannel_Intv}
 \alias{PeekChannel_Intv}
-\title{Title}
+\title{Fast plot a channel with interval.}
 \usage{
-PeekChannel_Intv(abf, intv, channel = 1, colour = FALSE, ratio = 50,
-  ...)
+PeekChannel_Intv(abf, intv, channel = 1, colour = FALSE,
+  time_unit = "tick", ratio = 50, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{intv}{an interval.}
+
+\item{channel}{channel to plot, channel id is 1-based.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{time_unit}{time unit for the plot.}
+
+\item{ratio}{sampling ratio.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Fast plot a channel with interval.
 }

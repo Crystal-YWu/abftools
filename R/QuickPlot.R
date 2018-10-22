@@ -1,12 +1,11 @@
-#' Title
+#' Quick plot I-V curves at given position
 #'
-#' @param abf
-#' @param pos
+#' @param abf an abf object.
+#' @param pos an interval or a cursor.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 QuickPlotIV <- function(abf, pos, smooth = FALSE) {
 
   current_channel <- GetFirstCurrentChan(abf)
@@ -25,24 +24,25 @@ QuickPlotIV <- function(abf, pos, smooth = FALSE) {
   qplot(x = voltage, y = current, geom = geom_type) + theme_bw()
 }
 
-#' Title
+#' Quick plot trace vs. trace curve.
 #'
-#' @param abf
-#' @param channel
-#' @param episodeX
-#' @param episodeY
-#' @param intv
+#' @param abf an abf object.
+#' @param channelX channel of X trace.
+#' @param episodeX episode of X trace.
+#' @param channelY channel of Y trace.
+#' @param episodeY channel of Y trace.
+#' @param intv interval of the traces to be plotted.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
-QuickPlotTrace <- function(abf, channel, episodeX, episodeY, intv) {
+QuickPlotTrace <- function(abf, channelX, episodeX, channelY, episodeY, intv) {
 
-  ch <- abf[[channel]]
+  chX <- abf[[channelX]]
+  chY <- abf[[channelY]]
   mask <- intv[1]:intv[2]
-  traceX <- ch[mask, episodeX]
-  traceY <- ch[mask, episodeY]
+  traceX <- chX[mask, episodeX]
+  traceY <- chY[mask, episodeY]
 
   qplot(x = traceX, y = traceY, geom = "point") + theme_bw()
 }

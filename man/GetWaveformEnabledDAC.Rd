@@ -2,13 +2,16 @@
 % Please edit documentation in R/epoch.R
 \name{GetWaveformEnabledDAC}
 \alias{GetWaveformEnabledDAC}
-\title{Title}
+\title{Get DAC id of which waveform is enabled.}
 \usage{
 GetWaveformEnabledDAC(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+DAC id, 1-based.
 }
 \description{
-Title
+Get DAC id of which waveform is enabled.
 }

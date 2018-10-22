@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetChannelName}
 \alias{GetChannelName}
-\title{Title}
+\title{Get names of channels.}
 \usage{
 GetChannelName(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+a character vector of channel names.
 }
 \description{
-Title
+Get names of channels.
 }

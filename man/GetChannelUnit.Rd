@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetChannelUnit}
 \alias{GetChannelUnit}
-\title{Title}
+\title{Get units of channels.}
 \usage{
 GetChannelUnit(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+a character vector of channel units.
 }
 \description{
-Title
+Get units of channels.
 }

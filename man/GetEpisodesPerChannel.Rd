@@ -2,13 +2,19 @@
 % Please edit documentation in R/attr.R
 \name{GetEpisodesPerChannel}
 \alias{GetEpisodesPerChannel}
-\title{Title}
+\title{Get number of episodes/sweeps per channel.}
 \usage{
 GetEpisodesPerChannel(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+number of episodes/sweeps per channel.
 }
 \description{
-Title
+The returned number may be different to the result of dim(abf[[chan_id]]) if
+you have removed episodes from the abf object. GetEpisodesPerChannel / nEpi
+always return the original number of episodes per channel setting in the
+abf2 protocol.
 }

@@ -1,14 +1,13 @@
 #' IVSummary calculates average current of a list of abf objects, within given intervals
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param current_channel
-#' @param voltage_channel
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param current_channel current channel id, 1-based.
+#' @param voltage_channel voltage channel id, 1-based.
 #'
-#' @return
+#' @return a data frame containing calculated Voltage, SEM Voltage, Current, SEM Current columns.
 #' @export
 #'
-#' @examples
 IVSummary <- function(abf_list, intv_list, current_channel = 0, voltage_channel = 0) {
 
   #figure out current channel and voltage channel

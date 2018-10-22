@@ -2,14 +2,27 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotChannel_Intv}
 \alias{PlotChannel_Intv}
-\title{Title}
+\title{Plot a channel with interval.}
 \usage{
 PlotChannel_Intv(abf, intv, channel = 1, colour = FALSE,
   time_unit = "tick", ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{intv}{an interval.}
+
+\item{channel}{channel to plot, channel id is 1-based.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{time_unit}{time unit for the plot.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot a channel with interval.
 }

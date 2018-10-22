@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetTitle}
 \alias{GetTitle}
-\title{Title}
+\title{Get title of an abf object.}
 \usage{
 GetTitle(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+the title of the abf object.
 }
 \description{
-Title
+Get title of an abf object.
 }

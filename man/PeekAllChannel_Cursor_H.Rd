@@ -2,13 +2,24 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PeekAllChannel_Cursor_H}
 \alias{PeekAllChannel_Cursor_H}
-\title{Title}
+\title{Fast all channels with cursors horizontally.}
 \usage{
 PeekAllChannel_Cursor_H(abf, cursor, colour = FALSE, ratio = 50, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{cursor}{cursors to plot.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{ratio}{sampling ratio.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Fast all channels with cursors horizontally.
 }

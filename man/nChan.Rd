@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{nChan}
 \alias{nChan}
-\title{Title}
+\title{Get number of channels.}
 \usage{
 nChan(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+number of channels.
 }
 \description{
-Title
+Get number of channels.
 }

@@ -2,13 +2,22 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotAllChannel_Intv_V}
 \alias{PlotAllChannel_Intv_V}
-\title{Title}
+\title{Plot all channels with interval vertically}
 \usage{
 PlotAllChannel_Intv_V(abf, intv, colour = FALSE, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{intv}{an interval.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot all channels with interval vertically
 }

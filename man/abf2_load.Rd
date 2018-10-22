@@ -7,11 +7,17 @@
 abf2_load(filename, abf_title = NULL)
 }
 \arguments{
-\item{abf_title}{}
+\item{filename}{file path to the abf2 file.}
+
+\item{abf_title}{a title assigned to the loaded file, default is filename.}
 }
 \value{
-ABF2.Episodic, ABF2.Gapfree depending on file type.
+an abf object.
 }
 \description{
 abf2_load
+}
+\examples{
+abf <- abf2_load("experiment/001.abf")
+abf <- abf2_load("experiment/001.abf", "Some random title")
 }

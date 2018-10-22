@@ -2,13 +2,24 @@
 % Please edit documentation in R/utils.R
 \name{SetIntv}
 \alias{SetIntv}
-\title{Title}
+\title{Set intervals, by-ref behaviour}
 \usage{
 SetIntv(intv, startPos, endPos)
 }
 \arguments{
-\item{endPos}{}
+\item{intv}{an interval.}
+
+\item{startPos}{starting position of the new interval.}
+
+\item{endPos}{ending position of the new interval.}
+}
+\value{
+an interval.
 }
 \description{
-Title
+Set intervals, by-ref behaviour
+}
+\examples{
+#intv itself is changed, no need to assign
+SetIntv(intv, 100L, 500L)
 }

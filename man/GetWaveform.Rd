@@ -2,13 +2,20 @@
 % Please edit documentation in R/waveform.R
 \name{GetWaveform}
 \alias{GetWaveform}
-\title{Title}
+\title{Simulate waveform.}
 \usage{
 GetWaveform(abf, episodes = 0, wf_dac = 0)
 }
 \arguments{
-\item{episodes}{}
+\item{abf}{an abf object.}
+
+\item{episodes}{the episodes to simulate.}
+
+\item{wf_dac}{waveform DAC channel, 1-based.}
+}
+\value{
+channel data of the simulated waveform.
 }
 \description{
-Title
+Simulate waveform.
 }

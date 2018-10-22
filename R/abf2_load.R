@@ -1,12 +1,14 @@
 #' abf2_load
 #'
-#' @param filename
-#' @param abf_title
+#' @param filename file path to the abf2 file.
+#' @param abf_title a title assigned to the loaded file, default is filename.
 #'
-#' @return ABF2.Episodic, ABF2.Gapfree depending on file type.
+#' @return an abf object.
 #' @export
 #'
 #' @examples
+#' abf <- abf2_load("experiment/001.abf")
+#' abf <- abf2_load("experiment/001.abf", "Some random title")
 abf2_load <- function(filename, abf_title = NULL) {
 
   fp <- file(filename, "rb")
@@ -224,15 +226,17 @@ abf2_load <- function(filename, abf_title = NULL) {
 
 #' abf2_loadlist
 #'
-#' @param filelist
-#' @param folder
-#' @param attach_ext
-#' @param titlelist
+#' @param filelist a list of file name.
+#' @param folder the path to the folder of the files, if filelist contains full path, leave this to empty.
+#' @param attach_ext automatically add ".abf" extension to filelist if not present.
+#' @param titlelist a list of titles, a single title to be assigned to all loaded files.
 #'
-#' @return
+#' @return a list of abf objects.
 #' @export
 #'
 #' @examples
+#' flist <- samples$filenames
+#' alist <- abf2_loadlist(flist, "experiment/")
 abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist = NULL) {
 
   if (folder != "") {

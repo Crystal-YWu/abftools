@@ -2,13 +2,16 @@
 % Please edit documentation in R/abf2_protocol.R
 \name{GetProtocol}
 \alias{GetProtocol}
-\title{Title}
+\title{Return the protocols of an abf object.}
 \usage{
 GetProtocol(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+a list of data frames of protocol sections.
 }
 \description{
-Title
+Return the protocols of an abf object.
 }

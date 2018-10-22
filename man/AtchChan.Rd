@@ -2,13 +2,30 @@
 % Please edit documentation in R/channel.R
 \name{AtchChan}
 \alias{AtchChan}
-\title{Title}
+\title{Attach a new channel to an abf object.}
 \usage{
 AtchChan(abf, new_channel, channel_name, channel_unit, channel_desc)
 }
 \arguments{
-\item{channel_desc}{}
+\item{abf}{an abf object.}
+
+\item{new_channel}{data of the new channel.}
+
+\item{channel_name}{name of the new channel.}
+
+\item{channel_unit}{unit of the new channel.}
+
+\item{channel_desc}{description of the new channel.}
+}
+\value{
+an abf object with the attached channel.
 }
 \description{
-Title
+The attached new_channel's dimensions must match original dimensions,
+regardless of removed episodes due to the mechanism of RemoveEpisodes (they
+are only marked removed and excluded when extracting using [[).
+}
+\examples{
+wf <- GetWaveform(abf)
+new_abf <- AtchChan(abf, wf, "wf 0", "mV", "Simulated Waveform")
 }

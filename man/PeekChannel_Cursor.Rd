@@ -2,14 +2,29 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PeekChannel_Cursor}
 \alias{PeekChannel_Cursor}
-\title{Title}
+\title{Fast plot a channel with cursors.}
 \usage{
 PeekChannel_Cursor(abf, cursor, channel = 1, colour = FALSE,
-  ratio = 50, ...)
+  time_unit = "tick", ratio = 50, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{cursor}{cursors to plot.}
+
+\item{channel}{channel to plot, channel id is 1-based.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{time_unit}{time unit for the plot.}
+
+\item{ratio}{sampling ratio.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Fast plot a channel with cursors.
 }

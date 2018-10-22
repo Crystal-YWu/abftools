@@ -1,5 +1,22 @@
-print.abf <- function(x, ...) {
+#' Print an abf object
+#'
+#' @param x an abf object.
+#'
+#' @return the abf object itself, invisibly.
+#' @export
+#'
+#' @examples
+#' print(abf)
+print.abf <- function(x) {
 
+    fmt_str <- paste0("Mode %d abf object %s.\n",
+                      "Recorded %d ADC channels of %d episodes with %d points per episode. ",
+                      "Sampling interval: %.2f us.")
+    s <- sprintf(fmt_str, GetMode(x), GetTitle(x), nChan(x), nEpi(x), nPts(x),
+                 GetSamplingIntv(x))
+    cat(s, "\n")
+
+    invisible(x)
 }
 
 #' Extract channel data from an abf object.
@@ -11,13 +28,14 @@ print.abf <- function(x, ...) {
 #' also apply to other properties such as DAC num, Epoch num etc which have
 #' internal numbered indices.
 #'
-#' @param x
-#' @param channel
+#' @param x an abf object.
+#' @param channel ADC channel id, 1-based.
 #'
-#' @return
+#' @return a matrix of the channel data, with colnames of epiX.
 #' @export
 #'
 #' @examples
+#' abf[[1]]
 `[[.abf` <- function(x, channel) {
 
   channel <- FirstElement(channel)
@@ -46,15 +64,14 @@ print.abf <- function(x, ...) {
 }
 AllEpisodesAvail <- function(abf) all(attr(abf, "EpiAvail"))
 
-#' Title
+#' Convert a channel of an abf object to data.frame
 #'
-#' @param x
-#' @param channel
+#' @param x an abf object.
+#' @param channel ADC channel id, 1-based.
 #'
-#' @return
+#' @return a data frame of the channel data, with colname of epiX.
 #' @export
 #'
-#' @examples
 as.data.frame.abf <- function(x, channel = 1) {
 
   df <- x[[channel]]
@@ -62,17 +79,16 @@ as.data.frame.abf <- function(x, channel = 1) {
   return(data.frame(df))
 }
 
-#' Title
+#' Replacing channel data.
 #'
-#' @param x
-#' @param channel
-#' @param ...
+#' @param x an abf object.
+#' @param channel ADC channel id, 1-based.
+#' @param channel_data channel data to replace the original.
 #'
-#' @return
+#' @return an abf object with the replaced channel.
 #' @export
 #'
-#' @examples
-`[[<-.abf` <- function(x, ...) {
+`[[<-.abf` <- function(x, channel, channel_data) {
 
-  stop("Replace method for whole channel is not supported.")
+  return(RplcChan(x, channel, channel_data))
 }

@@ -2,14 +2,29 @@
 % Please edit documentation in R/autointv.R
 \name{CmpWaveform}
 \alias{CmpWaveform}
-\title{Title}
+\title{Compare epoch waveform setting to a channel data.}
 \usage{
 CmpWaveform(abf, channel, epoch, delta, relative, min_win = 0,
   max_win = 0)
 }
 \arguments{
-\item{relative}{}
+\item{abf}{an abf object.}
+
+\item{channel}{the channel to compare, channel id is 1-based.}
+
+\item{epoch}{the epoch to compare.}
+
+\item{delta}{allowed deviation.}
+
+\item{relative}{delta is given in relative value or absolute value.}
+
+\item{min_win}{minimum interval window size of the result.}
+
+\item{max_win}{maximum interval window size of the result.}
+}
+\value{
+a list of intervals of which pass comparison.
 }
 \description{
-Title
+Compare epoch waveform setting to a channel data.
 }

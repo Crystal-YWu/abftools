@@ -7,7 +7,16 @@
 EpisodicIntervalSems(abf_list, intv_list, channel = 1, na.rm = TRUE)
 }
 \arguments{
-\item{na.rm}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{intv_list}{a list of intervals.}
+
+\item{channel}{channel to calculated, channel id is 1-based.}
+
+\item{na.rm}{remove NAs.}
+}
+\value{
+a vector of calculated values.
 }
 \description{
 EpisodicIntervalSems calculates interval SEM of a list of abf objects

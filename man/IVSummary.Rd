@@ -8,7 +8,16 @@ IVSummary(abf_list, intv_list, current_channel = 0,
   voltage_channel = 0)
 }
 \arguments{
-\item{voltage_channel}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{intv_list}{a list of intervals.}
+
+\item{current_channel}{current channel id, 1-based.}
+
+\item{voltage_channel}{voltage channel id, 1-based.}
+}
+\value{
+a data frame containing calculated Voltage, SEM Voltage, Current, SEM Current columns.
 }
 \description{
 IVSummary calculates average current of a list of abf objects, within given intervals

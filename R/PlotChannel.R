@@ -1,15 +1,14 @@
-#' Title
+#' Plot a channel.
 #'
-#' @param abf
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param ...
+#' @param abf an abf object.
+#' @param channel channel to plot, channel id is 1-based.
+#' @param colour wheter to plot in coloured mode.
+#' @param time_unit time unit for the plot.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ...) {
 
   p <- GetChannelP(abf, channel, time_unit = time_unit, ...)
@@ -31,19 +30,18 @@ PlotChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ..
   return(p)
 }
 
-#' Title
+#' Plot a channel with interval.
 #'
-#' @param abf
-#' @param intv
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param ...
+#' @param abf an abf object.
+#' @param intv an interval.
+#' @param channel channel to plot, channel id is 1-based.
+#' @param colour wheter to plot in coloured mode.
+#' @param time_unit time unit for the plot.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, time_unit = "tick", ...) {
 
   p <- PlotChannel(abf, channel, colour, time_unit, ...)
@@ -54,19 +52,18 @@ PlotChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, time_unit =
   return(p)
 }
 
-#' Title
+#' Plot a channel with cursors.
 #'
-#' @param abf
-#' @param cursor
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param ...
+#' @param abf an abf object.
+#' @param cursor cursors to plot.
+#' @param channel channel to plot, channel id is 1-based.
+#' @param colour wheter to plot in coloured mode.
+#' @param time_unit time unit for the plot.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, time_unit = "tick", ...) {
 
   p <- PlotChannel(abf, channel, colour, time_unit, ...)
@@ -77,69 +74,68 @@ PlotChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, time_un
   return(p)
 }
 
-#' Title
+#' Fast plot a channel.
 #'
-#' @param abf
-#' @param channel
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param channel channel to plot, channel id is 1-based.
+#' @param colour wheter to plot in coloured mode.
+#' @param time_unit time unit for the plot.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
-PeekChannel <- function(abf, channel = 1, colour = FALSE, ratio = 50, ...) {
+PeekChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ratio = 50, ...) {
 
-  return(PlotChannel(abf, channel, colour, sampling_ratio = ratio, ...))
+  return(PlotChannel(abf, channel, colour, time_unit, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Fast plot a channel with interval.
 #'
-#' @param abf
-#' @param intv
-#' @param channel
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param intv an interval.
+#' @param channel channel to plot, channel id is 1-based.
+#' @param colour wheter to plot in coloured mode.
+#' @param time_unit time unit for the plot.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
-PeekChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, ratio = 50, ...) {
+PeekChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, time_unit = "tick", ratio = 50, ...) {
 
-  return(PlotChannel_Intv(abf, intv, channel, colour, sampling_ratio = ratio, ...))
+  return(PlotChannel_Intv(abf, intv, channel, colour, time_unit, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Fast plot a channel with cursors.
 #'
-#' @param abf
-#' @param cursor
-#' @param channel
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param cursor cursors to plot.
+#' @param channel channel to plot, channel id is 1-based.
+#' @param colour wheter to plot in coloured mode.
+#' @param time_unit time unit for the plot.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
-PeekChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, ratio = 50, ...) {
+PeekChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, time_unit = "tick", ratio = 50, ...) {
 
-  return(PlotChannel_Cursor(abf, cursor, channel, colour, sampling_ratio = ratio, ...))
+  return(PlotChannel_Cursor(abf, cursor, channel, colour, time_unit, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Plot all channels horizontally
 #'
-#' @param abf
-#' @param colour
-#' @param ...
+#' @param abf an abf object.
+#' @param colour wheter to plot in coloured mode.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotAllChannel_H <- function(abf, colour = FALSE, ...) {
 
   p <- CollectAllChannel(abf, colour, ...)
@@ -147,16 +143,15 @@ PlotAllChannel_H <- function(abf, colour = FALSE, ...) {
   return(plot_grid(plotlist = p, nrow = 1))
 }
 
-#' Title
+#' Plot all channels vertically
 #'
-#' @param abf
-#' @param colour
-#' @param ...
+#' @param abf an abf object.
+#' @param colour wheter to plot in coloured mode.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotAllChannel_V <- function(abf, colour = FALSE, ...) {
 
   p <- CollectAllChannel(abf, colour, ...)
@@ -164,49 +159,46 @@ PlotAllChannel_V <- function(abf, colour = FALSE, ...) {
   return(plot_grid(plotlist = p, ncol = 1))
 }
 
-#' Title
+#' Fast plot all channels horizontally
 #'
-#' @param abf
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param colour wheter to plot in coloured mode.
+#' @param ratio sampling ratio
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PeekAllChannel_H <- function(abf, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_H(abf, colour, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Fast plot all channels vertically
 #'
-#' @param abf
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param colour wheter to plot in coloured mode.
+#' @param ratio sampling ratio
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PeekAllChannel_V <- function(abf, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_V(abf, colour, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Plot all channels with interval horizontally
 #'
-#' @param abf
-#' @param intv
-#' @param colour
-#' @param ...
+#' @param abf an abf object.
+#' @param intv an interval.
+#' @param colour wheter to plot in coloured mode.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotAllChannel_Intv_H <- function(abf, intv, colour = FALSE, ...) {
 
   p <- CollectAllChannel_Intv(abf, intv, colour, ...)
@@ -214,17 +206,16 @@ PlotAllChannel_Intv_H <- function(abf, intv, colour = FALSE, ...) {
   return(plot_grid(plotlist = p, nrow = 1))
 }
 
-#' Title
+#' Plot all channels with interval vertically
 #'
-#' @param abf
-#' @param intv
-#' @param colour
-#' @param ...
+#' @param abf an abf object.
+#' @param intv an interval.
+#' @param colour wheter to plot in coloured mode.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotAllChannel_Intv_V <- function(abf, intv, colour = FALSE, ...) {
 
   p <- CollectAllChannel_Intv(abf, intv, colour, ...)
@@ -232,51 +223,48 @@ PlotAllChannel_Intv_V <- function(abf, intv, colour = FALSE, ...) {
   return(plot_grid(plotlist = p, ncol = 1))
 }
 
-#' Title
+#' Fast plot all channels with interval horizontally.
 #'
-#' @param abf
-#' @param intv
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param intv an interval.
+#' @param colour wheter to plot in coloured mode.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PeekAllChannel_Intv_H <- function(abf, intv, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_Intv_H(abf, intv, colour, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Fast plot all channels with interval vertically.
 #'
-#' @param abf
-#' @param intv
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param intv an interval.
+#' @param colour wheter to plot in coloured mode.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PeekAllChannel_Intv_V <- function(abf, intv, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_Intv_V(abf, intv, colour, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Plot all channels with cursors horizontally
 #'
-#' @param abf
-#' @param cursor
-#' @param colour
-#' @param ...
+#' @param abf an abf object.
+#' @param cursor cursors to plot.
+#' @param colour wheter to plot in coloured mode.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotAllChannel_Cursor_H <- function(abf, cursor, colour = FALSE, ...) {
 
   p <- CollectAllChannel_Cursor(abf, cursor, colour, ...)
@@ -284,17 +272,16 @@ PlotAllChannel_Cursor_H <- function(abf, cursor, colour = FALSE, ...) {
   return(plot_grid(plotlist = p, nrow = 1))
 }
 
-#' Title
+#' Plot all channels with cursors vertically.
 #'
-#' @param abf
-#' @param cursor
-#' @param colour
-#' @param ...
+#' @param abf an abf object.
+#' @param cursor cursors to plot.
+#' @param colour wheter to plot in coloured mode.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PlotAllChannel_Cursor_V <- function(abf, cursor, colour = FALSE, ...) {
 
   p <- CollectAllChannel_Cursor(abf, cursor, colour, ...)
@@ -302,35 +289,33 @@ PlotAllChannel_Cursor_V <- function(abf, cursor, colour = FALSE, ...) {
   return(plot_grid(plotlist = p, ncol = 1))
 }
 
-#' Title
+#' Fast all channels with cursors horizontally.
 #'
-#' @param abf
-#' @param cursor
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param cursor cursors to plot.
+#' @param colour wheter to plot in coloured mode.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PeekAllChannel_Cursor_H <- function(abf, cursor, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_Cursor_H(abf, cursor, colour, sampling_ratio = ratio, ...))
 }
 
-#' Title
+#' Fast all channels with cursors vertically.
 #'
-#' @param abf
-#' @param cursor
-#' @param colour
-#' @param ratio
-#' @param ...
+#' @param abf an abf object.
+#' @param cursor cursors to plot.
+#' @param colour wheter to plot in coloured mode.
+#' @param ratio sampling ratio.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 PeekAllChannel_Cursor_V <- function(abf, cursor, colour = FALSE, ratio = 50, ...) {
 
   return(PlotAllChannel_Cursor_V(abf, cursor, colour, sampling_ratio = ratio, ...))

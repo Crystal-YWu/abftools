@@ -1,13 +1,13 @@
-#' Title
+#' Mask episodes with a value.
 #'
-#' @param abf
-#' @param channel
-#' @param episodes
-#' @param value
-#' @return
+#' @param abf an abf object.
+#' @param channel channel id, 1-based.
+#' @param episodes the episodes to mask.
+#' @param value the value assigned to the episodes.
+#'
+#' @return an abf object with desired episodes masked with value.
 #' @export
 #'
-#' @examples
 MskEpi <- function(abf, channel, episodes, value) {
 
   if (is.na(value)) {
@@ -24,17 +24,19 @@ MskEpi <- function(abf, channel, episodes, value) {
   return(abf)
 }
 
-#' Title
+#' Mask episodes with a value, by-ref behaviour.
 #'
-#' @param abf
-#' @param channel
-#' @param episodes
-#' @param value
+#' @param abf an abf object.
+#' @param channel channel id, 1-based.
+#' @param episodes the episodes to mask.
+#' @param value the value assigned to the episodes.
 #'
-#' @return
+#' @return an abf object with desired episodes masked with value.
 #' @export
 #'
 #' @examples
+#' #abf itself is changed, no need to assign.
+#' MaskEpisodes(abf, 2, c(1,2,3,4), 0.0)
 MaskEpisodes <- function(abf, channel, episodes, value) {
 
   if (is.na(value)) {
@@ -65,15 +67,18 @@ MaskEpisodes <- function(abf, channel, episodes, value) {
 
 }
 
-#' Title
+#' Remove episodes from an abf object.
 #'
-#' @param abf
-#' @param episodes
+#' Function behaviour: episodes will be removed from ALL channels. Removing
+#' episodes only affect results of [[ extracting and GetAvailEpisodes, since
+#' episodic data is not actually removed but marked "removed"
 #'
-#' @return
+#' @param abf an abf object.
+#' @param episodes episodes to remove.
+#'
+#' @return an abf object with desired episodes marked removed.
 #' @export
 #'
-#' @examples
 RmEpi <- function(abf, episodes) {
 
   d <- dim(abf)
@@ -87,15 +92,21 @@ RmEpi <- function(abf, episodes) {
   return(abf)
 }
 
-#' Title
+#' Remove episodes from an abf object, by-ref behaviour.
 #'
-#' @param abf
-#' @param episodes
+#' Function behaviour: episodes will be removed from ALL channels. Removing
+#' episodes only affect results of [[ extracting and GetAvailEpisodes, since
+#' episodic data is not actually removed but marked "removed"
 #'
-#' @return
+#' @param abf an abf object.
+#' @param episodes episodes to remove.
+#'
+#' @return an abf object with desired episodes marked removed.
 #' @export
 #'
 #' @examples
+#' #abf itself is changed, no need to assign
+#' RemoveEpisodes(abf, c(1,2,3,4))
 RemoveEpisodes <- function(abf, episodes) {
 
   if (class(abf) == "abf") {
@@ -122,14 +133,70 @@ RemoveEpisodes <- function(abf, episodes) {
 
 }
 
-#' Title
+#' Restore previous removed episodes.
 #'
-#' @param abf
+#' @param abf an abf object.
+#' @param episodes episodes to restore.
 #'
-#' @return
+#' @return an abf object.
+#' @export
+#'
+ResEpi <- function(abf, episodes) {
+
+  d <- dim(abf)
+  if (d[3] == 1L)
+    err_abf_not_episodic("ResEpi")
+
+  epi_avail <- attr(abf, "EpiAvail")
+  epi_avail[episodes] <- TRUE
+  attr(abf, "EpiAvail") <- epi_avail
+
+  return(abf)
+}
+
+#' Restore previous removed episodes, by-ref behaviour.
+#'
+#' @param abf an abf object.
+#' @param episodes episodes to restore.
+#'
+#' @return an abf object.
 #' @export
 #'
 #' @examples
+#' #abf itself is changed, no need to assign
+#' RestoreEpisodes(abf, c(1,2,3,4,5))
+RestoreEpisodes <- function(abf, episodes) {
+
+  if (class(abf) == "abf") {
+    return(
+      eval.parent(substitute({
+        abf <- ResEpi(abf, episodes)
+      }))
+    )
+  } else if (IsAbfList(abf)) {
+    return(
+      eval.parent(substitute({
+        for (i_____ in seq_along(abf)) {
+          abf[[i_____]] <- ResEpi(abf[[i_____]], episodes)
+        }
+        rm(i_____)
+        #invisible so this function still "returns" a value
+        invisible(abf)
+      }))
+    )
+  } else {
+    err_class_abf_list("RestoreEpisodes")
+  }
+
+}
+
+#' Get available episodes
+#'
+#' @param abf an abf objects
+#'
+#' @return episodes that are not marked removed.
+#' @export
+#'
 GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {

@@ -2,13 +2,29 @@
 % Please edit documentation in R/channel.R
 \name{AttachChannel}
 \alias{AttachChannel}
-\title{Title}
+\title{Attach a new channel to an abf object, by-ref like behaviour.}
 \usage{
 AttachChannel(abf, new_channel, channel_name, channel_unit, channel_desc)
 }
 \arguments{
-\item{channel_desc}{}
+\item{abf}{an abf object.}
+
+\item{new_channel}{data of the new channel.}
+
+\item{channel_name}{name of the new channel.}
+
+\item{channel_unit}{unit of the new channel.}
+
+\item{channel_desc}{description of the new channel.}
+}
+\value{
+an abf object with the attached channel.
 }
 \description{
-Title
+Attach a new channel to an abf object, by-ref like behaviour.
+}
+\examples{
+wf <- GetWaveform(abf)
+#abf itself is changed, no need to assign.
+AttachChannel(abf, wf, "wf 0", "mV", "Simulated Waveform")
 }

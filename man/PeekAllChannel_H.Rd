@@ -2,13 +2,22 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PeekAllChannel_H}
 \alias{PeekAllChannel_H}
-\title{Title}
+\title{Fast plot all channels horizontally}
 \usage{
 PeekAllChannel_H(abf, colour = FALSE, ratio = 50, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{ratio}{sampling ratio}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Fast plot all channels horizontally
 }

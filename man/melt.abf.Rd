@@ -18,6 +18,9 @@
 
 \item{time_unit}{time unit of the sampled data, can be tick, us, ms, s, min or hr}
 }
+\value{
+a melted data frame.
+}
 \description{
 For easier melting abf channel data, sampling time (by given time unit) is
 selected as id.vars, variable.name is set to Episode and value.name is

@@ -2,13 +2,24 @@
 % Please edit documentation in R/attr.R
 \name{SetTitle}
 \alias{SetTitle}
-\title{Title}
+\title{Set title of an abf object, by-ref behaviour.}
 \usage{
 SetTitle(abf, title)
 }
 \arguments{
-\item{title}{}
+\item{abf}{an abf object, a list of abf objects are also supported.}
+
+\item{title}{the title to be set.}
+}
+\value{
+an abf object
 }
 \description{
-Title
+In order to mimic the by-ref behaviour, when setting titles for a list of abf
+objects, a temp variable "i_____" in caller's scope is used an then removed.
+This may cause some trouble if you use i_____ in your code.
+}
+\examples{
+#abf itself is changed, no need to assign
+SetTitle(abf, "new title")
 }

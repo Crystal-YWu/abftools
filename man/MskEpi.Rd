@@ -2,10 +2,22 @@
 % Please edit documentation in R/episode.R
 \name{MskEpi}
 \alias{MskEpi}
-\title{Title}
+\title{Mask episodes with a value.}
 \usage{
 MskEpi(abf, channel, episodes, value)
 }
+\arguments{
+\item{abf}{an abf object.}
+
+\item{channel}{channel id, 1-based.}
+
+\item{episodes}{the episodes to mask.}
+
+\item{value}{the value assigned to the episodes.}
+}
+\value{
+an abf object with desired episodes masked with value.
+}
 \description{
-Title
+Mask episodes with a value.
 }

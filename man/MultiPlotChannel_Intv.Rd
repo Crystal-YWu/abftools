@@ -2,15 +2,34 @@
 % Please edit documentation in R/MultiPlot.R
 \name{MultiPlotChannel_Intv}
 \alias{MultiPlotChannel_Intv}
-\title{Title}
+\title{Plot a channel of multiple abf objects, with intervals.}
 \usage{
 MultiPlotChannel_Intv(abf_list, intv_list, channel = 1, colour = FALSE,
   time_unit = "tick", num_label = FALSE, title_label = TRUE,
   unify_y = TRUE, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{intv_list}{a list of intervals.}
+
+\item{channel}{channel id, 1-based.}
+
+\item{colour}{whether to plot in coloured mode.}
+
+\item{time_unit}{time unit to use in plot.}
+
+\item{num_label}{whether to show a numbered label of each abf object.}
+
+\item{title_label}{wheter to show title of each abf object.}
+
+\item{unify_y}{wheter to unifier y scale of each abf object.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot a channel of multiple abf objects, with intervals.
 }

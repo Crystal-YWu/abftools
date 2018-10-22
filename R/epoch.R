@@ -1,11 +1,10 @@
-#' Title
+#' Convert epoch name to epoch id
 #'
-#' @param epoch_name
+#' @param epoch_name name of the epoch, A-J
 #'
-#' @return
+#' @return id of the epoch, epoch id is 1-based.
 #' @export
 #'
-#' @examples
 GetEpochId <- function(epoch_name) {
 
   epoch <- 0
@@ -15,14 +14,13 @@ GetEpochId <- function(epoch_name) {
   return(epoch)
 }
 
-#' Title
+#' Get DAC id of which waveform is enabled.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return DAC id, 1-based.
 #' @export
 #'
-#' @examples
 GetWaveformEnabledDAC <- function(abf) {
 
   meta <- get_meta(abf)
@@ -50,15 +48,17 @@ GetWaveformEpdac <- function(abf, wf_dac) {
   return(ret)
 }
 
-#' Title
+#' Get intervals of all epochs.
 #'
-#' @param abf
-#' @param wf_dac
+#' The returned array contains all interval info, which can be accessed by:
+#' epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
 #'
-#' @return
+#' @param abf an abf object.
+#' @param wf_dac id of the waveform DAC, 1-based.
+#'
+#' @return a 3-d array, see details.
 #' @export
 #'
-#' @examples
 GetEpochIntervals <- function(abf, wf_dac = 0) {
 
   if (wf_dac[1] == 0) {

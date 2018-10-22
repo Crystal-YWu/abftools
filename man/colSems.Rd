@@ -2,13 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{colSems}
 \alias{colSems}
-\title{Title}
+\title{Calculate column standard error of measurements}
 \usage{
 colSems(df, na.rm = FALSE)
 }
 \arguments{
-\item{na.rm}{}
+\item{df}{a data frame of data frame like 2d data}
+
+\item{na.rm}{remove NAs}
+}
+\value{
+calculated column sem
 }
 \description{
-Title
+Calculate column standard error of measurements
 }

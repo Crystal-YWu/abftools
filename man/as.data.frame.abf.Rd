@@ -2,13 +2,18 @@
 % Please edit documentation in R/s3func.R
 \name{as.data.frame.abf}
 \alias{as.data.frame.abf}
-\title{Title}
+\title{Convert a channel of an abf object to data.frame}
 \usage{
 \method{as.data.frame}{abf}(x, channel = 1)
 }
 \arguments{
-\item{channel}{}
+\item{x}{an abf object.}
+
+\item{channel}{ADC channel id, 1-based.}
+}
+\value{
+a data frame of the channel data, with colname of epiX.
 }
 \description{
-Title
+Convert a channel of an abf object to data.frame
 }

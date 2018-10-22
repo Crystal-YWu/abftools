@@ -2,13 +2,20 @@
 % Please edit documentation in R/episode.R
 \name{RmEpi}
 \alias{RmEpi}
-\title{Title}
+\title{Remove episodes from an abf object.}
 \usage{
 RmEpi(abf, episodes)
 }
 \arguments{
-\item{episodes}{}
+\item{abf}{an abf object.}
+
+\item{episodes}{episodes to remove.}
+}
+\value{
+an abf object with desired episodes marked removed.
 }
 \description{
-Title
+Function behaviour: episodes will be removed from ALL channels. Removing
+episodes only affect results of [[ extracting and GetAvailEpisodes, since
+episodic data is not actually removed but marked "removed"
 }

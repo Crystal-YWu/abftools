@@ -1,12 +1,11 @@
-#' Title
+#' Calculate column standard deviations
 #'
-#' @param df
-#' @param na.rm
+#' @param df a data frame or data frame like 2d data
+#' @param na.rm remove NAs
 #'
-#' @return
+#' @return calculated column sd
 #' @export
 #'
-#' @examples
 colSds <- function(df, na.rm = FALSE) {
 
   n <- ifelse(na.rm, colSums(!is.na(df)), nrow(df))
@@ -17,15 +16,14 @@ colSds <- function(df, na.rm = FALSE) {
   return(ret)
 }
 
-#' Title
+#' Calculate column standard error of measurements
 #'
-#' @param df
-#' @param na.rm
+#' @param df a data frame of data frame like 2d data
+#' @param na.rm remove NAs
 #'
-#' @return
+#' @return calculated column sem
 #' @export
 #'
-#' @examples
 colSems <- function(df, na.rm = FALSE) {
 
   sds <- colSds(df, na.rm)
@@ -35,16 +33,18 @@ colSems <- function(df, na.rm = FALSE) {
 }
 
 
-#' Title
+#' Set intervals, by-ref behaviour
 #'
-#' @param intv
-#' @param startPos
-#' @param endPos
+#' @param intv an interval.
+#' @param startPos starting position of the new interval.
+#' @param endPos ending position of the new interval.
 #'
-#' @return
+#' @return an interval.
 #' @export
 #'
 #' @examples
+#' #intv itself is changed, no need to assign
+#' SetIntv(intv, 100L, 500L)
 SetIntv <- function(intv, startPos, endPos) {
 
   if (startPos >= endPos) {

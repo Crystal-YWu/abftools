@@ -2,13 +2,20 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotAllChannel_V}
 \alias{PlotAllChannel_V}
-\title{Title}
+\title{Plot all channels vertically}
 \usage{
 PlotAllChannel_V(abf, colour = FALSE, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot all channels vertically
 }

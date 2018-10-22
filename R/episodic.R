@@ -1,14 +1,13 @@
 #' EpisodicIntervalMeans calculates interval means of a list of abf objects
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param channel
-#' @param na.rm
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param channel channel to calculated, channel id is 1-based.
+#' @param na.rm remove NAs.
 #'
-#' @return
+#' @return a vector of calculated values.
 #' @export
 #'
-#' @examples
 EpisodicIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colMeans(x, na.rm)
@@ -25,15 +24,14 @@ EpisodicIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE
 
 #' EpisodicIntervalSds calculates interval standard deviations of a list of abf objects
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param channel
-#' @param na.rm
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param channel channel to calculated, channel id is 1-based.
+#' @param na.rm remove NAs.
 #'
-#' @return
+#' @return a vector of calculated values.
 #' @export
 #'
-#' @examples
 EpisodicIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colSds(x, na.rm)
@@ -49,15 +47,14 @@ EpisodicIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) 
 
 #' EpisodicIntervalSems calculates interval SEM of a list of abf objects
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param channel
-#' @param na.rm
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param channel channel to calculated, channel id is 1-based.
+#' @param na.rm remove NAs.
 #'
-#' @return
+#' @return a vector of calculated values.
 #' @export
 #'
-#' @examples
 EpisodicIntervalSems <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colSems(x, na.rm)

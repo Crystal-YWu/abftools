@@ -2,13 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{colSds}
 \alias{colSds}
-\title{Title}
+\title{Calculate column standard deviations}
 \usage{
 colSds(df, na.rm = FALSE)
 }
 \arguments{
-\item{na.rm}{}
+\item{df}{a data frame or data frame like 2d data}
+
+\item{na.rm}{remove NAs}
+}
+\value{
+calculated column sd
 }
 \description{
-Title
+Calculate column standard deviations
 }

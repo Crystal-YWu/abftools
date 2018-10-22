@@ -2,13 +2,19 @@
 % Please edit documentation in R/epoch.R
 \name{GetEpochIntervals}
 \alias{GetEpochIntervals}
-\title{Title}
+\title{Get intervals of all epochs.}
 \usage{
 GetEpochIntervals(abf, wf_dac = 0)
 }
 \arguments{
-\item{wf_dac}{}
+\item{abf}{an abf object.}
+
+\item{wf_dac}{id of the waveform DAC, 1-based.}
+}
+\value{
+a 3-d array, see details.
 }
 \description{
-Title
+The returned array contains all interval info, which can be accessed by:
+epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
 }

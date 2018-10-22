@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetChannelDesc}
 \alias{GetChannelDesc}
-\title{Title}
+\title{Get descriptions of channels.}
 \usage{
 GetChannelDesc(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+a character vector of channel descriptions.
 }
 \description{
-Title
+Get descriptions of channels.
 }

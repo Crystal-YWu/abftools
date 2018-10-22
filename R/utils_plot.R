@@ -16,7 +16,7 @@
 #' @param sampling_func a function, default to null so no processing sampled points
 #' @param time_unit time unit of the sampled data, can be tick, us, ms, s, min or hr
 #'
-#' @return
+#' @return a melted data frame.
 #' @export
 #'
 #' @examples

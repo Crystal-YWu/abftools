@@ -2,14 +2,27 @@
 % Please edit documentation in R/MultiPlot.R
 \name{MultiPlotChannel_Pub}
 \alias{MultiPlotChannel_Pub}
-\title{Title}
+\title{Plot a channel of multiple abf objects, in a common publication standard.}
 \usage{
 MultiPlotChannel_Pub(abf_list, channel = 1, time_unit = "s",
   title_label = FALSE, spacing = 0, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{channel}{channel id, 1-based.}
+
+\item{time_unit}{time unit to use in plot.}
+
+\item{title_label}{whether to show title for each abf object.}
+
+\item{spacing}{tweak space between two plot.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot a channel of multiple abf objects, in a common publication standard.
 }

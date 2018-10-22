@@ -2,13 +2,20 @@
 % Please edit documentation in R/s3func.R
 \name{[[<-.abf}
 \alias{[[<-.abf}
-\title{Title}
+\title{Replacing channel data.}
 \usage{
-\method{[[}{abf}(x, ...) <- value
+\method{[[}{abf}(x, channel, channel_data) <- value
 }
 \arguments{
-\item{...}{}
+\item{x}{an abf object.}
+
+\item{channel}{ADC channel id, 1-based.}
+
+\item{channel_data}{channel data to replace the original.}
+}
+\value{
+an abf object with the replaced channel.
 }
 \description{
-Title
+Replacing channel data.
 }

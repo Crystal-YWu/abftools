@@ -1,12 +1,12 @@
-#' Title
+#' Simulate waveform.
 #'
-#' @param abf
-#' @param episodes
+#' @param abf an abf object.
+#' @param episodes the episodes to simulate.
+#' @param wf_dac waveform DAC channel, 1-based.
 #'
-#' @return
+#' @return channel data of the simulated waveform.
 #' @export
 #'
-#' @examples
 GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
 
   if (class(abf) != "abf") {
@@ -118,14 +118,16 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
   return(mx)
 }
 
-#' Title
+#' Attach a waveform channel to an abf object, by-ref behaviour.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return an abf object with a new waveform channel attached.
 #' @export
 #'
 #' @examples
+#' #abf itself is changed, no need to assign
+#' AttachWaveform(abf)
 AttachWaveform <- function(abf) {
 
   #get waveform channel

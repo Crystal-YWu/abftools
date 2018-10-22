@@ -2,13 +2,17 @@
 % Please edit documentation in R/abf2_protocol.R
 \name{abf2_load_protocol}
 \alias{abf2_load_protocol}
-\title{Title}
+\title{Load an abf2 protocol (*.pro) file, or the protocol sections of an abf2 file.}
 \usage{
 abf2_load_protocol(filename)
 }
 \arguments{
-\item{filename}{}
+\item{filename}{path to the file to load.}
+}
+\value{
+a list of data frames of the loaded protocol sections.
 }
 \description{
-Title
+Sections will be loaded to seperated data frames with their names. However,
+strings section is loaded as a list of strings as an exception.
 }

@@ -2,13 +2,26 @@
 % Please edit documentation in R/QuickPlot.R
 \name{QuickPlotTrace}
 \alias{QuickPlotTrace}
-\title{Title}
+\title{Quick plot trace vs. trace curve.}
 \usage{
-QuickPlotTrace(abf, channel, episodeX, episodeY, intv)
+QuickPlotTrace(abf, channelX, episodeX, channelY, episodeY, intv)
 }
 \arguments{
-\item{intv}{}
+\item{abf}{an abf object.}
+
+\item{channelX}{channel of X trace.}
+
+\item{episodeX}{episode of X trace.}
+
+\item{channelY}{channel of Y trace.}
+
+\item{episodeY}{channel of Y trace.}
+
+\item{intv}{interval of the traces to be plotted.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Quick plot trace vs. trace curve.
 }

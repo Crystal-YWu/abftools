@@ -2,13 +2,20 @@
 % Please edit documentation in R/waveform.R
 \name{AttachWaveform}
 \alias{AttachWaveform}
-\title{Title}
+\title{Attach a waveform channel to an abf object, by-ref behaviour.}
 \usage{
 AttachWaveform(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+an abf object with a new waveform channel attached.
 }
 \description{
-Title
+Attach a waveform channel to an abf object, by-ref behaviour.
+}
+\examples{
+#abf itself is changed, no need to assign
+AttachWaveform(abf)
 }

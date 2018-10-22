@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetPointsPerEpisode}
 \alias{GetPointsPerEpisode}
-\title{Title}
+\title{Get number of recorded points per episode/sweep.}
 \usage{
 GetPointsPerEpisode(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+number of recorded points per episode/sweep.
 }
 \description{
-Title
+Get number of recorded points per episode/sweep.
 }

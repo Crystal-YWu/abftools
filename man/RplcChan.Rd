@@ -2,13 +2,23 @@
 % Please edit documentation in R/channel.R
 \name{RplcChan}
 \alias{RplcChan}
-\title{Title}
+\title{Replacing channel data.}
 \usage{
 RplcChan(abf, channel, channel_data)
 }
 \arguments{
-\item{channel_data}{}
+\item{channel}{ADC channel id, 1-based.}
+
+\item{channel_data}{channel data to replace the original.}
+
+\item{x}{an abf object.}
+}
+\value{
+an abf object with the replaced channel.
 }
 \description{
-Title
+Replacing channel data.
+}
+\examples{
+abf_new <- RplcChan(abf, 2, data)
 }

@@ -1,18 +1,17 @@
-#' Title
+#' Plot a channel of multiple abf objects.
 #'
-#' @param abf_list
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param num_label
-#' @param title_label
-#' @param unify_y
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param channel channel id, 1-based.
+#' @param colour whether to plot in coloured mode.
+#' @param time_unit time unit to use in plot.
+#' @param num_label whether to show a numbered label of each abf object.
+#' @param title_label wheter to show title of each abf object.
+#' @param unify_y wheter to unifier y scale of each abf object.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPlotChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = "tick",
                              num_label = FALSE, title_label = TRUE, unify_y = TRUE, ...) {
 
@@ -23,22 +22,21 @@ MultiPlotChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = 
   return(plot_grid(plotlist = p, ncol = n))
 }
 
-#' Title
+#' Fast plot a channel of multiple abf objects by sampling points.
 #'
-#' @param abf_list
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param num_label
-#' @param title_label
-#' @param unify_y
-#' @param ratio
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param channel channel id, 1-based.
+#' @param colour whether to plot in coloured mode.
+#' @param time_unit time unit to use in plot.
+#' @param num_label whether to show a numbered label of each abf object.
+#' @param title_label wheter to show title of each abf object.
+#' @param unify_y wheter to unifier y scale of each abf object.
+#' @param ratio sampling ratio for faster plotting.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPeekChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = "tick",
                              num_label = FALSE, title_label = TRUE, unify_y = TRUE,
                              ratio = 100, ...) {
@@ -48,22 +46,21 @@ MultiPeekChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = 
   return(p)
 }
 
-#' Title
+#' Plot a channel of multiple abf objects, with intervals.
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param num_label
-#' @param title_label
-#' @param unify_y
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param channel channel id, 1-based.
+#' @param colour whether to plot in coloured mode.
+#' @param time_unit time unit to use in plot.
+#' @param num_label whether to show a numbered label of each abf object.
+#' @param title_label wheter to show title of each abf object.
+#' @param unify_y wheter to unifier y scale of each abf object.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPlotChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FALSE,
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ...) {
@@ -81,23 +78,22 @@ MultiPlotChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FAL
   return(plot_grid(plotlist = p, ncol = n))
 }
 
-#' Title
+#' Fast plot a channel of multiple abf objects, with intervals.
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param num_label
-#' @param title_label
-#' @param unify_y
-#' @param ratio
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param channel channel id, 1-based.
+#' @param colour whether to plot in coloured mode.
+#' @param time_unit time unit to use in plot.
+#' @param num_label whether to show a numbered label of each abf object.
+#' @param title_label wheter to show title of each abf object.
+#' @param unify_y wheter to unifier y scale of each abf object.
+#' @param ratio sampling ratio for faster plotting.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPeekChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FALSE,
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ratio = 100, ...) {
@@ -107,22 +103,21 @@ MultiPeekChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FAL
   return(p)
 }
 
-#' Title
+#' Plot a channel of multiple abf objects, with curosrs.
 #'
-#' @param abf_list
-#' @param cursor_list
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param num_label
-#' @param title_label
-#' @param unify_y
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param cursor_list a list of cursors.
+#' @param channel channel id, 1-based.
+#' @param colour whether to plot in coloured mode.
+#' @param time_unit time unit to use in plot.
+#' @param num_label whether to show a numbered label of each abf object.
+#' @param title_label wheter to show title of each abf object.
+#' @param unify_y wheter to unifier y scale of each abf object.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPlotChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour = FALSE,
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ...) {
@@ -140,23 +135,22 @@ MultiPlotChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour =
   return(plot_grid(plotlist = p, ncol = n))
 }
 
-#' Title
+#' Fast plot a channel of multiple abf objects, with curosrs.
 #'
-#' @param abf_list
-#' @param cursor_list
-#' @param channel
-#' @param colour
-#' @param time_unit
-#' @param num_label
-#' @param title_label
-#' @param unify_y
-#' @param ratio
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param cursor_list a list of cursors.
+#' @param channel channel id, 1-based.
+#' @param colour whether to plot in coloured mode.
+#' @param time_unit time unit to use in plot.
+#' @param num_label whether to show a numbered label of each abf object.
+#' @param title_label wheter to show title of each abf object.
+#' @param unify_y wheter to unifier y scale of each abf object.
+#' @param ratio sampling ratio for faster plotting.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPeekChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour = FALSE,
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ratio = 100, ...) {
@@ -166,19 +160,18 @@ MultiPeekChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour =
   return(p)
 }
 
-#' Title
+#' Plot a channel of multiple abf objects, in a common publication standard.
 #'
-#' @param abf_list
-#' @param channel
-#' @param time_unit
-#' @param title_label
-#' @param spacing
-#' @param ...
+#' @param abf_list a list of abf objects.
+#' @param channel channel id, 1-based.
+#' @param time_unit time unit to use in plot.
+#' @param title_label whether to show title for each abf object.
+#' @param spacing tweak space between two plot.
+#' @param ... other arguments, see melt.abf for more details.
 #'
-#' @return
+#' @return a ggplot object.
 #' @export
 #'
-#' @examples
 MultiPlotChannel_Pub <- function(abf_list, channel = 1, time_unit = "s", title_label = FALSE,
                                  spacing = 0, ...) {
 

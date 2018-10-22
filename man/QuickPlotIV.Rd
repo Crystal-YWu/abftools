@@ -2,13 +2,18 @@
 % Please edit documentation in R/QuickPlot.R
 \name{QuickPlotIV}
 \alias{QuickPlotIV}
-\title{Title}
+\title{Quick plot I-V curves at given position}
 \usage{
 QuickPlotIV(abf, pos, smooth = FALSE)
 }
 \arguments{
-\item{pos}{}
+\item{abf}{an abf object.}
+
+\item{pos}{an interval or a cursor.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Quick plot I-V curves at given position
 }

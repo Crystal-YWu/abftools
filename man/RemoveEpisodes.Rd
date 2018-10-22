@@ -2,13 +2,24 @@
 % Please edit documentation in R/episode.R
 \name{RemoveEpisodes}
 \alias{RemoveEpisodes}
-\title{Title}
+\title{Remove episodes from an abf object, by-ref behaviour.}
 \usage{
 RemoveEpisodes(abf, episodes)
 }
 \arguments{
-\item{episodes}{}
+\item{abf}{an abf object.}
+
+\item{episodes}{episodes to remove.}
+}
+\value{
+an abf object with desired episodes marked removed.
 }
 \description{
-Title
+Function behaviour: episodes will be removed from ALL channels. Removing
+episodes only affect results of [[ extracting and GetAvailEpisodes, since
+episodic data is not actually removed but marked "removed"
+}
+\examples{
+#abf itself is changed, no need to assign
+RemoveEpisodes(abf, c(1,2,3,4))
 }

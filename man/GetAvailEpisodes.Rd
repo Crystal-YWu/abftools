@@ -2,13 +2,16 @@
 % Please edit documentation in R/episode.R
 \name{GetAvailEpisodes}
 \alias{GetAvailEpisodes}
-\title{Title}
+\title{Get available episodes}
 \usage{
 GetAvailEpisodes(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf objects}
+}
+\value{
+episodes that are not marked removed.
 }
 \description{
-Title
+Get available episodes
 }

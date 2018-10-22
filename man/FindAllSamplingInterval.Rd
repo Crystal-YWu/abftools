@@ -2,13 +2,18 @@
 % Please edit documentation in R/autointv.R
 \name{FindAllSamplingInterval}
 \alias{FindAllSamplingInterval}
-\title{Title}
+\title{Call FindSamplingInterval for a list of abf objects.}
 \usage{
 FindAllSamplingInterval(abf_list, ...)
 }
 \arguments{
+\item{abf_list}{a list of abf objects.}
+
 \item{...}{}
 }
+\value{
+a list of found intervals.
+}
 \description{
-Title
+Call FindSamplingInterval for a list of abf objects.
 }

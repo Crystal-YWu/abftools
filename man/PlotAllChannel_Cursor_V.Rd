@@ -2,13 +2,22 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotAllChannel_Cursor_V}
 \alias{PlotAllChannel_Cursor_V}
-\title{Title}
+\title{Plot all channels with cursors vertically.}
 \usage{
 PlotAllChannel_Cursor_V(abf, cursor, colour = FALSE, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{cursor}{cursors to plot.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot all channels with cursors vertically.
 }

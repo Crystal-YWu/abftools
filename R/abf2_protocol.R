@@ -1,13 +1,15 @@
 #functions for parsing various protocol settings
 
-#' Title
+#' Load an abf2 protocol (*.pro) file, or the protocol sections of an abf2 file.
 #'
-#' @param filename
+#' Sections will be loaded to seperated data frames with their names. However,
+#' strings section is loaded as a list of strings as an exception.
 #'
-#' @return
+#' @param filename path to the file to load.
+#'
+#' @return a list of data frames of the loaded protocol sections.
 #' @export
 #'
-#' @examples
 abf2_load_protocol <- function(filename) {
 
   fp <- file(filename, "rb")
@@ -77,14 +79,13 @@ get_meta <- function(abf) {
 
   return(meta)
 }
-#' Title
+#' Return the protocols of an abf object.
 #'
-#' @param abf
+#' @param abf an abf object.
 #'
-#' @return
+#' @return a list of data frames of protocol sections.
 #' @export
 #'
-#' @examples
 GetProtocol <- function(abf) {
 
   return(get_meta(abf))

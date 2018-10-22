@@ -7,7 +7,12 @@
 \method{[[}{abf}(x, channel)
 }
 \arguments{
-\item{channel}{}
+\item{x}{an abf object.}
+
+\item{channel}{ADC channel id, 1-based.}
+}
+\value{
+a matrix of the channel data, with colnames of epiX.
 }
 \description{
 In an abf object, channel id is one-based instead of zero-based as in pClamp
@@ -16,4 +21,7 @@ is one-based. The significance is you may find ADC channel names not correspond
 to channel id i.e. channel 1 is "IN 0", channel 2 is "IN 1" instead. This may
 also apply to other properties such as DAC num, Epoch num etc which have
 internal numbered indices.
+}
+\examples{
+abf[[1]]
 }

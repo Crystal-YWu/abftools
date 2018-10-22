@@ -2,13 +2,16 @@
 % Please edit documentation in R/attr.R
 \name{GetMode}
 \alias{GetMode}
-\title{Title}
+\title{Get mode of the abf object.}
 \usage{
 GetMode(abf)
 }
 \arguments{
-\item{abf}{}
+\item{abf}{an abf object.}
+}
+\value{
+the mode of the recording.
 }
 \description{
-Title
+Get mode of the abf object.
 }

@@ -2,14 +2,27 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotChannel_Cursor}
 \alias{PlotChannel_Cursor}
-\title{Title}
+\title{Plot a channel with cursors.}
 \usage{
 PlotChannel_Cursor(abf, cursor, channel = 1, colour = FALSE,
   time_unit = "tick", ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{cursor}{cursors to plot.}
+
+\item{channel}{channel to plot, channel id is 1-based.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{time_unit}{time unit for the plot.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Plot a channel with cursors.
 }

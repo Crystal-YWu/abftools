@@ -2,13 +2,24 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PeekAllChannel_Intv_H}
 \alias{PeekAllChannel_Intv_H}
-\title{Title}
+\title{Fast plot all channels with interval horizontally.}
 \usage{
 PeekAllChannel_Intv_H(abf, intv, colour = FALSE, ratio = 50, ...)
 }
 \arguments{
-\item{...}{}
+\item{abf}{an abf object.}
+
+\item{intv}{an interval.}
+
+\item{colour}{wheter to plot in coloured mode.}
+
+\item{ratio}{sampling ratio.}
+
+\item{...}{other arguments, see melt.abf for more details.}
+}
+\value{
+a ggplot object.
 }
 \description{
-Title
+Fast plot all channels with interval horizontally.
 }

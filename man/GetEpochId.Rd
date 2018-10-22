@@ -2,13 +2,16 @@
 % Please edit documentation in R/epoch.R
 \name{GetEpochId}
 \alias{GetEpochId}
-\title{Title}
+\title{Convert epoch name to epoch id}
 \usage{
 GetEpochId(epoch_name)
 }
 \arguments{
-\item{epoch_name}{}
+\item{epoch_name}{name of the epoch, A-J}
+}
+\value{
+id of the epoch, epoch id is 1-based.
 }
 \description{
-Title
+Convert epoch name to epoch id
 }
