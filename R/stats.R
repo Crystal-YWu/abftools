@@ -77,7 +77,7 @@ AverageAbf <- function(abf_list, w = 0) {
   return(ret)
 }
 
-#' Sampling abf object to reduce data points.
+#' Sample abf object to reduce data points.
 #'
 #' @param abf an abf object.
 #' @param sampling_ratio the sampling ratio. See melt.abf for more details.
@@ -147,4 +147,32 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   attr(data, "meta") <- meta
 
   return(data)
+}
+
+#' Sample abf object to reduce data points, by-ref like behaviour.
+#'
+#' @param abf an abf object.
+#' @param sampling_ratio the sampling ratio. See melt.abf for more details.
+#' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
+#'
+#' @return
+#' @export
+#'
+SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
+
+  if (class(abf) == "abf") {
+    return(
+      eval.parent(substitute({
+        abf <- SmplAbf(abf, sampling_ratio, sampling_func)
+      }))
+    )
+  } else if (IsAbfList(abf)) {
+    return(
+      eval.parent(substitute({
+        abf <- lapply(abf, function(x) SmplAbf(x, sampling_ratio, sampling_func))
+      }))
+    )
+  } else {
+    err_class_abf_list("SampleAbf")
+  }
 }

@@ -50,12 +50,7 @@ MaskEpisodes <- function(abf, channel, episodes, value) {
     warning("MaskEpisodes: masking a list of abf objects.")
     return(
       eval.parent(substitute({
-        for (i_____ in seq_along(abf)) {
-          abf[[i_____]] <- MskEpi(abf[[i_____]], channel, episodes, value)
-        }
-        rm(i_____)
-        #invisible so this function still "returns" a value
-        invisible(abf)
+        abf <- lapply(abf, function(x) MskEpi(x, channel, episodes, value))
       }))
     )
   } else {
@@ -113,12 +108,7 @@ RemoveEpisodes <- function(abf, episodes) {
     warning("RemoveEpisodes: removing episodes from a list of abf objects.")
     return(
       eval.parent(substitute({
-        for (i_____ in seq_along(abf)) {
-          abf[[i_____]] <- RmEpi(abf[[i_____]], episodes)
-        }
-        rm(i_____)
-        #invisible so this function still "returns" a value
-        invisible(abf)
+        abf <- lapply(abf, function(x) RmEpi(x, episodes))
       }))
     )
   } else {
@@ -167,12 +157,7 @@ RestoreEpisodes <- function(abf, episodes) {
   } else if (IsAbfList(abf)) {
     return(
       eval.parent(substitute({
-        for (i_____ in seq_along(abf)) {
-          abf[[i_____]] <- ResEpi(abf[[i_____]], episodes)
-        }
-        rm(i_____)
-        #invisible so this function still "returns" a value
-        invisible(abf)
+        abf <- lapply(abf, function(x) ResEpi(x, episodes))
       }))
     )
   } else {
