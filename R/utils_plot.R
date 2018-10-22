@@ -6,9 +6,9 @@
 #' of the abf object.
 #'
 #' You can also provide sampling_ratio and sampling_func to reduce data points
-#' of the molten data frame. A sampling function should take a numeric vector as
-#' input and return a single value or be left NULL so the data is sampled at the
-#' exact position every sampling_ratio points.
+#' of the molten data frame. A sampling function should accept a matrix as input
+#' and apply column-wise ops to the sampled data and return a numeric (e.g. colMeans),
+#' or be left NULL so no sampling ops is applied at all.
 #'
 #' @param abf an abf object
 #' @param channel the channel to melt, default to 1
@@ -23,7 +23,6 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
                      time_unit = "tick") {
 
   npts <- nPts(abf)
-  nepi <- nEpi(abf)
   chan_desc <- GetChannelDesc(abf)[channel]
 
   #extract channel data
@@ -38,12 +37,14 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
     #apply sampling function
     for (i in 1L:(length(ctick) - 1L)) {
       mask <- ctick[i]:(ctick[i + 1L] - 1L)
-      sampling_value <- sapply(seq.int(nepi), function(x) sampling_func(data[mask, x]))
+      #sampling_value <- sapply(seq.int(nepi), function(x) sampling_func(data[mask, x]))
+      sampling_value <- sampling_func(data[mask, , drop = FALSE])
       df[i, ] <- sampling_value
     }
     i <- length(ctick)
     mask <- ctick[i]:npts
-    sampling_value <- sapply(seq.int(nepi), function(x) sampling_func(data[mask, x]))
+    #sampling_value <- sapply(seq.int(nepi), function(x) sampling_func(data[mask, x]))
+    sampling_value <- sampling_func(data[mask, , drop = FALSE])
     df[i, ] <- sampling_value
   }
   #bind time column

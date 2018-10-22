@@ -29,7 +29,7 @@ of the abf object.
 }
 \details{
 You can also provide sampling_ratio and sampling_func to reduce data points
-of the molten data frame. A sampling function should take a numeric vector as
-input and return a single value or be left NULL so the data is sampled at the
-exact position every sampling_ratio points.
+of the molten data frame. A sampling function should accept a matrix as input
+and apply column-wise ops to the sampled data and return a numeric (e.g. colMeans),
+or be left NULL so no sampling ops is applied at all.
 }
