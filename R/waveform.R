@@ -125,9 +125,6 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
 #' @return an abf object with a new waveform channel attached.
 #' @export
 #'
-#' @examples
-#' #abf itself is changed, no need to assign
-#' AttachWaveform(abf)
 AttachWaveform <- function(abf) {
 
   #get waveform channel

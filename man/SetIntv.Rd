@@ -19,7 +19,3 @@ an interval.
 \description{
 Set intervals, by-ref behaviour
 }
-\examples{
-#intv itself is changed, no need to assign
-SetIntv(intv, 100L, 500L)
-}

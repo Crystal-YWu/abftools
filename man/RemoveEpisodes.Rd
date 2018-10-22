@@ -19,7 +19,3 @@ Function behaviour: episodes will be removed from ALL channels. Removing
 episodes only affect results of [[ extracting and GetAvailEpisodes, since
 episodic data is not actually removed but marked "removed"
 }
-\examples{
-#abf itself is changed, no need to assign
-RemoveEpisodes(abf, c(1,2,3,4))
-}

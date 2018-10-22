@@ -17,7 +17,3 @@ an abf object.
 \description{
 Restore previous removed episodes, by-ref behaviour.
 }
-\examples{
-#abf itself is changed, no need to assign
-RestoreEpisodes(abf, c(1,2,3,4,5))
-}

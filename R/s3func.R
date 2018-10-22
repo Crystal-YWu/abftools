@@ -5,9 +5,7 @@
 #' @return the abf object itself, invisibly.
 #' @export
 #'
-#' @examples
-#' print(abf)
-print.abf <- function(x) {
+print.abf <- function(x, ...) {
 
     fmt_str <- paste0("Mode %d abf object %s.\n",
                       "Recorded %d ADC channels of %d episodes with %d points per episode. ",
@@ -34,8 +32,6 @@ print.abf <- function(x) {
 #' @return a matrix of the channel data, with colnames of epiX.
 #' @export
 #'
-#' @examples
-#' abf[[1]]
 `[[.abf` <- function(x, channel) {
 
   channel <- FirstElement(channel)
@@ -83,12 +79,12 @@ as.data.frame.abf <- function(x, channel = 1) {
 #'
 #' @param x an abf object.
 #' @param channel ADC channel id, 1-based.
-#' @param channel_data channel data to replace the original.
+#' @param value channel data to replace the original.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-`[[<-.abf` <- function(x, channel, channel_data) {
+`[[<-.abf` <- function(x, channel, value) {
 
-  return(RplcChan(x, channel, channel_data))
+  return(RplcChan(x, channel, value))
 }

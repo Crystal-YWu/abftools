@@ -4,7 +4,7 @@
 \alias{print.abf}
 \title{Print an abf object}
 \usage{
-\method{print}{abf}(x)
+\method{print}{abf}(x, ...)
 }
 \arguments{
 \item{x}{an abf object.}
@@ -14,7 +14,4 @@ the abf object itself, invisibly.
 }
 \description{
 Print an abf object
-}
-\examples{
-print(abf)
 }

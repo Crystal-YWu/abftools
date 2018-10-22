@@ -20,12 +20,3 @@ in sample_index. A sample_index should have named columns which descpribes
 properties of your samples, any unnamed columns or conditions will be ignored.
 Be noticed that all names are case-sensitive.
 }
-\examples{
-
-records <- read.csv("experiment_record.csv")
-selected_oocyte <- SelectSample(records, gene = c("B", "N1"), type = "gapfree")
-#you can also select empty elements by using NA
-selected_oocyte <- SelectSample(records, OocyteId = 5, remakes = NA)
-#for columns with special names, use a back quote
-selected_oocyte <- SelectSample(records, `funny behave ?~` = c(NA, "no"))
-}

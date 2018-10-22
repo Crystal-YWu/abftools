@@ -22,6 +22,3 @@ to channel id i.e. channel 1 is "IN 0", channel 2 is "IN 1" instead. This may
 also apply to other properties such as DAC num, Epoch num etc which have
 internal numbered indices.
 }
-\examples{
-abf[[1]]
-}

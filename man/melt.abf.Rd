@@ -33,9 +33,3 @@ of the molten data frame. A sampling function should take a numeric vector as
 input and return a single value or be left NULL so the data is sampled at the
 exact position every sampling_ratio points.
 }
-\examples{
-Melt first channel with all default behaviors:
-df <- melt(abf)
-Melt second channel, sample every 200 points and take their mean, using time unit of ms:
-df <- melt(abf, channel = 2, sampling_ratio = 200, sampling_func = mean, time_unit = "ms")
-}

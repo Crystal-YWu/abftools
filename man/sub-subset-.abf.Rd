@@ -4,14 +4,14 @@
 \alias{[[<-.abf}
 \title{Replacing channel data.}
 \usage{
-\method{[[}{abf}(x, channel, channel_data) <- value
+\method{[[}{abf}(x, channel) <- value
 }
 \arguments{
 \item{x}{an abf object.}
 
 \item{channel}{ADC channel id, 1-based.}
 
-\item{channel_data}{channel data to replace the original.}
+\item{value}{channel data to replace the original.}
 }
 \value{
 an abf object with the replaced channel.

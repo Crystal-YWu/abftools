@@ -9,7 +9,7 @@ FindAllSamplingInterval(abf_list, ...)
 \arguments{
 \item{abf_list}{a list of abf objects.}
 
-\item{...}{}
+\item{...}{other arguments to pass to FindSamplingInterval}
 }
 \value{
 a list of found intervals.

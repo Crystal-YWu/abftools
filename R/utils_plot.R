@@ -19,11 +19,6 @@
 #' @return a melted data frame.
 #' @export
 #'
-#' @examples
-#' Melt first channel with all default behaviors:
-#' df <- melt(abf)
-#' Melt second channel, sample every 200 points and take their mean, using time unit of ms:
-#' df <- melt(abf, channel = 2, sampling_ratio = 200, sampling_func = mean, time_unit = "ms")
 melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NULL,
                      time_unit = "tick") {
 

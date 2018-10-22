@@ -22,7 +22,3 @@ a list of abf objects.
 \description{
 abf2_loadlist
 }
-\examples{
-flist <- samples$filenames
-alist <- abf2_loadlist(flist, "experiment/")
-}

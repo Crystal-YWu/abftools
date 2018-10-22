@@ -42,9 +42,6 @@ colSems <- function(df, na.rm = FALSE) {
 #' @return an interval.
 #' @export
 #'
-#' @examples
-#' #intv itself is changed, no need to assign
-#' SetIntv(intv, 100L, 500L)
 SetIntv <- function(intv, startPos, endPos) {
 
   if (startPos >= endPos) {

@@ -7,19 +7,15 @@
 ReplaceChannel(abf, channel, channel_data)
 }
 \arguments{
+\item{abf}{an abf object.}
+
 \item{channel}{ADC channel id, 1-based.}
 
 \item{channel_data}{channel data to replace the original.}
-
-\item{x}{an abf object.}
 }
 \value{
 an abf object with the replaced channel.
 }
 \description{
 Replacing channel data, by-ref like behaviour.
-}
-\examples{
-#abf itself is changed, no need to assign.
-ReplaceChannel(abf, 2, data)
 }

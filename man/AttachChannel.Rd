@@ -23,8 +23,3 @@ an abf object with the attached channel.
 \description{
 Attach a new channel to an abf object, by-ref like behaviour.
 }
-\examples{
-wf <- GetWaveform(abf)
-#abf itself is changed, no need to assign.
-AttachChannel(abf, wf, "wf 0", "mV", "Simulated Waveform")
-}

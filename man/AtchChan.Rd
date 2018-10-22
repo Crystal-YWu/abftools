@@ -25,7 +25,3 @@ The attached new_channel's dimensions must match original dimensions,
 regardless of removed episodes due to the mechanism of RemoveEpisodes (they
 are only marked removed and excluded when extracting using [[).
 }
-\examples{
-wf <- GetWaveform(abf)
-new_abf <- AtchChan(abf, wf, "wf 0", "mV", "Simulated Waveform")
-}

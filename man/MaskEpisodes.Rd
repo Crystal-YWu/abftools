@@ -21,7 +21,3 @@ an abf object with desired episodes masked with value.
 \description{
 Mask episodes with a value, by-ref behaviour.
 }
-\examples{
-#abf itself is changed, no need to assign.
-MaskEpisodes(abf, 2, c(1,2,3,4), 0.0)
-}

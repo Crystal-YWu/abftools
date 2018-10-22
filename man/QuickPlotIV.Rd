@@ -10,6 +10,8 @@ QuickPlotIV(abf, pos, smooth = FALSE)
 \item{abf}{an abf object.}
 
 \item{pos}{an interval or a cursor.}
+
+\item{smooth}{whether to smooth the plot.}
 }
 \value{
 a ggplot object.

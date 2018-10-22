@@ -11,14 +11,6 @@
 #' @return selected rows of sample_index
 #' @export
 #'
-#' @examples
-#'
-#' records <- read.csv("experiment_record.csv")
-#' selected_oocyte <- SelectSample(records, gene = c("B", "N1"), type = "gapfree")
-#' #you can also select empty elements by using NA
-#' selected_oocyte <- SelectSample(records, OocyteId = 5, remakes = NA)
-#' #for columns with special names, use a back quote
-#' selected_oocyte <- SelectSample(records, `funny behave ?~` = c(NA, "no"))
 SelectSample <- function(sample_index, ...) {
 
   cvalue <- list(...)
@@ -54,14 +46,6 @@ SelectSample <- function(sample_index, ...) {
 #' @return remaining rows of sample_index
 #' @export
 #'
-#' @examples
-#'
-#' records <- read.csv("experiment_record.csv")
-#' selected_oocyte <- ExcludeSample(records, gene = c("B", "N1"), bad = "yes")
-#' #you can also select empty elements by using NA
-#' selected_oocyte <- ExcludeSample(records, OocyteId = c(NA, 3))
-#' #for columns with special names, use a back quote
-#' selected_oocyte <- ExcludeSample(records, `funny behave ?~` = "Yes")
 ExcludeSample <- function(sample_index, ...) {
 
   cvalue <- list(...)

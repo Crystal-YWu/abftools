@@ -34,9 +34,6 @@ MskEpi <- function(abf, channel, episodes, value) {
 #' @return an abf object with desired episodes masked with value.
 #' @export
 #'
-#' @examples
-#' #abf itself is changed, no need to assign.
-#' MaskEpisodes(abf, 2, c(1,2,3,4), 0.0)
 MaskEpisodes <- function(abf, channel, episodes, value) {
 
   if (is.na(value)) {
@@ -104,9 +101,6 @@ RmEpi <- function(abf, episodes) {
 #' @return an abf object with desired episodes marked removed.
 #' @export
 #'
-#' @examples
-#' #abf itself is changed, no need to assign
-#' RemoveEpisodes(abf, c(1,2,3,4))
 RemoveEpisodes <- function(abf, episodes) {
 
   if (class(abf) == "abf") {
@@ -162,9 +156,6 @@ ResEpi <- function(abf, episodes) {
 #' @return an abf object.
 #' @export
 #'
-#' @examples
-#' #abf itself is changed, no need to assign
-#' RestoreEpisodes(abf, c(1,2,3,4,5))
 RestoreEpisodes <- function(abf, episodes) {
 
   if (class(abf) == "abf") {

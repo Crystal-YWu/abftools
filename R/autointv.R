@@ -166,7 +166,7 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
 #' Call FindSamplingInterval for a list of abf objects.
 #'
 #' @param abf_list a list of abf objects.
-#' @param ...
+#' @param ... other arguments to pass to FindSamplingInterval
 #'
 #' @return a list of found intervals.
 #' @export

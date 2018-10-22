@@ -2,6 +2,7 @@
 #'
 #' @param abf an abf object.
 #' @param pos an interval or a cursor.
+#' @param smooth whether to smooth the plot.
 #'
 #' @return a ggplot object.
 #' @export

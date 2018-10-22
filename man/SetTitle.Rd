@@ -19,7 +19,3 @@ In order to mimic the by-ref behaviour, when setting titles for a list of abf
 objects, a temp variable "i_____" in caller's scope is used an then removed.
 This may cause some trouble if you use i_____ in your code.
 }
-\examples{
-#abf itself is changed, no need to assign
-SetTitle(abf, "new title")
-}

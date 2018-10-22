@@ -24,9 +24,6 @@ CheckChannelDim <- function(abf, channel_data) {
 #' @return an abf object with the attached channel.
 #' @export
 #'
-#' @examples
-#' wf <- GetWaveform(abf)
-#' new_abf <- AtchChan(abf, wf, "wf 0", "mV", "Simulated Waveform")
 AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc) {
 
   if (class(abf) != "abf") {
@@ -110,10 +107,6 @@ AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc)
 #' @return an abf object with the attached channel.
 #' @export
 #'
-#' @examples
-#' wf <- GetWaveform(abf)
-#' #abf itself is changed, no need to assign.
-#' AttachChannel(abf, wf, "wf 0", "mV", "Simulated Waveform")
 AttachChannel <- function(abf, new_channel, channel_name, channel_unit, channel_desc) {
 
   return(
@@ -125,15 +118,13 @@ AttachChannel <- function(abf, new_channel, channel_name, channel_unit, channel_
 
 #' Replacing channel data.
 #'
-#' @param x an abf object.
+#' @param abf an abf object.
 #' @param channel ADC channel id, 1-based.
 #' @param channel_data channel data to replace the original.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-#' @examples
-#' abf_new <- RplcChan(abf, 2, data)
 RplcChan <- function(abf, channel, channel_data) {
 
   if (class(abf) != "abf") {
@@ -150,16 +141,13 @@ RplcChan <- function(abf, channel, channel_data) {
 
 #' Replacing channel data, by-ref like behaviour.
 #'
-#' @param x an abf object.
+#' @param abf an abf object.
 #' @param channel ADC channel id, 1-based.
 #' @param channel_data channel data to replace the original.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-#' @examples
-#' #abf itself is changed, no need to assign.
-#' ReplaceChannel(abf, 2, data)
 ReplaceChannel <- function(abf, channel, channel_data) {
 
   return(

@@ -15,7 +15,3 @@ an abf object with a new waveform channel attached.
 \description{
 Attach a waveform channel to an abf object, by-ref behaviour.
 }
-\examples{
-#abf itself is changed, no need to assign
-AttachWaveform(abf)
-}

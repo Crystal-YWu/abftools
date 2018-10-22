@@ -17,7 +17,3 @@ an abf object.
 \description{
 abf2_load
 }
-\examples{
-abf <- abf2_load("experiment/001.abf")
-abf <- abf2_load("experiment/001.abf", "Some random title")
-}

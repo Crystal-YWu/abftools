@@ -6,9 +6,6 @@
 #' @return an abf object.
 #' @export
 #'
-#' @examples
-#' abf <- abf2_load("experiment/001.abf")
-#' abf <- abf2_load("experiment/001.abf", "Some random title")
 abf2_load <- function(filename, abf_title = NULL) {
 
   fp <- file(filename, "rb")
@@ -234,9 +231,6 @@ abf2_load <- function(filename, abf_title = NULL) {
 #' @return a list of abf objects.
 #' @export
 #'
-#' @examples
-#' flist <- samples$filenames
-#' alist <- abf2_loadlist(flist, "experiment/")
 abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist = NULL) {
 
   if (folder != "") {

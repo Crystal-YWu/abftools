@@ -29,9 +29,6 @@ GetTitle <- function(abf) {
 #' @return an abf object
 #' @export
 #'
-#' @examples
-#' #abf itself is changed, no need to assign
-#' SetTitle(abf, "new title")
 SetTitle <- function(abf, title) {
 
   if (class(abf) == "abf") {
