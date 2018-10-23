@@ -1,21 +1,3 @@
-#' Calculate column standard deviations
-#'
-#' @param df a data frame or data frame like 2d data
-#' @param na.rm remove NAs
-#'
-#' @return calculated column sd
-#' @export
-#'
-colSds <- function(df, na.rm = FALSE) {
-
-  n <- ifelse(na.rm, colSums(!is.na(df)), nrow(df))
-  #implementation for the missing colSds, may not be most effective
-  ret <- colMeans(df * df, na.rm) - colMeans(df, na.rm)^2
-  ret <- sqrt(ret * n / (n - 1))
-
-  return(ret)
-}
-
 #' Calculate column standard error of measurements
 #'
 #' @param df a data frame of data frame like 2d data
