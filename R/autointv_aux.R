@@ -27,7 +27,7 @@ BinSearchIntv <- function(channel_data, intv, min_intv, f) {
 
   mask <- MaskIntv(intv)
   ret <- list()
-  ret$score <- colSds(channel_data[mask, ])
+  ret$score <- colMads(channel_data[mask, ])
   ret$intv <- intv
 
   if (intv[3] %/% 2L <= min_intv) {
