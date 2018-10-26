@@ -58,7 +58,6 @@ abf2_load <- function(filename, abf_title = NULL) {
   #if (section_info$UserList$llNumEntries > 0)
   #  section$UserList <- read_section(fp, section_info$UserList, ABF2.UserList.def)
 
-  section$String <- NA
   #Read strings section
   if (section_info$Strings$llNumEntries > 0)
     section$Strings <- read_str_section(fp, section_info$Strings)
