@@ -14,11 +14,6 @@ GetEpochId <- function(epoch_name) {
   return(epoch)
 }
 
-#TODO: maybe we should revisit DAC id and nDACnum. The difference of 1-based and
-# 0-based indices are a mess.
-# Unlike channel id, nDACnum is pure meta information, and is not referred to
-# subset/extract actual data.
-
 #' Get DAC id of which waveform is enabled.
 #'
 #' @param abf an abf object.
@@ -30,11 +25,15 @@ GetWaveformEnabledDAC <- function(abf) {
 
   meta <- get_meta(abf)
 
-  ret <- which(as.logical(meta$DAC$nWaveformEnable))
-  if (length(ret) > 1L) {
-    #not sure if this could really happen in real life
-    warning("WaveformDAC: Multiple waveform DAC enabled.")
+  idx <- as.logical(meta$DAC$nWaveformEnable)
+  nDACNum <- meta$DAC$nDACNum[idx]
+  if (length(nDACNum) > 1L) {
+    #TODO: parse all enabled DAC channel.
+    warning("GetWaveformEnabledDAC: Multiple waveform DAC enabled.")
   }
+
+  #force DACid <-> nDACNum conversion
+  DACid <- nDACNum + 1L
 
   #We can't rely solely on DAC$nWaveformEnable because even if user selected other
   #modes which waveforms are not enabled and corresponding settings are grayed
@@ -47,17 +46,18 @@ GetWaveformEnabledDAC <- function(abf) {
     return(integer())
   }
 
-  return(ret)
+  return(DACid)
 }
 
 #I don't think we need to export this
-GetWaveformEpdac <- function(abf, wf_dac) {
+GetWaveformEpdac <- function(abf, DACid) {
 
   meta <- get_meta(abf)
   epdac <- meta$EpochPerDAC
+  nDACNum <- DACid - 1L
 
   #nDACNum is 0-based
-  mask <- epdac$nDACNum == (wf_dac - 1L)
+  mask <- epdac$nDACNum == nDACNum
   #sort epdac by nEpochNum just in case
   ret <- epdac[mask, ]
   ret <- ret[order(ret$nEpochNum), ]
@@ -71,27 +71,27 @@ GetWaveformEpdac <- function(abf, wf_dac) {
 #' epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
 #'
 #' @param abf an abf object.
-#' @param wf_dac id of the waveform DAC, 1-based.
+#' @param wf_dac_id id of the waveform DAC, 1-based.
 #'
 #' @return a 3-d array, see details.
 #' @export
 #'
-GetEpochIntervals <- function(abf, wf_dac = 0) {
+GetEpochIntervals <- function(abf, wf_dac_id = 0) {
 
-  if (wf_dac[1] == 0) {
-    wf_dac <- GetWaveformEnabledDAC(abf)
+  if (wf_dac_id[1] == 0) {
+    wf_dac_id <- GetWaveformEnabledDAC(abf)
   }
-  if (length(wf_dac) == 0L) {
+  if (length(wf_dac_id) == 0L) {
     #The abf is not waveform stimulus mode, return epoch as whole episode
     nepi <- nEpi(abf)
     npts <- nPts(abf)
     ret <- array(c(1L, npts, npts), dim = c(3L, 1L, nepi))
     return(ret)
   }
-  wf_dac <- FirstElement(wf_dac)
+  wf_dac_id <- FirstElement(wf_dac_id)
 
   #EpochPerDAC table
-  epdac <- GetWaveformEpdac(abf, wf_dac)
+  epdac <- GetWaveformEpdac(abf, wf_dac_id)
 
   #length of first holding
   npts <- nPts(abf)

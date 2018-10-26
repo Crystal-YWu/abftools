@@ -2,12 +2,12 @@
 #'
 #' @param abf an abf object.
 #' @param episodes the episodes to simulate.
-#' @param wf_dac waveform DAC channel, 1-based.
+#' @param wf_dac_id waveform DAC channel, 1-based.
 #'
 #' @return channel data of the simulated waveform.
 #' @export
 #'
-GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
+GetWaveform <- function(abf, episodes = 0, wf_dac_id = 0) {
 
   if (class(abf) != "abf") {
     err_class_abf("GetWaveform")
@@ -17,15 +17,15 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
 
   meta <- get_meta(abf)
   #Check DAC channel and DAC source
-  if (wf_dac[1] == 0) {
-    wf_dac <- GetWaveformEnabledDAC(abf)
+  if (wf_dac_id[1] == 0) {
+    wf_dac_id <- GetWaveformEnabledDAC(abf)
   }
-  if (length(wf_dac) == 0L) {
+  if (length(wf_dac_id) == 0L) {
     err_wf_dac("GetWaveform")
   }
-  wf_dac <- FirstElement(wf_dac)
+  wf_dac_id <- FirstElement(wf_dac_id)
   #Stimulus file is not supported yet
-  wf_src <- meta$DAC$nWaveformSource[wf_dac]
+  wf_src <- meta$DAC$nWaveformSource[wf_dac_id]
   if (wf_src != 1L) {
     err_wf_support("GetWaveform")
   }
@@ -44,7 +44,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
   #Assume instrument holding. Because I don't know where to extract exact holding
   #values at the moment.
   #throw a warning at this stage
-  wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac]
+  wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac_id]
   npts <- nPts(abf)
   if (nepi == 1L) {
     mx <- rep(wf_holding, npts)
@@ -53,7 +53,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
   }
 
   #Extract epoch settings
-  epdac <- GetWaveformEpdac(abf, wf_dac)
+  epdac <- GetWaveformEpdac(abf, wf_dac_id)
   nepoch <- nrow(epdac)
   if (nepoch == 0L) {
     err_wf_dac("GetWaveform")
@@ -127,11 +127,15 @@ GetWaveform <- function(abf, episodes = 0, wf_dac = 0) {
 #'
 AttachWaveform <- function(abf) {
 
+  dac <- GetWaveformEnabledDAC(abf)
+  if (length(dac) == 0L) {
+    err_wf_dac("AttachWaveform")
+  }
+  dac <- FirstElement(dac)
   #get waveform channel
-  wf <- GetWaveform(abf)
+  wf <- GetWaveform(abf, wf_dac_id = dac)
   #figure out waveform unit
   meta <- get_meta(abf)
-  dac <- GetWaveformEnabledDAC(abf)
   idx_name <- meta$DAC$lDACChannelNameIndex[dac]
   idx_unit <- meta$DAC$lDACChannelUnitsIndex[dac]
   dac_name <- meta$Strings[idx_name]
