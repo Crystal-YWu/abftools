@@ -14,6 +14,11 @@ GetEpochId <- function(epoch_name) {
   return(epoch)
 }
 
+#TODO: maybe we should revisit DAC id and nDACnum. The difference of 1-based and
+# 0-based indices are a mess.
+# Unlike channel id, nDACnum is pure meta information, and is not referred to
+# subset/extract actual data.
+
 #' Get DAC id of which waveform is enabled.
 #'
 #' @param abf an abf object.
@@ -31,6 +36,17 @@ GetWaveformEnabledDAC <- function(abf) {
     warning("WaveformDAC: Multiple waveform DAC enabled.")
   }
 
+  #We can't rely solely on DAC$nWaveformEnable because even if user selected other
+  #modes which waveforms are not enabled and corresponding settings are grayed
+  #out in Clampex software, somehow the program will write all previous Waveform
+  #settings.
+  #
+  #Check if EpochPerDAC is present
+  epdac <- meta$EpochPerDAC
+  if (is.null(epdac)) {
+    return(integer())
+  }
+
   return(ret)
 }
 
@@ -39,6 +55,7 @@ GetWaveformEpdac <- function(abf, wf_dac) {
 
   meta <- get_meta(abf)
   epdac <- meta$EpochPerDAC
+
   #nDACNum is 0-based
   mask <- epdac$nDACNum == (wf_dac - 1L)
   #sort epdac by nEpochNum just in case
@@ -65,7 +82,11 @@ GetEpochIntervals <- function(abf, wf_dac = 0) {
     wf_dac <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac) == 0L) {
-    err_wf_dac("GetEpochIntervals")
+    #The abf is not waveform stimulus mode, return epoch as whole episode
+    nepi <- nEpi(abf)
+    npts <- nPts(abf)
+    ret <- array(c(1L, npts, npts), dim = c(3L, 1L, nepi))
+    return(ret)
   }
   wf_dac <- FirstElement(wf_dac)
 
