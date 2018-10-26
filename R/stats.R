@@ -83,7 +83,7 @@ AverageAbf <- function(abf_list, w = 0) {
 #' @param sampling_ratio the sampling ratio. See melt.abf for more details.
 #' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
 #'
-#' @return
+#' @return a sampled abf object
 #' @export
 #'
 SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
@@ -155,7 +155,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 #' @param sampling_ratio the sampling ratio. See melt.abf for more details.
 #' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
 #'
-#' @return
+#' @return the sampled abf itself
 #' @export
 #'
 SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {

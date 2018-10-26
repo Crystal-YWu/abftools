@@ -13,6 +13,9 @@ SampleAbf(abf, sampling_ratio, sampling_func = NULL)
 
 \item{sampling_func}{a sampling function applied to sampled points. See melt.abf for more details.}
 }
+\value{
+the sampled abf itself
+}
 \description{
 Sample abf object to reduce data points, by-ref like behaviour.
 }

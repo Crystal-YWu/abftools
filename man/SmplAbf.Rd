@@ -13,6 +13,9 @@ SmplAbf(abf, sampling_ratio, sampling_func = NULL)
 
 \item{sampling_func}{a sampling function applied to sampled points. See melt.abf for more details.}
 }
+\value{
+a sampled abf object
+}
 \description{
 Sample abf object to reduce data points.
 }
