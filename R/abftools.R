@@ -1,7 +1,6 @@
 ##' @import ggplot2
 ##' @import reshape2
-##' @import cowplot
-##' @import stringi
+##' @importFrom cowplot plot_grid
 ##' @import matrixStats
 ##' @import stats
 ##' @import Matrix
