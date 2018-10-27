@@ -4,4 +4,5 @@
 ##' @import stringi
 ##' @import matrixStats
 ##' @import stats
+##' @import Matrix
 NULL
