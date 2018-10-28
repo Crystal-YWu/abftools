@@ -93,6 +93,24 @@ FirstElement <- function(x) {
   return(x[1])
 }
 
+ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
+
+  epoch_intv <- GetEpochIntervals(abf)
+  intv <- epoch_intv[, epoch, episode]
+  if ((lagL + lagR) < intv[3]) {
+    intv[1] <- intv[1] + lagL
+    intv[2] <- intv[2] - lagR
+  } else {
+    #This shouldn't really happen
+    add_msg <- sprintf("lag too large: L = %d, R = %d", lagL, lagR)
+    err_internal_bug("ExtractFrom", add_msg)
+  }
+  mask <- MaskIntv(intv)
+  y <- abf[mask, episode, channel]
+
+  return(y)
+}
+
 abf_list_copy_paste_place_holder <- function(abf) {
 
   if (class(abf) == "abf") {
