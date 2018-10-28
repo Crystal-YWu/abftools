@@ -1,19 +1,3 @@
-#' Calculate baselines of an abf object
-#'
-#' Currently only als (Asymmetric Least Squares Smoothing) is available.
-#'
-#' @param abf an abf object
-#' @param epoch an epoch name/id to of which the baselines will be calculated
-#' @param intv an interval in which the baselines will be calculated
-#' @param episodes episodes to calculate
-#' @param channel channel id, 1-based
-#' @param algo algorithm to calculate baselines
-#' @param ... other arguments to pass to the algorithm
-#'
-#' @return a list of vectors
-#' @export
-#'
-#' @examples
 GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als", ...) {
 
   missing_epoch <- missing(epoch)
@@ -34,7 +18,6 @@ GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als
   }
 
   mask <- intv[1]:intv[2]
-  y <- abf[mask, , channel]
 
   baseline_f <- paste0("baseline_", algo)
   bl <- list()
@@ -52,6 +35,74 @@ GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als
   }
 
   return(bl)
+}
+
+#' Calculate baselines of an abf object.
+#'
+#' Currently only als (Asymmetric Least Squares Smoothing) is available.
+#'
+#' @param abf an abf object.
+#' @param epoch the epoch name/id to evaluate baselines in.
+#' @param episodes episodes/sweeps to calculate.
+#' @param channel channel id, 1-based.
+#' @param algo algorithm to calculate baselines.
+#' @param ... other arguments to pass to the selected algorithm.
+#'
+#' @return baselines of selected episodes/sweeps in a list of vectors
+#' @export
+#'
+BaselineEpoch <- function(abf, epoch, episodes = 0, channel = 1, algo = "als", ...) {
+
+  if (episodes[1] == 0) {
+    episodes <- seq.int(nEpi(abf))
+  }
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
+  baseline_f <- paste0("baseline_", algo)
+
+  baseline <- list()
+  for (i in episodes) {
+    y <- ExtractFrom(abf, epoch, i, channel)
+    baseline[[i]] <- do.call(baseline_f, list(y = y, ...))
+  }
+
+  return(baseline)
+}
+
+#' Calculate baselines of an abf object.
+#'
+#' Currently only als (Asymmetric Least Squares Smoothing) is available.
+#'
+#' @param abf an abf object.
+#' @param intv the interval to evaluate baselines in.
+#' @param episodes episodes/sweeps to calculates.
+#' @param channel channel id, 1-based.
+#' @param algo algorithm to calculate baselines.
+#' @param ... other arguments to pass to the selected algorithm.
+#'
+#' @return baselines of selected episodes/sweeps in a named column matrix
+#' @export
+#'
+BaselineIntv <- function(abf, intv, episodes = 0, channel = 1, algo = "als", ...) {
+
+  if (episodes[1] == 0) {
+    episodes <- seq.int(nEpi(abf))
+  }
+  baseline_f <- paste0("baseline_", algo)
+
+  mask <- MaskIntv(intv)
+  idx <- 0L
+  baseline <- matrix(0, nrow = intv[3], ncol = length(episodes))
+  for (i in episodes) {
+    y <- abf[mask, i, channel]
+    by <- do.call(baseline_f, list(y = y, ...))
+    idx <- idx + 1L
+    baseline[, idx] <- by
+  }
+  colnames(baseline) <- paste0("epi", episodes)
+
+  return(baseline)
 }
 
 #baseline removal from DWT?
