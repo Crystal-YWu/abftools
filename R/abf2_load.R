@@ -45,8 +45,12 @@ abf2_load <- function(filename, abf_title = NULL) {
     section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def)
   if (section_info$Epoch$llNumEntries > 0)
     section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def)
-  if (section_info$EpochPerDAC$llNumEntries > 0)
-    section$EpochPerDAC <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
+  if (section_info$EpochPerDAC$llNumEntries > 0) {
+    epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
+    #sort EpochPerDAC prior to saving to meta, so we don't need to re-sort this
+    #everytime calling epoch.R functions.
+    section$EpochPerDAC <- epdac[order(epdac$nDACNum, epdac$nEpochNum), ]
+  }
   if (section_info$SynchArray$llNumEntries > 0)
     section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
 

@@ -60,7 +60,8 @@ GetWaveformEpdac <- function(abf, DACid) {
   mask <- epdac$nDACNum == nDACNum
   #sort epdac by nEpochNum just in case
   ret <- epdac[mask, ]
-  ret <- ret[order(ret$nEpochNum), ]
+  #EpochPerDAC is already sorted in abf2_load.
+  #ret <- ret[order(ret$nEpochNum), ]
 
   return(ret)
 }
