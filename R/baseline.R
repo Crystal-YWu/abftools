@@ -53,19 +53,7 @@ GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als
 #'
 BaselineEpoch <- function(abf, epoch, episodes = 0, channel = 1, algo = "als", ...) {
 
-  if (episodes[1] == 0) {
-    episodes <- seq.int(nEpi(abf))
-  }
-  if (is.character(epoch)) {
-    epoch <- GetEpochId(epoch)
-  }
-  baseline_f <- paste0("baseline_", algo)
-
-  baseline <- list()
-  for (i in episodes) {
-    y <- ExtractFrom(abf, epoch, i, channel)
-    baseline[[i]] <- do.call(baseline_f, list(y = y, ...))
-  }
+  baseline <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "baseline", algo, ...)
 
   return(baseline)
 }
@@ -86,21 +74,7 @@ BaselineEpoch <- function(abf, epoch, episodes = 0, channel = 1, algo = "als", .
 #'
 BaselineIntv <- function(abf, intv, episodes = 0, channel = 1, algo = "als", ...) {
 
-  if (episodes[1] == 0) {
-    episodes <- seq.int(nEpi(abf))
-  }
-  baseline_f <- paste0("baseline_", algo)
-
-  mask <- MaskIntv(intv)
-  idx <- 0L
-  baseline <- matrix(0, nrow = intv[3], ncol = length(episodes))
-  for (i in episodes) {
-    y <- abf[mask, i, channel]
-    by <- do.call(baseline_f, list(y = y, ...))
-    idx <- idx + 1L
-    baseline[, idx] <- by
-  }
-  colnames(baseline) <- paste0("epi", episodes)
+  baseline <- ExternalAlgoIntv(abf, intv, episodes, channel, "baseline", algo, ...)
 
   return(baseline)
 }
