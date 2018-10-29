@@ -90,7 +90,7 @@ baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10,
   m <- length(y)
   diag_idx <- seq.int(m)
 
-  D <- diff(Diagonal(m), differences = 2)
+  D <- diff(Matrix::Diagonal(m), differences = 2)
   lambda <- 10^lambda_pow10
   Delta <- lambda * t(D) %*% D
 
@@ -104,11 +104,11 @@ baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10,
   for (i in seq.int(maxitr)) {
     #W <- Diagonal(x = w)
     #solving sparseMatrix is much faster than Diagonal, W is sparse anyway
-    W <- sparseMatrix(i = diag_idx, j = diag_idx, x = w)
+    W <- Matrix::sparseMatrix(i = diag_idx, j = diag_idx, x = w)
 
     #Note of as.vector: solved z should be an dgeMatrix, coercing it to a vector
     #greatly improve the speed of the following calculation by vectorisation
-    z <- as.vector(solve(W + Delta, w * y))
+    z <- as.vector(Matrix::solve(W + Delta, w * y))
 
     #update w
     v <- y > z
