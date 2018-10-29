@@ -7,6 +7,8 @@
 #different episodes.
 #ExternalAlgoIntv returns named column matrix for each selected episode, which
 #can be more convenient for subsequent data analysis.
+#ExternalAlgoIntv_list returns a list of vectors, in case that lengths of returned
+#vectors are not determined by lengths of input.
 
 ExternalAlgoEpoch <- function(abf, epoch, episodes, channel, func, algo, ...) {
 
@@ -45,6 +47,25 @@ ExternalAlgoIntv <- function(abf, intv, episodes, channel, func, algo, ...) {
     algo_ret[, idx] <- do.call(algo_f, list(y = y, ...))
   }
   colnames(algo_ret) <- paste0("epi", episodes)
+
+  return(algo_ret)
+}
+
+ExternalAlgoIntv_list <- function(abf, intv, episodes, channel, func, algo, ...) {
+
+  if (episodes[1] == 0) {
+    episodes <- seq.int(nEpi(abf))
+  }
+  algo_f <- paste0(func, "_", algo)
+  mask <- MaskIntv(intv)
+
+  algo_ret <- list()
+  for (i in episodes) {
+    y <- abf[mask, i, channel]
+    algo_ret[[i]] <- do.call(algo_f, list(y = y, ...))
+  }
+  algo_names <- paste0("epi", seq.int(length(algo_ret)))
+  names(algo_ret) <- algo_names
 
   return(algo_ret)
 }
