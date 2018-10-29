@@ -34,7 +34,7 @@ EpisodicIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE
 #'
 EpisodicIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
-  f <- function(x) colSds(x, na.rm)
+  f <- function(x) matrixStats::colSds(x, na.rm)
 
   #na.rm is problematic here since na.rm make colX functions return NaN for removed
   #episodes, so we replace those with NA

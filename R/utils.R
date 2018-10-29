@@ -8,7 +8,7 @@
 #'
 colSems <- function(df, na.rm = FALSE) {
 
-  sds <- colSds(df, na.rm)
+  sds <- matrixStats::colSds(df, na.rm)
   sqn <- sqrt(length(sds))
 
   return(sds / sqn)
