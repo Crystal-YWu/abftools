@@ -4,4 +4,5 @@
 ##' @import matrixStats
 ##' @import stats
 ##' @import Matrix
+##' @import wmtsa
 NULL
