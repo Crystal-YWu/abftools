@@ -4,6 +4,7 @@
 #'
 #' @return the abf object itself, invisibly.
 #' @export
+#' @method print abf
 #'
 print.abf <- function(x, ...) {
 

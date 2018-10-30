@@ -118,3 +118,10 @@ err_mask_na <- function(func) {
   msg <- "You can't mask an episode with NA."
   err(func, msg)
 }
+
+err_internal_bug <- function(func, additional) {
+
+  msg <- paste0("Internal error, please submit bug report. Addional debug info: ",
+                additional)
+  err(func, msg)
+}
