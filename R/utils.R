@@ -27,7 +27,7 @@ colSems <- function(df, na.rm = FALSE) {
 SetIntv <- function(intv, startPos, endPos) {
 
   if (startPos >= endPos) {
-    err_intv_pos("SetIntv")
+    err_intv_pos()
   }
   if (abs(endPos - startPos) < 3L) {
     warning("SetIntv: interval size smaller than 3.")
@@ -45,7 +45,7 @@ push <- function(x, items) {
       x <- append(x, items)
     }))
   } else {
-    err_class_vec_list("push")
+    err_class_vec_list()
   }
 }
 
@@ -65,6 +65,6 @@ pop <- function(x) {
       item
     }))
   } else {
-    err_class_vec_list("pop")
+    err_class_vec_list()
   }
 }

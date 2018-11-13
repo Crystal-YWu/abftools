@@ -1,18 +1,24 @@
 #' abf2_load
 #'
 #' @param filename file path to the abf2 file.
-#' @param folder path to folder containing the abf2 file.
-#' @param abf_title a title assigned to the loaded file, default is filename.
+#' @param folder OPTIONAL, path to folder containing the abf2 file.
+#' @param abf_title OPTIONAL, a title assigned to the loaded file, default is filename.
 #'
 #' @return an abf object.
 #' @export
 #'
 abf2_load <- function(filename, folder, abf_title) {
 
+  if (missing(abf_title) || is.null(abf_title)) {
+    abf_title <- as.character(filename)
+  } else {
+    abf_title <- as.character(abf_title)
+  }
   if (!missing(folder) && !is.null(folder)) {
-    folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
+    folder <- AddSurfix(folder, "/")
     filename <- paste0(folder, filename)
   }
+
   fp <- file(filename, "rb")
 
   #Read header
@@ -207,10 +213,7 @@ abf2_load <- function(filename, folder, abf_title) {
   }
 
   attr(data, "class") <- "abf"
-  if (missing(abf_title) || is.null(abf_title))
-    attr(data, "title") <- filename
-  else
-    attr(data, "title") <- as.character(abf_title)
+  attr(data, "title") <- abf_title
   attr(data, "mode") <- op_mode
 
   #attr(data, "ChannelNum") <- chan_num
@@ -232,24 +235,25 @@ abf2_load <- function(filename, folder, abf_title) {
 #' abf2_loadlist
 #'
 #' @param filelist a list of file name.
-#' @param folder the path to the folder of the files, if filelist contains full path, leave this to empty.
+#' @param folder OPTIONAL, the path to the folder of the files, if filelist contains full path, leave this to empty.
 #' @param attach_ext automatically add ".abf" extension to filelist if not present.
-#' @param titlelist a list of titles, a single title to be assigned to all loaded files.
+#' @param titlelist OPTIONAL, a list of titles, a single title to be assigned to all loaded files.
 #'
 #' @return a list of abf objects.
 #' @export
 #'
 abf2_loadlist <- function(filelist, folder, attach_ext = TRUE, titlelist) {
 
-  filelist <- unlist(filelist)
+  filelist <- as.character(unlist(filelist))
   if (!missing(folder) && !is.null(folder)) {
-    folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
-    filelist <- paste0(folder, filelist)
+    folder <- AddSurfix(folder, "/")
+  } else {
+    folder <- NULL
   }
   if (attach_ext)
-    filelist <- lapply(filelist, function(x) ifelse(endsWith(x, ".abf"), x, paste0(x, ".abf")))
+    filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
 
-  abf_list <- lapply(filelist, abf2_load)
+  abf_list <- lapply(filelist, function(x) abf2_load(x, folder, NULL))
   #set titles
   if (!missing(titlelist) && !is.null(titlelist)) {
     if (length(titlelist) == 1L) {
@@ -269,3 +273,5 @@ abf2_loadlist <- function(filelist, folder, attach_ext = TRUE, titlelist) {
 
   return(abf_list)
 }
+
+AddSurfix <- function(x, sur) ifelse(endsWith(x, sur), x, paste0(x, sur))

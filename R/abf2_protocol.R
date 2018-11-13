@@ -74,7 +74,7 @@ get_meta <- function(abf) {
   } else if (class(abf) == "abf_protocol") {
     meta <- abf
   } else {
-    err_class_abf_protocol("get_meta")
+    err_class_abf_protocol()
   }
 
   return(meta)

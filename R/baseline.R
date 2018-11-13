@@ -3,7 +3,7 @@ GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", .
   missing_epoch <- missing(epoch)
   missing_intv <- missing(intv)
   if (missing_epoch && missing_intv) {
-    err_wrong_arg_num("GetBaseline", "Expected epoch or intv.")
+    err_wrong_arg_num("Expected epoch or intv.")
   }
   if (!xor(missing_intv, missing_epoch)) {
     warning("GetBaseline: argument epoch will be ignored since intv is provided.")

@@ -18,10 +18,10 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
     voltage_channel <- GetFirstVoltageChan(abf_list[[1]])
   }
   if (is.na(current_channel)) {
-    err_id_current_chan("AllSamples_IVSummary")
+    err_id_current_chan()
   }
   if (is.na(voltage_channel)) {
-    err_id_voltage_chan("AllSamples_IVSummary")
+    err_id_voltage_chan()
   }
 
   current_means <- EpisodicIntervalMeans(abf_list, intv_list, current_channel)
@@ -48,7 +48,7 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 AverageAbf <- function(abf_list, w) {
 
   if (!IsAbfList(abf_list)) {
-    err_class_abf_list("MeanABF")
+    err_class_abf_list()
   }
   if (class(abf_list) == "abf") {
     return(abf_list)
@@ -64,7 +64,7 @@ AverageAbf <- function(abf_list, w) {
   } else {
     n <- length(abf_list)
     if (n != length(w)) {
-      err_wrong_dim("AverageABF")
+      err_wrong_dim()
     }
     ret <- abf_list[[1]] * w[1]
     for (i in 2:n) {
@@ -173,7 +173,7 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
       }))
     )
   } else {
-    err_class_abf_list("SampleAbf")
+    err_class_abf_list()
   }
 }
 

@@ -10,9 +10,9 @@
 GetWaveform <- function(abf, episodes, wf_dac_id) {
 
   if (class(abf) != "abf") {
-    err_class_abf("GetWaveform")
+    err_class_abf()
   } else if (attr(abf, "mode") != 5L) {
-    err_wf_mode("GetWaveform")
+    err_wf_mode()
   }
 
   meta <- get_meta(abf)
@@ -21,13 +21,13 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
     wf_dac_id <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac_id) == 0L) {
-    err_wf_dac("GetWaveform")
+    err_wf_dac()
   }
   wf_dac_id <- FirstElement(wf_dac_id)
   #Stimulus file is not supported yet
   wf_src <- meta$DAC$nWaveformSource[wf_dac_id]
   if (wf_src != 1L) {
-    err_wf_support("GetWaveform")
+    err_wf_support()
   }
 
   #Parse episodes
@@ -36,7 +36,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
     episodes = seq_len(nepi)
   }
   if (max(episodes) > nepi) {
-    err_epi("GetWaveform")
+    err_epi()
   }
   #update nepi according to selected episodes
   nepi <- length(episodes)
@@ -56,7 +56,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
   epdac <- GetWaveformEpdac(abf, wf_dac_id)
   nepoch <- nrow(epdac)
   if (nepoch == 0L) {
-    err_wf_dac("GetWaveform")
+    err_wf_dac()
   }
 
   #extract epoch settings
@@ -93,11 +93,11 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
                     #waveform 5
                     wf_cos(len, Vin, Vhi, p_period[epoch]),
                     #waveform 6
-                    err_wf_type("GetWaveform"),
+                    err_wf_type(),
                     #waveform 7
                     wf_biphsc(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
                     #other
-                    err_wf_type("GetWaveform"))
+                    err_wf_type())
 
       #copy tmp to mx
       mask <- seq(from = idx, length.out = len)
@@ -129,7 +129,7 @@ AttachWaveform <- function(abf) {
 
   dac <- GetWaveformEnabledDAC(abf)
   if (length(dac) == 0L) {
-    err_wf_dac("AttachWaveform")
+    err_wf_dac()
   }
   dac <- FirstElement(dac)
   #get waveform channel

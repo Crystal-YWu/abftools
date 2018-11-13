@@ -3,15 +3,19 @@
 #' @param abf an abf object.
 #' @param channel the channel to compare, channel id is 1-based.
 #' @param epoch the epoch to compare.
-#' @param delta allowed deviation.
+#' @param delta allowed max deviation.
 #' @param relative delta is given in relative value or absolute value.
-#' @param min_win minimum interval window size of the result.
-#' @param max_win maximum interval window size of the result.
+#' @param min_win OPTIONAL, minimum interval window size of the result.
+#' @param max_win OPTIONAL, maximum interval window size of the result.
 #'
 #' @return a list of intervals of which pass comparison.
 #' @export
 #'
 CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
 
   epoch_intv <- GetEpochIntervals(abf)
   epoch <- FirstElement(epoch)
@@ -87,10 +91,10 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
     voltage_channel <- GetFirstVoltageChan(abf)
   }
   if (is.na(current_channel)) {
-    err_id_current_chan("FindSamplingInterval")
+    err_id_current_chan()
   }
   if (is.na(voltage_channel)) {
-    err_id_voltage_chan("FindSamplingInterval")
+    err_id_voltage_chan()
   }
 
   epoch <- GetEpochId(epoch_name)

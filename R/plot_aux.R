@@ -42,7 +42,7 @@ TickToTime <- function(abf, time_unit, ctick) {
                   s  = ctick * GetSamplingIntv(abf) / 1000 / 1000,
                   min = ctick * GetSamplingIntv(abf) / 1000 / 1000 / 60,
                   hr = ctick * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60,
-                  err_time_unit("TickToTime"))
+                  err_time_unit())
 
   return(ctime)
 }

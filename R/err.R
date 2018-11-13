@@ -1,127 +1,136 @@
-err <- function(func, msg) {
+err <- function(msg) {
+
+  func <- as.character(sys.call(-2L))[1]
 
   err_msg <- paste0(func, ": ", msg)
   stop(err_msg)
 }
 
-err_abf_not_episodic <- function(func) {
+err_abf_not_episodic <- function() {
 
   msg <- "The abf object is not episodic."
-  err(func, msg)
+  err(msg)
 }
 
-err_class_abf <- function(func) {
+err_class_abf <- function() {
 
   msg <- "Only abf object is supported."
-  err(func, msg)
+  err(msg)
 }
 
-err_class_abf_list <- function(func) {
+err_class_abf_list <- function() {
 
   msg <- "Only abf or a list of abf objects are supported"
-  err(func, msg)
+  err(msg)
 }
 
-err_class_abf_protocol <- function(func) {
+err_class_abf_protocol <- function() {
 
   msg <- "Only abf or abf protocol object are supported."
-  err(func, msg)
+  err(msg)
 }
 
-err_class_vec_list <- function(func) {
+err_class_vec_list <- function() {
 
   msg <- "Only vector or list are supported."
-  err(func, msg)
+  err(msg)
 }
 
-err_intv_pos <- function(func) {
+err_intv_pos <- function() {
 
   msg <- "End position should be larger than start position."
-  err(func, msg)
+  err(msg)
 }
 
-err_id_current_chan <- function(func) {
+err_id_current_chan <- function() {
 
   msg <- "Failed to identify current channel id. Please provide manually."
-  err(func, msg)
+  err(msg)
 }
 
-err_id_voltage_chan <- function(func) {
+err_id_voltage_chan <- function() {
 
   msg <- "Failed to identify voltage channel id. Please provide manually."
-  err(func, msg)
+  err(msg)
 }
 
-err_epoch_name <- function(func) {
+err_epoch_name <- function() {
 
   msg <- "Invalid epoch name."
-  err(func, msg)
+  err(msg)
 }
 
-err_epoch <- function(func) {
+err_epoch <- function() {
 
   msg <- "Invalid epoch number."
-  err(func, msg)
+  err(msg)
 }
 
-err_wf_mode <- function(func) {
+err_wf_mode <- function() {
 
   msg <- "Episodic stimulation (mode 5) abf object requied."
-  err(func, msg)
+  err(msg)
 }
 
-err_wf_dac <- function(func) {
+err_wf_dac <- function() {
 
   msg <- "Waveform DAC channel not found."
-  err(func, msg)
+  err(msg)
 }
 
-err_wf_support <- function(func) {
+err_wf_support <- function() {
 
   msg <- "Waveform source not supported."
-  err(func, msg)
+  err(msg)
 }
 
-err_wf_type <- function(func) {
+err_wf_type <- function() {
 
   msg <- "Unsupported waveform type."
-  err(func, msg)
+  err(msg)
 }
 
-err_epi <- function(func) {
+err_epi <- function() {
 
   msg <- "Invalid episode number."
-  err(func, msg)
+  err(msg)
 }
 
-err_wrong_arg_num <- function(func, additional = "") {
+err_wrong_arg_num <- function(additional = "") {
 
   msg <- paste0("Wrong number of arguments. ", additional)
-  err(func, msg)
+  err(msg)
 }
 
-err_time_unit <- function(func) {
+err_time_unit <- function() {
 
   msg <- paste("Invalid time unit, which can only be:",
                 "tick, us, ms, s, min or hr.")
-  err(func, msg)
+  err(msg)
 }
 
-err_wrong_dim <- function(func) {
+err_wrong_dim <- function() {
 
   msg <- "Dimensions do not match."
-  err(func, msg)
+  err(msg)
 }
 
-err_mask_na <- function(func) {
+err_mask_na <- function() {
 
   msg <- "You can't mask an episode with NA."
-  err(func, msg)
+  err(msg)
 }
 
-err_internal_bug <- function(func, additional) {
+err_internal_bug <- function(additional) {
 
   msg <- paste0("Internal error, please submit bug report. Addional debug info: ",
                 additional)
-  err(func, msg)
+  err(msg)
+}
+
+err_assert_len <- function(var, to_match) {
+
+  msg <- sprintf("Length of %s does not match %s.", var, to_match)
+
+  err(msg)
 }

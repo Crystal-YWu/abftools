@@ -9,7 +9,7 @@ abf2_load(filename, folder, abf_title)
 \arguments{
 \item{filename}{file path to the abf2 file.}
 
-\item{folder}{path to folder containing the abf2 file.}
+\item{folder}{OPTIONAL, path to folder containing the abf2 file.}
 
 \item{abf_title}{a title assigned to the loaded file, default is filename.}
 }

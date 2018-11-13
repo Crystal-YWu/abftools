@@ -74,14 +74,6 @@ FilterMaxIntervalPos <- function(interval, max_intv_pos) {
   return(interval[ , mask, drop = FALSE])
 }
 
-IsAbfList <- function(x) {
-
-  if (class(x) != "list")
-    return(FALSE)
-  else
-    return(all(sapply(x, function(y) class(y) == "abf")))
-}
-
 FirstElement <- function(x) {
 
   x_name <- deparse(substitute(x))
@@ -103,7 +95,7 @@ ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
   } else {
     #This shouldn't really happen
     add_msg <- sprintf("lag too large: L = %d, R = %d", lagL, lagR)
-    err_internal_bug("ExtractFrom", add_msg)
+    err_internal_bug(add_msg)
   }
   mask <- MaskIntv(intv)
   y <- abf[mask, episode, channel]
@@ -113,12 +105,12 @@ ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
 
 abf_list_copy_paste_place_holder <- function(abf) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
 
   } else if (IsAbfList(abf)) {
 
   } else {
-    err_class_abf_list("")
+    err_class_abf_list()
   }
 
 }

@@ -11,12 +11,12 @@
 MskEpi <- function(abf, channel, episodes, value) {
 
   if (is.na(value)) {
-    err_mask_na("MskEpi")
+    err_mask_na()
   }
 
   d <- dim(abf)
   if (d[3] == 1L) {
-    err_abf_not_episodic("MskEpi")
+    err_abf_not_episodic()
   }
 
   abf[, episodes, channel] <- value
@@ -37,7 +37,7 @@ MskEpi <- function(abf, channel, episodes, value) {
 MaskEpisodes <- function(abf, channel, episodes, value) {
 
   if (is.na(value)) {
-    err_mask_na("MaskEpisodes")
+    err_mask_na()
   }
 
   if (class(abf) == "abf") {
@@ -54,7 +54,7 @@ MaskEpisodes <- function(abf, channel, episodes, value) {
       }))
     )
   } else {
-    err_class_abf_list("MaskEpisodes")
+    err_class_abf_list()
   }
 
 }
@@ -75,7 +75,7 @@ RmEpi <- function(abf, episodes) {
 
   d <- dim(abf)
   if (d[3] == 1L)
-    err_abf_not_episodic("RmEpi")
+    err_abf_not_episodic()
 
   epi_avail <- attr(abf, "EpiAvail")
   epi_avail[episodes] <- FALSE
@@ -112,7 +112,7 @@ RemoveEpisodes <- function(abf, episodes) {
       }))
     )
   } else {
-    err_class_abf_list("RemoveEpisodes")
+    err_class_abf_list()
   }
 
 }
@@ -129,7 +129,7 @@ ResEpi <- function(abf, episodes) {
 
   d <- dim(abf)
   if (d[3] == 1L)
-    err_abf_not_episodic("ResEpi")
+    err_abf_not_episodic()
 
   epi_avail <- attr(abf, "EpiAvail")
   epi_avail[episodes] <- TRUE
@@ -161,7 +161,7 @@ RestoreEpisodes <- function(abf, episodes) {
       }))
     )
   } else {
-    err_class_abf_list("RestoreEpisodes")
+    err_class_abf_list()
   }
 
 }
@@ -187,7 +187,7 @@ GetAvailEpisodes <- function(abf) {
   } else if (IsAbfList(abf)) {
     return(lapply(abf, f))
   } else {
-    err_class_abf_list("GetAvailEpisodes")
+    err_class_abf_list()
   }
 
 }

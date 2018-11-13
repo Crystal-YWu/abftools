@@ -42,7 +42,7 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
 
     return(p)
   } else {
-    err_class_abf_list("QuickPlotIV")
+    err_class_abf_list()
   }
 
 }

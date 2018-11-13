@@ -7,12 +7,12 @@
 #'
 GetTitle <- function(abf) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     return(attr(abf, "title"))
   } else if (IsAbfList(abf)) {
     return(lapply(abf, function(x) attr(x, "title")))
   } else {
-    err_class_abf_list("GetTitle")
+    err_class_abf_list()
   }
 
 }
@@ -31,12 +31,15 @@ GetTitle <- function(abf) {
 #'
 SetTitle <- function(abf, title) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     eval.parent(substitute({
       attr(abf, "title") <- as.character(title)
       invisible(abf)
     }))
   } else if (IsAbfList(abf)) {
+    if (!AssertLength(title, 1L, length(abf))) {
+      err_assert_len("title", "abf")
+    }
     if (length(title) == 1L) {
       eval.parent(substitute({
         for (i_____ in seq_along(abf)) {
@@ -55,7 +58,7 @@ SetTitle <- function(abf, title) {
       }))
     }
   } else {
-    err_class_abf_list("SetTitle")
+    err_class_abf_list()
   }
 }
 
@@ -69,6 +72,10 @@ SetTitle <- function(abf, title) {
 #'
 GetChannelName <- function(abf) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
   return(attr(abf, "ChannelName"))
 }
 
@@ -80,6 +87,10 @@ GetChannelName <- function(abf) {
 #' @export
 #'
 GetChannelUnit <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
 
   return(attr(abf, "ChannelUnit"))
 }
@@ -93,6 +104,10 @@ GetChannelUnit <- function(abf) {
 #'
 GetChannelDesc <- function(abf) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
   return(attr(abf, "ChannelDesc"))
 }
 
@@ -105,6 +120,10 @@ GetChannelDesc <- function(abf) {
 #'
 GetSamplingIntv <- function(abf) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
   return(attr(abf, "SamplingInterval"))
 }
 
@@ -116,6 +135,10 @@ GetSamplingIntv <- function(abf) {
 #' @export
 #'
 GetMode <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
 
   return(attr(abf, "mode"))
 }
