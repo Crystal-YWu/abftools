@@ -16,9 +16,20 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
   if (!IsAbf(abf)) {
     err_class_abf()
   }
-
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
   epoch_intv <- GetEpochIntervals(abf)
   epoch <- FirstElement(epoch)
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
+  if (!AssertEpoch(abf, epoch)) {
+    err_epoch()
+  }
+  if (relative && delta >= 1.0) {
+    warning("Very large delta is given in relative mode. Please notice delta is not a percentage.")
+  }
 
   episodes <- GetAvailEpisodes(abf)
   wf <- GetWaveform(abf, episodes)
@@ -83,6 +94,10 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
                                  min_sampling_size, allowed_voltage_delta,
                                  epoch_name = "B", backward_search = TRUE) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
   #figure out current channel and voltage channel
   if (missing(current_channel) || is.null(current_channel)) {
     current_channel <- GetFirstCurrentChan(abf)
@@ -98,12 +113,15 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
   }
 
   epoch <- GetEpochId(epoch_name)
+  if (!AssertEpoch(abf, epoch)) {
+    err_epoch()
+  }
 
   #Default allowed voltage delta is 5% of max voltage setting
   meta <- get_meta(abf)
   if (missing(allowed_voltage_delta) || is.null(allowed_voltage_delta)) {
     v_settings <- meta$EpochPerDAC$fEpochInitLevel[epoch] +
-      (seq_len(nEpi(abf)) - 1) * meta$EpochPerDAC$fEpochLevelInc[epoch]
+      (seq_len(nEpi(abf)) - 1L) * meta$EpochPerDAC$fEpochLevelInc[epoch]
     allowed_voltage_delta = max(abs(v_settings)) * 0.05
   }
 
@@ -178,6 +196,10 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
 #'
 FindAllSamplingInterval <- function(abf_list, ...) {
 
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+
   intv_list = list()
   for (i in seq_along(abf_list)) {
     intv_list[[i]] <- FindSamplingInterval(abf_list[[i]], ...)
@@ -193,19 +215,28 @@ FindAllSamplingInterval <- function(abf_list, ...) {
 #' @param channel OPTIONAL, the channel to compare.
 #' @param epoch OPTIONAL, the epoch to compare.
 #'
-#' @return
+#' @return Nothing
 #' @export
 #'
-#' @examples
 CheckSamplingInterval <- function(abf, intv, channel, epoch = "B") {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
 
   if (missing(channel) || is.null(channel)) {
     channel <- GetFirstVoltageChan(abf)
+  } else if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   if (is.character(epoch[1])) {
     epoch <- GetEpochId(epoch)
   }
   epoch <- FirstElement(epoch)
+  if (!AssertEpoch(abf, epoch)) {
+    err_epoch()
+  }
 
   episodes <- GetAvailEpisodes(abf)
   wf <- GetWaveform(abf, episodes)
@@ -230,4 +261,5 @@ CheckSamplingInterval <- function(abf, intv, channel, epoch = "B") {
                  episodes[i], max_abs, wf_unit, max_rel, means, sems)
     cat(s)
   }
+
 }

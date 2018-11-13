@@ -15,6 +15,9 @@ CheckSamplingInterval(abf, intv, channel, epoch = "B")
 
 \item{epoch}{OPTIONAL, the epoch to compare.}
 }
+\value{
+Nothing
+}
 \description{
 Print a quick waveform channel summary of a sampling interval.
 }

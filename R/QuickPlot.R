@@ -9,7 +9,7 @@
 #'
 QuickPlotIV <- function(abf, pos, colour = FALSE) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
 
     current_channel <- GetFirstCurrentChan(abf)
     voltage_channel <- GetFirstVoltageChan(abf)
@@ -60,6 +60,16 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
 #' @export
 #'
 QuickPlotTrace <- function(abf, channelX, episodeX, channelY, episodeY, intv) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channelX) || !AssertChannel(abf, channelY)) {
+    err_channel()
+  }
+  if (!AssertEpisode(abf, episodeX) || !AssertEpisode(abf, episodeY)) {
+    err_epi()
+  }
 
   chX <- abf[[channelX]]
   chY <- abf[[channelY]]

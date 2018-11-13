@@ -26,7 +26,7 @@ CheckChannelDim <- function(abf, channel_data) {
 #'
 AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc) {
 
-  if (class(abf) != "abf") {
+  if (!IsAbf(abf)) {
     err_class_abf()
   }
   if (!CheckChannelDim(abf, new_channel)) {
@@ -127,8 +127,11 @@ AttachChannel <- function(abf, new_channel, channel_name, channel_unit, channel_
 #'
 RplcChan <- function(abf, channel, channel_data) {
 
-  if (class(abf) != "abf") {
+  if (!IsAbf(abf)) {
     err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   if (!CheckChannelDim(abf, channel_data)) {
     err_wrong_dim()

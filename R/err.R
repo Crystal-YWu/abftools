@@ -141,3 +141,10 @@ err_epoch_dac <- function() {
 
   err(msg)
 }
+
+err_channel <- function() {
+
+  msg <- "Invalid channel id."
+
+  err(msg)
+}

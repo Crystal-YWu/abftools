@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{mean.abf}
 \alias{mean.abf}
-\title{Calculates mean values of an abf object.}
+\title{Calculate mean values of an abf object.}
 \usage{
 \method{mean}{abf}(abf, intv, desc_colnames = TRUE, ...)
 }
@@ -16,7 +16,7 @@
 \item{...}{Passed to arithmetic mean.}
 }
 \value{
-A data.frame object
+A data.frame object.
 }
 \description{
 Returns a data.frame object containing episodic mean values of each channel.

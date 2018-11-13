@@ -2,13 +2,20 @@
 % Please edit documentation in R/stats.R
 \name{MultiMean_Voltage}
 \alias{MultiMean_Voltage}
-\title{Title}
+\title{Calculate mean voltages of multiple abf objects}
 \usage{
 MultiMean_Voltage(abf_list, intv_list, na.rm = TRUE)
 }
 \arguments{
-\item{na.rm}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{intv_list}{a list of intervals.}
+
+\item{na.rm}{wheter to remove na values.}
+}
+\value{
+A data.frame object.
 }
 \description{
-Title
+Calculate mean voltages of multiple abf objects
 }

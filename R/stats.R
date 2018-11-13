@@ -177,7 +177,7 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   }
 }
 
-#' Calculates mean values of an abf object.
+#' Calculate mean values of an abf object.
 #'
 #' Returns a data.frame object containing episodic mean values of each channel.
 #'
@@ -186,7 +186,7 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 #' @param desc_colnames Whether to use descriptive colnames, set to FALSE to use original channel names.
 #' @param ... Passed to arithmetic mean.
 #'
-#' @return A data.frame object
+#' @return A data.frame object.
 #' @export
 #' @method mean abf
 #'
@@ -213,17 +213,16 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
   return(as.data.frame(ret))
 }
 
-#' Title
+#' Calculate mean values of multiple abf objects
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param channel
-#' @param na.rm
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param channel channel id, 1-based.
+#' @param na.rm wheter to remove na values..
 #'
-#' @return
+#' @return A data.frame object.
 #' @export
 #'
-#' @examples
 MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   colname <- c()
@@ -236,16 +235,15 @@ MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
   return(ret)
 }
 
-#' Title
+#' Calculate mean currents of multiple abf objects
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param na.rm
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param na.rm wheter to remove na values..
 #'
-#' @return
+#' @return A data.frame object.
 #' @export
 #'
-#' @examples
 MultiMean_Current <- function(abf_list, intv_list, na.rm = TRUE) {
 
   channel <- GetFirstCurrentChan(abf_list[[1]])
@@ -253,16 +251,15 @@ MultiMean_Current <- function(abf_list, intv_list, na.rm = TRUE) {
   return(MultiMean(abf_list, intv_list, channel, na.rm))
 }
 
-#' Title
+#' Calculate mean voltages of multiple abf objects
 #'
-#' @param abf_list
-#' @param intv_list
-#' @param na.rm
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of intervals.
+#' @param na.rm wheter to remove na values.
 #'
-#' @return
+#' @return A data.frame object.
 #' @export
 #'
-#' @examples
 MultiMean_Voltage <- function(abf_list, intv_list, na.rm =TRUE) {
 
   channel <- GetFirstVoltageChan(abf_list[[1]])

@@ -11,6 +11,10 @@ GetEpochId <- function(epoch_name) {
   epoch_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
   epoch <- match(epoch_name, epoch_names)
 
+  if (is.null(epoch)) {
+    err_epoch_name()
+  }
+
   return(epoch)
 }
 
@@ -22,6 +26,10 @@ GetEpochId <- function(epoch_name) {
 #' @export
 #'
 GetWaveformEnabledDAC <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
 
   meta <- get_meta(abf)
 
@@ -41,8 +49,7 @@ GetWaveformEnabledDAC <- function(abf) {
   #settings.
   #
   #Check if EpochPerDAC is present
-  epdac <- meta$EpochPerDAC
-  if (is.null(epdac)) {
+  if (nEpoch(abf) == 0L) {
     return(integer())
   }
 
@@ -51,6 +58,10 @@ GetWaveformEnabledDAC <- function(abf) {
 
 #I don't think we need to export this
 GetWaveformEpdac <- function(abf, DACid) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
 
   meta <- get_meta(abf)
   epdac <- meta$EpochPerDAC
@@ -72,27 +83,26 @@ GetWaveformEpdac <- function(abf, DACid) {
 #' epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
 #'
 #' @param abf an abf object.
-#' @param wf_dac_id id of the waveform DAC, 1-based.
+#' @param wf_dac_ch OPTIONAL, waveform DAC channel, 1-based.
 #'
 #' @return a 3-d array, see details.
 #' @export
 #'
-GetEpochIntervals <- function(abf, wf_dac_id) {
+GetEpochIntervals <- function(abf, wf_dac_ch) {
 
-  if (missing(wf_dac_id) || is.null(wf_dac_id)) {
-    wf_dac_id <- GetWaveformEnabledDAC(abf)
+  if (!IsAbf(abf)) {
+    err_class_abf()
   }
-  if (length(wf_dac_id) == 0L) {
-    #The abf is not waveform stimulus mode, return epoch as whole episode
-    nepi <- nEpi(abf)
-    npts <- nPts(abf)
-    ret <- array(c(1L, npts, npts), dim = c(3L, 1L, nepi))
-    return(ret)
+  if (missing(wf_dac_ch) || is.null(wf_dac_ch)) {
+    wf_dac_ch <- GetWaveformEnabledDAC(abf)
   }
-  wf_dac_id <- FirstElement(wf_dac_id)
+  if (length(wf_dac_ch) == 0L) {
+    err_epoch_dac()
+  }
+  wf_dac_ch <- FirstElement(wf_dac_ch)
 
   #EpochPerDAC table
-  epdac <- GetWaveformEpdac(abf, wf_dac_id)
+  epdac <- GetWaveformEpdac(abf, wf_dac_ch)
 
   #length of first holding
   npts <- nPts(abf)

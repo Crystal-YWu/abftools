@@ -7,7 +7,7 @@
 RemoveEpisodes(abf, episodes)
 }
 \arguments{
-\item{abf}{an abf object.}
+\item{abf}{an abf or a list of abf object.}
 
 \item{episodes}{episodes to remove.}
 }

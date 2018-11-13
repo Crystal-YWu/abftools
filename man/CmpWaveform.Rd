@@ -13,13 +13,13 @@ CmpWaveform(abf, channel, epoch, delta, relative, min_win, max_win)
 
 \item{epoch}{the epoch to compare.}
 
-\item{delta}{allowed deviation.}
+\item{delta}{allowed max deviation.}
 
 \item{relative}{delta is given in relative value or absolute value.}
 
-\item{min_win}{minimum interval window size of the result.}
+\item{min_win}{OPTIONAL, minimum interval window size of the result.}
 
-\item{max_win}{maximum interval window size of the result.}
+\item{max_win}{OPTIONAL, maximum interval window size of the result.}
 }
 \value{
 a list of intervals of which pass comparison.

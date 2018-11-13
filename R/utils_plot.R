@@ -22,6 +22,13 @@
 melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NULL,
                      time_unit = "tick") {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
+
   npts <- nPts(abf)
   chan_desc <- GetChannelDesc(abf)[channel]
 

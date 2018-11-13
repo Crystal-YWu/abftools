@@ -9,11 +9,11 @@ abf2_loadlist(filelist, folder, attach_ext = TRUE, titlelist)
 \arguments{
 \item{filelist}{a list of file name.}
 
-\item{folder}{the path to the folder of the files, if filelist contains full path, leave this to empty.}
+\item{folder}{OPTIONAL, the path to the folder of the files, if filelist contains full path, leave this to empty.}
 
 \item{attach_ext}{automatically add ".abf" extension to filelist if not present.}
 
-\item{titlelist}{a list of titles, a single title to be assigned to all loaded files.}
+\item{titlelist}{OPTIONAL, a list of titles, a single title to be assigned to all loaded files.}
 }
 \value{
 a list of abf objects.

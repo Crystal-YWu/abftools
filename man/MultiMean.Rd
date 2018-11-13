@@ -2,13 +2,22 @@
 % Please edit documentation in R/stats.R
 \name{MultiMean}
 \alias{MultiMean}
-\title{Title}
+\title{Calculate mean values of multiple abf objects}
 \usage{
 MultiMean(abf_list, intv_list, channel = 1, na.rm = TRUE)
 }
 \arguments{
-\item{na.rm}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{intv_list}{a list of intervals.}
+
+\item{channel}{channel id, 1-based.}
+
+\item{na.rm}{wheter to remove na values..}
+}
+\value{
+A data.frame object.
 }
 \description{
-Title
+Calculate mean values of multiple abf objects
 }

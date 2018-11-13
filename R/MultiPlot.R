@@ -15,6 +15,15 @@
 MultiPlotChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = "tick",
                              num_label = FALSE, title_label = TRUE, unify_y = TRUE, ...) {
 
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+  for (tmp in abf_list) {
+    if (!AssertChannel(tmp, channel)) {
+      err_channel()
+    }
+  }
+
   p <- MultiPlotP(abf_list, NULL, channel, colour, time_unit, num_label, title_label,
                   unify_y, ...)
 
@@ -64,6 +73,18 @@ MultiPeekChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = 
 MultiPlotChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FALSE,
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ...) {
+
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+  if (!AssertLength(intv_list, length(abf_list))) {
+    err_assert_len("intv_list", "abf_list")
+  }
+  for (tmp in abf_list) {
+    if (!AssertChannel(tmp, channel)) {
+      err_channel()
+    }
+  }
 
   p <- MultiPlotP(abf_list, intv_list, channel, colour, time_unit, num_label,
                   title_label, unify_y, ...)
@@ -122,6 +143,18 @@ MultiPlotChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour =
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ...) {
 
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+  if (!AssertLength(cursor_list, length(abf_list))) {
+    err_assert_len("cursor_list", "abf_list")
+  }
+  for (tmp in abf_list) {
+    if (!AssertChannel(tmp, channel)) {
+      err_channel()
+    }
+  }
+
   p <- MultiPlotP(abf_list, cursor_list, channel, colour, time_unit, num_label,
                   title_label, unify_y, ...)
   for (i in seq_along(p)) {
@@ -174,6 +207,15 @@ MultiPeekChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour =
 #'
 MultiPlotChannel_Pub <- function(abf_list, channel = 1, time_unit = "s", title_label = FALSE,
                                  spacing = 0, ...) {
+
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+  for (tmp in abf_list) {
+    if (!AssertChannel(tmp, channel)) {
+      err_channel()
+    }
+  }
 
   p <- MultiPlotP(abf_list, NULL, channel, FALSE, time_unit, FALSE, title_label,
                   TRUE, ...)

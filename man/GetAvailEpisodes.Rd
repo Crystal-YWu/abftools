@@ -7,7 +7,7 @@
 GetAvailEpisodes(abf)
 }
 \arguments{
-\item{abf}{an abf objects}
+\item{abf}{an abf or a list of abf object.}
 }
 \value{
 episodes that are not marked removed.

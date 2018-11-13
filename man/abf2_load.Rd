@@ -11,7 +11,7 @@ abf2_load(filename, folder, abf_title)
 
 \item{folder}{OPTIONAL, path to folder containing the abf2 file.}
 
-\item{abf_title}{a title assigned to the loaded file, default is filename.}
+\item{abf_title}{OPTIONAL, a title assigned to the loaded file, default is filename.}
 }
 \value{
 an abf object.

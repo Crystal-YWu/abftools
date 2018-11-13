@@ -15,8 +15,23 @@
 PeakDetectEpoch <- function(abf, epoch, episodes, channel = 1,
                             algo = "cwt", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  epoch <- FirstElement(epoch)
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
+  if (!AssertEpoch(abf, epoch)) {
+    err_epoch()
+  }
   if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   peaks <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "peak", algo, ...)
 
@@ -39,8 +54,16 @@ PeakDetectEpoch <- function(abf, epoch, episodes, channel = 1,
 #'
 PeakDetectIntv <- function(abf, intv, episodes, channel = 1, algo = "cwt", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
   if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   peaks <- ExternalAlgoIntv_list(abf, intv, episodes, channel, "peak", algo, ...)
 

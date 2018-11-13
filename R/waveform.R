@@ -9,13 +9,11 @@
 #'
 GetWaveform <- function(abf, episodes, wf_dac_id) {
 
-  if (class(abf) != "abf") {
+  if (!IsAbf(abf)) {
     err_class_abf()
   } else if (attr(abf, "mode") != 5L) {
     err_wf_mode()
   }
-
-  meta <- get_meta(abf)
   #Check DAC channel and DAC source
   if (missing(wf_dac_id) || is.null(wf_dac_id)) {
     wf_dac_id <- GetWaveformEnabledDAC(abf)
@@ -24,22 +22,22 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
     err_wf_dac()
   }
   wf_dac_id <- FirstElement(wf_dac_id)
+  #Parse episodes
+  nepi <- nEpi(abf)
+  if (missing(episodes) || is.null(episodes)) {
+    episodes = seq_len(nepi)
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  #update nepi according to selected episodes
+  nepi <- length(episodes)
+
+  meta <- get_meta(abf)
   #Stimulus file is not supported yet
   wf_src <- meta$DAC$nWaveformSource[wf_dac_id]
   if (wf_src != 1L) {
     err_wf_support()
   }
-
-  #Parse episodes
-  nepi <- nEpi(abf)
-  if (missing(episodes) || is.null(episodes)) {
-    episodes = seq_len(nepi)
-  }
-  if (max(episodes) > nepi) {
-    err_epi()
-  }
-  #update nepi according to selected episodes
-  nepi <- length(episodes)
 
   #Assume instrument holding. Because I don't know where to extract exact holding
   #values at the moment.
@@ -126,6 +124,10 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
 #' @export
 #'
 AttachWaveform <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf(abf)
+  }
 
   dac <- GetWaveformEnabledDAC(abf)
   if (length(dac) == 0L) {

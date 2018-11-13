@@ -2,13 +2,20 @@
 % Please edit documentation in R/stats.R
 \name{MultiMean_Current}
 \alias{MultiMean_Current}
-\title{Title}
+\title{Calculate mean currents of multiple abf objects}
 \usage{
 MultiMean_Current(abf_list, intv_list, na.rm = TRUE)
 }
 \arguments{
-\item{na.rm}{}
+\item{abf_list}{a list of abf objects.}
+
+\item{intv_list}{a list of intervals.}
+
+\item{na.rm}{wheter to remove na values..}
+}
+\value{
+A data.frame object.
 }
 \description{
-Title
+Calculate mean currents of multiple abf objects
 }

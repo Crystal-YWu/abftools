@@ -11,11 +11,11 @@ BaselineEpoch(abf, epoch, episodes, channel = 1L, algo = "als", ...)
 
 \item{epoch}{the epoch name/id to evaluate baselines in.}
 
-\item{episodes}{episodes/sweeps to calculate.}
+\item{episodes}{OPTIONAL, episodes/sweeps to calculate.}
 
-\item{channel}{channel id, 1-based.}
+\item{channel}{OPTIONAL, channel id, 1-based.}
 
-\item{algo}{algorithm to calculate baselines.}
+\item{algo}{OPTIONAL, algorithm to calculate baselines.}
 
 \item{...}{other arguments to pass to the selected algorithm.}
 }

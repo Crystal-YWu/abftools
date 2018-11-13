@@ -10,6 +10,15 @@
 #'
 MskEpi <- function(abf, channel, episodes, value) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
+  if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
   if (is.na(value)) {
     err_mask_na()
   }
@@ -26,7 +35,7 @@ MskEpi <- function(abf, channel, episodes, value) {
 
 #' Mask episodes with a value, by-ref behaviour.
 #'
-#' @param abf an abf object.
+#' @param abf an abf or a list of abf object.
 #' @param channel channel id, 1-based.
 #' @param episodes the episodes to mask.
 #' @param value the value assigned to the episodes.
@@ -36,11 +45,7 @@ MskEpi <- function(abf, channel, episodes, value) {
 #'
 MaskEpisodes <- function(abf, channel, episodes, value) {
 
-  if (is.na(value)) {
-    err_mask_na()
-  }
-
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
         abf <- MskEpi(abf, channel, episodes, value)
@@ -73,9 +78,17 @@ MaskEpisodes <- function(abf, channel, episodes, value) {
 #'
 RmEpi <- function(abf, episodes) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+
   d <- dim(abf)
-  if (d[3] == 1L)
+  if (d[3] == 1L) {
     err_abf_not_episodic()
+  }
 
   epi_avail <- attr(abf, "EpiAvail")
   epi_avail[episodes] <- FALSE
@@ -90,7 +103,7 @@ RmEpi <- function(abf, episodes) {
 #' episodes only affect results of [[ extracting and GetAvailEpisodes, since
 #' episodic data is not actually removed but marked "removed"
 #'
-#' @param abf an abf object.
+#' @param abf an abf or a list of abf object.
 #' @param episodes episodes to remove.
 #'
 #' @return an abf object with desired episodes marked removed.
@@ -98,7 +111,7 @@ RmEpi <- function(abf, episodes) {
 #'
 RemoveEpisodes <- function(abf, episodes) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
         abf <- RmEpi(abf, episodes)
@@ -127,6 +140,13 @@ RemoveEpisodes <- function(abf, episodes) {
 #'
 ResEpi <- function(abf, episodes) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+
   d <- dim(abf)
   if (d[3] == 1L)
     err_abf_not_episodic()
@@ -140,7 +160,7 @@ ResEpi <- function(abf, episodes) {
 
 #' Restore previous removed episodes, by-ref behaviour.
 #'
-#' @param abf an abf object.
+#' @param abf an abf or a list of abf object.
 #' @param episodes episodes to restore.
 #'
 #' @return an abf object.
@@ -148,7 +168,7 @@ ResEpi <- function(abf, episodes) {
 #'
 RestoreEpisodes <- function(abf, episodes) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
         abf <- ResEpi(abf, episodes)
@@ -168,7 +188,7 @@ RestoreEpisodes <- function(abf, episodes) {
 
 #' Get available episodes
 #'
-#' @param abf an abf objects
+#' @param abf an abf or a list of abf object.
 #'
 #' @return episodes that are not marked removed.
 #' @export
@@ -182,7 +202,7 @@ GetAvailEpisodes <- function(abf) {
     return(all_epi[avail_epi])
   }
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     return(f(abf))
   } else if (IsAbfList(abf)) {
     return(lapply(abf, f))

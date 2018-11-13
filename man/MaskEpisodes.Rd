@@ -7,7 +7,7 @@
 MaskEpisodes(abf, channel, episodes, value)
 }
 \arguments{
-\item{abf}{an abf object.}
+\item{abf}{an abf or a list of abf object.}
 
 \item{channel}{channel id, 1-based.}
 

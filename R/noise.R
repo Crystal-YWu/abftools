@@ -16,8 +16,23 @@
 DenoiseEpoch <- function(abf, epoch, episodes, channel = 1,
                          algo = "sureshrink", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  epoch <- FirstElement(epoch)
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
+  if (!AssertEpoch(abf, epoch)) {
+    err_epoch()
+  }
   if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   denoised <- ExternalAlgoEpoch(abf, epoch, episodes, channel,
                                 "denoise", algo, ...)
@@ -43,8 +58,16 @@ DenoiseEpoch <- function(abf, epoch, episodes, channel = 1,
 DenoiseIntv <- function(abf, intv, episodes, channel = 1,
                         algo = "sureshrink", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
   if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   denoised <- ExternalAlgoIntv(abf, intv, episodes, channel,
                                "denoise", algo, ...)

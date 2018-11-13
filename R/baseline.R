@@ -43,9 +43,9 @@ GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", .
 #'
 #' @param abf an abf object.
 #' @param epoch the epoch name/id to evaluate baselines in.
-#' @param episodes episodes/sweeps to calculate.
-#' @param channel channel id, 1-based.
-#' @param algo algorithm to calculate baselines.
+#' @param episodes OPTIONAL, episodes/sweeps to calculate.
+#' @param channel OPTIONAL, channel id, 1-based.
+#' @param algo OPTIONAL, algorithm to calculate baselines.
 #' @param ... other arguments to pass to the selected algorithm.
 #'
 #' @return baselines of selected episodes/sweeps in a list of vectors
@@ -53,8 +53,20 @@ GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", .
 #'
 BaselineEpoch <- function(abf, epoch, episodes, channel = 1L, algo = "als", ...) {
 
+  epoch <- FirstElement(epoch)
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
+  if (!AssertEpoch(abf, epoch)) {
+    err_epoch()
+  }
   if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   baseline <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "baseline", algo, ...)
 
@@ -77,8 +89,16 @@ BaselineEpoch <- function(abf, epoch, episodes, channel = 1L, algo = "als", ...)
 #'
 BaselineIntv <- function(abf, intv, episodes, channel = 1L, algo = "als", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
   if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
+  } else if (!AssertEpisode(abf, episodes)) {
+    err_epi()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
   }
   baseline <- ExternalAlgoIntv(abf, intv, episodes, channel, "baseline", algo, ...)
 

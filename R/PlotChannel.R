@@ -11,6 +11,13 @@
 #'
 PlotChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
+
   p <- GetChannelP(abf, channel, time_unit = time_unit, ...)
 
   if (colour) {
@@ -44,6 +51,13 @@ PlotChannel <- function(abf, channel = 1, colour = FALSE, time_unit = "tick", ..
 #'
 PlotChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, time_unit = "tick", ...) {
 
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
+
   p <- PlotChannel(abf, channel, colour, time_unit, ...)
   #Convert intv to desired time_unit
   intv <- TickToTime(abf, time_unit, intv)
@@ -65,6 +79,13 @@ PlotChannel_Intv <- function(abf, intv, channel = 1, colour = FALSE, time_unit =
 #' @export
 #'
 PlotChannel_Cursor <- function(abf, cursor, channel = 1, colour = FALSE, time_unit = "tick", ...) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
 
   p <- PlotChannel(abf, channel, colour, time_unit, ...)
   #Convert cursors to desired time_unit
