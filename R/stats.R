@@ -176,3 +176,96 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
     err_class_abf_list("SampleAbf")
   }
 }
+
+#' Calculates mean values of an abf object.
+#'
+#' Returns a data.frame object containing episodic mean values of each channel.
+#'
+#' @param abf an abf object.
+#' @param intv OPTIONAL, an interval to mean over.
+#' @param desc_colnames Whether to use descriptive colnames, set to FALSE to use original channel names.
+#' @param ... Passed to arithmetic mean.
+#'
+#' @return A data.frame object
+#' @export
+#' @method mean abf
+#'
+mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
+
+  if (missing(intv) || is.null(intv)) {
+    intv <- c(1, nPts(abf), nPts(abf))
+  }
+
+  ncols <- nChan(abf)
+  nrows <- nEpi(abf)
+  ret <- matrix(nrow = nrows, ncol = ncols)
+  mask <- MaskIntv(intv)
+  for (i in seq_len(ncols))
+    for (j in seq_len(nrows)) {
+      ret[j, i] <- mean(abf[mask, j, i], ...)
+    }
+  if (desc_colnames) {
+    colnames(ret) <- paste0(GetChannelDesc(abf), " (", GetChannelUnit(abf), ")")
+  } else {
+    colnames(ret) <- GetChannelName(abf)
+  }
+
+  return(as.data.frame(ret))
+}
+
+#' Title
+#'
+#' @param abf_list
+#' @param intv_list
+#' @param channel
+#' @param na.rm
+#'
+#' @return
+#' @export
+#'
+#' @examples
+MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
+
+  colname <- c()
+  for (i in seq_along(abf_list)) {
+    colname[i] <- GetTitle(abf_list[[i]])
+  }
+  ret <- as.data.frame(t(EpisodicIntervalMeans(abf_list, intv_list, channel, na.rm)))
+  colnames(ret) <- colname
+
+  return(ret)
+}
+
+#' Title
+#'
+#' @param abf_list
+#' @param intv_list
+#' @param na.rm
+#'
+#' @return
+#' @export
+#'
+#' @examples
+MultiMean_Current <- function(abf_list, intv_list, na.rm = TRUE) {
+
+  channel <- GetFirstCurrentChan(abf_list[[1]])
+
+  return(MultiMean(abf_list, intv_list, channel, na.rm))
+}
+
+#' Title
+#'
+#' @param abf_list
+#' @param intv_list
+#' @param na.rm
+#'
+#' @return
+#' @export
+#'
+#' @examples
+MultiMean_Voltage <- function(abf_list, intv_list, na.rm =TRUE) {
+
+  channel <- GetFirstVoltageChan(abf_list[[1]])
+
+  return(MultiMean(abf_list, intv_list, channel, na.rm))
+}

@@ -1,28 +1,50 @@
 #' Quick plot I-V curves at given position
 #'
-#' @param abf an abf object.
-#' @param pos an interval or a cursor.
-#' @param smooth whether to smooth the plot.
+#' @param abf an abf or a list of abf objects.
+#' @param pos an interval/cursor or a list of intervals/cursors.
+#' @param colour whether to plot in coloured mode.
 #'
 #' @return a ggplot object.
 #' @export
 #'
-QuickPlotIV <- function(abf, pos, smooth = FALSE) {
+QuickPlotIV <- function(abf, pos, colour = FALSE) {
 
-  current_channel <- GetFirstCurrentChan(abf)
-  voltage_channel <- GetFirstVoltageChan(abf)
-  if (length(pos) == 1) {
-    #a cursor
-    current <- abf[pos, , current_channel]
-    voltage <- abf[pos, , voltage_channel]
+  if (class(abf) == "abf") {
+
+    current_channel <- GetFirstCurrentChan(abf)
+    voltage_channel <- GetFirstVoltageChan(abf)
+    if (length(pos) == 1) {
+      #a cursor
+      current <- abf[pos, , current_channel]
+      voltage <- abf[pos, , voltage_channel]
+    } else {
+      mask <- pos[1]:pos[2]
+      current <- colMeans(abf[[current_channel]][mask, ])
+      voltage <- colMeans(abf[[voltage_channel]][mask, ])
+    }
+
+    return(qplot(x = voltage, y = current, geom = "line") + theme_bw())
+  } else if (IsAbfList(abf)) {
+
+    melted <- MeltAbfMean(abf, pos)
+
+    cname <- colnames(melted)
+    xcol <- as.name(FirstElement(cname[startsWith(cname, "Voltage")]))
+    ycol <- as.name(FirstElement(cname[startsWith(cname, "Current")]))
+    p <- ggplot(melted, aes_string(x = xcol, y = ycol)) + theme_bw()
+    if (colour) {
+      p <- p + geom_line(aes_string(colour = "id"))
+    } else {
+      p <- p + geom_line(aes_string(group = "id"))
+    }
+    #Get rid of ``
+    p <- p + xlab(as.character(xcol)) + ylab(as.character(ycol))
+
+    return(p)
   } else {
-    mask <- pos[1]:pos[2]
-    current <- colMeans(abf[[current_channel]][mask, ])
-    voltage <- colMeans(abf[[voltage_channel]][mask, ])
+    err_class_abf_list("QuickPlotIV")
   }
 
-  geom_type <- ifelse(smooth, "smooth", "line")
-  qplot(x = voltage, y = current, geom = geom_type) + theme_bw()
 }
 
 #' Quick plot trace vs. trace curve.

@@ -4,14 +4,12 @@
 \alias{QuickPlotIV}
 \title{Quick plot I-V curves at given position}
 \usage{
-QuickPlotIV(abf, pos, smooth = FALSE)
+QuickPlotIV(abf, pos)
 }
 \arguments{
-\item{abf}{an abf object.}
+\item{abf}{an abf or a list of abf objects.}
 
-\item{pos}{an interval or a cursor.}
-
-\item{smooth}{whether to smooth the plot.}
+\item{pos}{an interval/cursor or a list of intervals/cursors.}
 }
 \value{
 a ggplot object.
