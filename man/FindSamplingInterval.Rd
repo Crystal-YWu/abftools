@@ -5,8 +5,8 @@
 \title{FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.}
 \usage{
 FindSamplingInterval(abf, current_channel, voltage_channel,
-  min_sampling_size, allowed_voltage_delta, epoch_name = "B",
-  backward_search = TRUE)
+  min_sampling_size, max_sampling_size, allowed_voltage_delta,
+  epoch_name = "B", backward_search = TRUE)
 }
 \arguments{
 \item{abf}{an abf object.}
@@ -16,6 +16,8 @@ FindSamplingInterval(abf, current_channel, voltage_channel,
 \item{voltage_channel}{OPTIONAL, channel id for voltage data, channel id is 1-based.}
 
 \item{min_sampling_size}{OPTIONAL, min size in points of a sampling interval.}
+
+\item{max_sampling_size}{OPTIONAL, max size in points of a sampling interval.}
 
 \item{allowed_voltage_delta}{OPTIONAL, allowed max deviation of voltage.}
 

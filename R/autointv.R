@@ -83,6 +83,7 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 #' @param current_channel OPTIONAL, channel id for current data, channel id is 1-based.
 #' @param voltage_channel OPTIONAL, channel id for voltage data, channel id is 1-based.
 #' @param min_sampling_size OPTIONAL, min size in points of a sampling interval.
+#' @param max_sampling_size OPTIONAL, max size in points of a sampling interval.
 #' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage.
 #' @param epoch_name OPTIONAL, the epoch to search, defaults to B (second epoch).
 #' @param backward_search OPTIONAL, perform search along backward direction.
@@ -91,8 +92,9 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 #' @export
 #'
 FindSamplingInterval <- function(abf, current_channel, voltage_channel,
-                                 min_sampling_size, allowed_voltage_delta,
-                                 epoch_name = "B", backward_search = TRUE) {
+                                 min_sampling_size, max_sampling_size,
+                                 allowed_voltage_delta, epoch_name = "B",
+                                 backward_search = TRUE) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -132,6 +134,12 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
   #Force min sampling size to 3, so that sd makes sense
   if (min_sampling_size < 3L) {
     min_sampling_size <- 3L
+  }
+  if (missing(max_sampling_size) || is.null(max_sampling_size)) {
+    max_sampling_size <- Inf
+  }
+  if (max_sampling_size < 3L) {
+    max_sampling_size <- 3L
   }
 
   #calculate episodic intervals
@@ -181,6 +189,10 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
       best_score <- search_result$score
       best_intv <- search_result$intv
     }
+  }
+
+  if (best_intv[3] > max_sampling_size) {
+    best_intv <- Intv(endPos = best_intv[2], len = max_sampling_size)
   }
 
   return(best_intv)
