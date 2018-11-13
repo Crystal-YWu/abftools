@@ -241,6 +241,7 @@ abf2_load <- function(filename, folder, abf_title) {
 #'
 abf2_loadlist <- function(filelist, folder, attach_ext = TRUE, titlelist) {
 
+  filelist <- unlist(filelist)
   if (!missing(folder) && !is.null(folder)) {
     folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
     filelist <- paste0(folder, filelist)
