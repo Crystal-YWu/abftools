@@ -12,9 +12,12 @@
 #' @return a named list of detected peaks' x positions.
 #' @export
 #'
-PeakDetectEpoch <- function(abf, epoch, episodes = 0, channel = 1,
+PeakDetectEpoch <- function(abf, epoch, episodes, channel = 1,
                             algo = "cwt", ...) {
 
+  if (missing(episodes)) {
+    episodes <- seq_len(nEpi(abf))
+  }
   peaks <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "peak", algo, ...)
 
   return(peaks)
@@ -34,8 +37,11 @@ PeakDetectEpoch <- function(abf, epoch, episodes = 0, channel = 1,
 #' @return a named list of detected peaks' x positions.
 #' @export
 #'
-PeakDetectIntv <- function(abf, intv, episodes = 0, channel = 1, algo = "cwt", ...) {
+PeakDetectIntv <- function(abf, intv, episodes, channel = 1, algo = "cwt", ...) {
 
+  if (missing(episodes)) {
+    episodes <- seq_len(nEpi(abf))
+  }
   peaks <- ExternalAlgoIntv_list(abf, intv, episodes, channel, "peak", algo, ...)
 
   return(peaks)
@@ -79,7 +85,7 @@ peak_zscore <- function(y, lag = length(y) %/% 1000L, threshold = 2.6, influence
 }
 
 #Pan Du, Warren A. Kibbe, and Simon M. Lin, Bioinformatics, 22, 2059–2065 (2006)
-#already implementedin package wmtsa
+#already implemented in package wmtsa
 peak_cwt <- function(y, peak_scale = 0.65, ...) {
 
   cwt <- wmtsa::wavCWT(y)

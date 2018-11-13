@@ -13,9 +13,12 @@
 #' @return a named list of denoised episodes/sweeps.
 #' @export
 #'
-DenoiseEpoch <- function(abf, epoch, episodes = 0, channel = 1,
+DenoiseEpoch <- function(abf, epoch, episodes, channel = 1,
                          algo = "sureshrink", ...) {
 
+  if (missing(episodes)) {
+    episodes <- seq_len(nEpi(abf))
+  }
   denoised <- ExternalAlgoEpoch(abf, epoch, episodes, channel,
                                 "denoise", algo, ...)
 
@@ -37,9 +40,12 @@ DenoiseEpoch <- function(abf, epoch, episodes = 0, channel = 1,
 #' @return a named list of denoised episodes/sweeps.
 #' @export
 #'
-DenoiseIntv <- function(abf, intv, episodes = 0, channel = 1,
+DenoiseIntv <- function(abf, intv, episodes, channel = 1,
                         algo = "sureshrink", ...) {
 
+  if (missing(episodes)) {
+    episodes <- seq_len(nEpi(abf))
+  }
   denoised <- ExternalAlgoIntv(abf, intv, episodes, channel,
                                "denoise", algo, ...)
 

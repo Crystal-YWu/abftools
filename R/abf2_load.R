@@ -6,7 +6,7 @@
 #' @return an abf object.
 #' @export
 #'
-abf2_load <- function(filename, abf_title = NULL) {
+abf2_load <- function(filename, abf_title) {
 
   fp <- file(filename, "rb")
 
@@ -202,7 +202,7 @@ abf2_load <- function(filename, abf_title = NULL) {
   }
 
   attr(data, "class") <- "abf"
-  if (is.null(abf_title))
+  if (missing(abf_title))
     attr(data, "title") <- filename
   else
     attr(data, "title") <- as.character(abf_title)
@@ -234,7 +234,7 @@ abf2_load <- function(filename, abf_title = NULL) {
 #' @return a list of abf objects.
 #' @export
 #'
-abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist = NULL) {
+abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist) {
 
   if (folder != "") {
     folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
@@ -245,16 +245,18 @@ abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist = 
 
   abf_list <- lapply(filelist, abf2_load)
   #set titles
-  if (!is.null(titlelist)) {
-    if (length(titlelist) == 1) {
-      for (i in seq_along(abf_list))
+  if (!missing(titlelist)) {
+    if (length(titlelist) == 1L) {
+      for (i in seq_along(abf_list)) {
         attr(abf_list[[i]], "title") <- as.character(titlelist)
+      }
     } else {
       if (length(titlelist) != length(abf_list)) {
         warning("abf2_loadlist: length of titlelist mismatches filelist, ignored.")
       } else {
-        for (i in seq_along(abf_list))
+        for (i in seq_along(abf_list)) {
           attr(abf_list[[i]], "title") <- as.character(titlelist[[i]])
+        }
       }
     }
   }

@@ -7,7 +7,7 @@
 #' @return channel data of the simulated waveform.
 #' @export
 #'
-GetWaveform <- function(abf, episodes = 0, wf_dac_id = 0) {
+GetWaveform <- function(abf, episodes, wf_dac_id = 0) {
 
   if (class(abf) != "abf") {
     err_class_abf("GetWaveform")
@@ -32,7 +32,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac_id = 0) {
 
   #Parse episodes
   nepi <- nEpi(abf)
-  if (episodes[1] == 0) {
+  if (missing(episodes)) {
     episodes = seq_len(nepi)
   }
   if (max(episodes) > nepi) {

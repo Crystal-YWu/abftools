@@ -1,4 +1,4 @@
-GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als", ...) {
+GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", ...) {
 
   missing_epoch <- missing(epoch)
   missing_intv <- missing(intv)
@@ -21,7 +21,7 @@ GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als
 
   baseline_f <- paste0("baseline_", algo)
   bl <- list()
-  if (episodes[1] == 0) {
+  if (missing(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   channel <- FirstElement(channel)
@@ -51,8 +51,11 @@ GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als
 #' @return baselines of selected episodes/sweeps in a list of vectors
 #' @export
 #'
-BaselineEpoch <- function(abf, epoch, episodes = 0, channel = 1, algo = "als", ...) {
+BaselineEpoch <- function(abf, epoch, episodes, channel = 1L, algo = "als", ...) {
 
+  if (missing(episodes)) {
+    episodes <- seq_len(nEpi(abf))
+  }
   baseline <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "baseline", algo, ...)
 
   return(baseline)
@@ -72,8 +75,11 @@ BaselineEpoch <- function(abf, epoch, episodes = 0, channel = 1, algo = "als", .
 #' @return baselines of selected episodes/sweeps in a named column matrix
 #' @export
 #'
-BaselineIntv <- function(abf, intv, episodes = 0, channel = 1, algo = "als", ...) {
+BaselineIntv <- function(abf, intv, episodes, channel = 1L, algo = "als", ...) {
 
+  if (missing(episodes)) {
+    episodes <- seq_len(nEpi(abf))
+  }
   baseline <- ExternalAlgoIntv(abf, intv, episodes, channel, "baseline", algo, ...)
 
   return(baseline)

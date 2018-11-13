@@ -12,9 +12,6 @@
 
 ExternalAlgoEpoch <- function(abf, epoch, episodes, channel, func, algo, ...) {
 
-  if (episodes[1] == 0) {
-    episodes <- seq_len(nEpi(abf))
-  }
   if (is.character(epoch)) {
     epoch <- GetEpochId(epoch)
   }
@@ -33,9 +30,6 @@ ExternalAlgoEpoch <- function(abf, epoch, episodes, channel, func, algo, ...) {
 
 ExternalAlgoIntv <- function(abf, intv, episodes, channel, func, algo, ...) {
 
-  if (episodes[1] == 0) {
-    episodes <- seq_len(nEpi(abf))
-  }
   algo_f <- paste0(func, "_", algo)
   mask <- MaskIntv(intv)
 
@@ -53,9 +47,6 @@ ExternalAlgoIntv <- function(abf, intv, episodes, channel, func, algo, ...) {
 
 ExternalAlgoIntv_list <- function(abf, intv, episodes, channel, func, algo, ...) {
 
-  if (episodes[1] == 0) {
-    episodes <- seq_len(nEpi(abf))
-  }
   algo_f <- paste0(func, "_", algo)
   mask <- MaskIntv(intv)
 
