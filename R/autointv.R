@@ -181,3 +181,49 @@ FindAllSamplingInterval <- function(abf_list, ...) {
 
   return(intv_list)
 }
+
+#' Print a quick waveform channel summary of a sampling interval.
+#'
+#' @param abf an abf object.
+#' @param intv an interval to summarise.
+#' @param channel OPTIONAL, the channel to compare.
+#' @param epoch OPTIONAL, the epoch to compare.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+CheckSamplingInterval <- function(abf, intv, channel, epoch = "B") {
+
+  if (missing(channel) || is.null(channel)) {
+    channel <- GetFirstVoltageChan(abf)
+  }
+  if (is.character(epoch[1])) {
+    epoch <- GetEpochId(epoch)
+  }
+  epoch <- FirstElement(epoch)
+
+  episodes <- GetAvailEpisodes(abf)
+  wf <- GetWaveform(abf, episodes)
+  wf_chan <- FirstElement(GetWaveformEnabledDAC(abf))
+  meta <- get_meta(abf)
+  wf_unit <- meta$Strings[[meta$DAC$lDACChannelUnitsIndex[wf_chan]]]
+  settings <- meta$EpochPerDAC$fEpochInitLevel[epoch] +
+    (seq_len(nEpi(abf)) - 1) * meta$EpochPerDAC$fEpochLevelInc[epoch]
+
+  for (i in seq_along(episodes)) {
+
+    mask <- MaskIntv(intv)
+
+    delta <- abs(abf[mask, episodes[i], channel] - wf[mask, episodes[i]])
+    max_abs <- max(delta)
+    max_rel <- max_abs / settings[episodes[i]]
+    means <- mean(abf[mask, episodes[i], channel])
+    sems <- stats::sd(abf[mask, episodes[i], channel]) /
+      sqrt(length(abf[mask, episodes[i], channel]))
+
+    s <- sprintf("Episode %d: Max absolute delta %.2f %s (relative %.2f, mean %.2f, SEM %.2f)\n",
+                 episodes[i], max_abs, wf_unit, max_rel, means, sems)
+    cat(s)
+  }
+}
