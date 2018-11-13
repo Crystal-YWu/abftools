@@ -4,10 +4,12 @@
 \alias{abf2_load}
 \title{abf2_load}
 \usage{
-abf2_load(filename, abf_title = NULL)
+abf2_load(filename, folder, abf_title)
 }
 \arguments{
 \item{filename}{file path to the abf2 file.}
+
+\item{folder}{path to folder containing the abf2 file.}
 
 \item{abf_title}{a title assigned to the loaded file, default is filename.}
 }

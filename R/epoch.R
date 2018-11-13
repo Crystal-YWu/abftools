@@ -79,7 +79,7 @@ GetWaveformEpdac <- function(abf, DACid) {
 #'
 GetEpochIntervals <- function(abf, wf_dac_id) {
 
-  if (missing(wf_dac_id)) {
+  if (missing(wf_dac_id) || is.null(wf_dac_id)) {
     wf_dac_id <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac_id) == 0L) {

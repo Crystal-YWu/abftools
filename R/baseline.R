@@ -53,7 +53,7 @@ GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", .
 #'
 BaselineEpoch <- function(abf, epoch, episodes, channel = 1L, algo = "als", ...) {
 
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   baseline <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "baseline", algo, ...)
@@ -77,7 +77,7 @@ BaselineEpoch <- function(abf, epoch, episodes, channel = 1L, algo = "als", ...)
 #'
 BaselineIntv <- function(abf, intv, episodes, channel = 1L, algo = "als", ...) {
 
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   baseline <- ExternalAlgoIntv(abf, intv, episodes, channel, "baseline", algo, ...)

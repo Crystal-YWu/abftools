@@ -7,7 +7,7 @@
 #' @return channel data of the simulated waveform.
 #' @export
 #'
-GetWaveform <- function(abf, episodes, wf_dac_id = 0) {
+GetWaveform <- function(abf, episodes, wf_dac_id) {
 
   if (class(abf) != "abf") {
     err_class_abf("GetWaveform")
@@ -17,7 +17,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id = 0) {
 
   meta <- get_meta(abf)
   #Check DAC channel and DAC source
-  if (wf_dac_id[1] == 0) {
+  if (missing(wf_dac_id) || is.null(wf_dac_id)) {
     wf_dac_id <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac_id) == 0L) {
@@ -32,7 +32,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id = 0) {
 
   #Parse episodes
   nepi <- nEpi(abf)
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes = seq_len(nepi)
   }
   if (max(episodes) > nepi) {

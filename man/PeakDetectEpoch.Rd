@@ -4,8 +4,7 @@
 \alias{PeakDetectEpoch}
 \title{Peak detection by epoch.}
 \usage{
-PeakDetectEpoch(abf, epoch, episodes = 0, channel = 1, algo = "cwt",
-  ...)
+PeakDetectEpoch(abf, epoch, episodes, channel = 1, algo = "cwt", ...)
 }
 \arguments{
 \item{abf}{an abf object.}

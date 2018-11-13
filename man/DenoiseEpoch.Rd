@@ -4,8 +4,8 @@
 \alias{DenoiseEpoch}
 \title{Denoise an abf object by epoch}
 \usage{
-DenoiseEpoch(abf, epoch, episodes = 0, channel = 1,
-  algo = "sureshrink", ...)
+DenoiseEpoch(abf, epoch, episodes, channel = 1, algo = "sureshrink",
+  ...)
 }
 \arguments{
 \item{abf}{an abf object.}

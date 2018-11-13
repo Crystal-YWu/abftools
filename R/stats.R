@@ -8,13 +8,13 @@
 #' @return a data frame containing calculated Voltage, SEM Voltage, Current, SEM Current columns.
 #' @export
 #'
-IVSummary <- function(abf_list, intv_list, current_channel = 0, voltage_channel = 0) {
+IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 
   #figure out current channel and voltage channel
-  if (current_channel == 0) {
+  if (missing(current_channel) || is.null(current_channel)) {
     current_channel <- GetFirstCurrentChan(abf_list[[1]])
   }
-  if (voltage_channel == 0) {
+  if (missing(voltage_channel) || is.null(voltage_channel)) {
     voltage_channel <- GetFirstVoltageChan(abf_list[[1]])
   }
   if (is.na(current_channel)) {
@@ -45,7 +45,7 @@ IVSummary <- function(abf_list, intv_list, current_channel = 0, voltage_channel 
 #' @return an averaged abf object, of which the protocol settings follow first element in abf_list.
 #' @export
 #'
-AverageAbf <- function(abf_list, w = 0) {
+AverageAbf <- function(abf_list, w) {
 
   if (!IsAbfList(abf_list)) {
     err_class_abf_list("MeanABF")
@@ -54,7 +54,7 @@ AverageAbf <- function(abf_list, w = 0) {
     return(abf_list)
   }
 
-  if (w[1] == 0) {
+  if (missing(w) || is.null(w)) {
     n <- length(abf_list)
     ret <- abf_list[[1]]
     for (i in 2:n) {

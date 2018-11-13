@@ -4,8 +4,7 @@
 \alias{PeakDetectIntv}
 \title{Peak detection by epoch.}
 \usage{
-PeakDetectIntv(abf, intv, episodes = 0, channel = 1, algo = "cwt",
-  ...)
+PeakDetectIntv(abf, intv, episodes, channel = 1, algo = "cwt", ...)
 }
 \arguments{
 \item{abf}{an abf object.}

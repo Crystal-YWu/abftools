@@ -4,8 +4,7 @@
 \alias{DenoiseIntv}
 \title{Denoise an abf object by an interval}
 \usage{
-DenoiseIntv(abf, intv, episodes = 0, channel = 1,
-  algo = "sureshrink", ...)
+DenoiseIntv(abf, intv, episodes, channel = 1, algo = "sureshrink", ...)
 }
 \arguments{
 \item{abf}{an abf object.}

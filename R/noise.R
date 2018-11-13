@@ -16,7 +16,7 @@
 DenoiseEpoch <- function(abf, epoch, episodes, channel = 1,
                          algo = "sureshrink", ...) {
 
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   denoised <- ExternalAlgoEpoch(abf, epoch, episodes, channel,
@@ -43,7 +43,7 @@ DenoiseEpoch <- function(abf, epoch, episodes, channel = 1,
 DenoiseIntv <- function(abf, intv, episodes, channel = 1,
                         algo = "sureshrink", ...) {
 
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   denoised <- ExternalAlgoIntv(abf, intv, episodes, channel,

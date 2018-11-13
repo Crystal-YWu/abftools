@@ -4,7 +4,7 @@
 \alias{GetEpochIntervals}
 \title{Get intervals of all epochs.}
 \usage{
-GetEpochIntervals(abf, wf_dac_id = 0)
+GetEpochIntervals(abf, wf_dac_id)
 }
 \arguments{
 \item{abf}{an abf object.}

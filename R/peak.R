@@ -15,7 +15,7 @@
 PeakDetectEpoch <- function(abf, epoch, episodes, channel = 1,
                             algo = "cwt", ...) {
 
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   peaks <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "peak", algo, ...)
@@ -39,7 +39,7 @@ PeakDetectEpoch <- function(abf, epoch, episodes, channel = 1,
 #'
 PeakDetectIntv <- function(abf, intv, episodes, channel = 1, algo = "cwt", ...) {
 
-  if (missing(episodes)) {
+  if (missing(episodes) || is.null(episodes)) {
     episodes <- seq_len(nEpi(abf))
   }
   peaks <- ExternalAlgoIntv_list(abf, intv, episodes, channel, "peak", algo, ...)

@@ -1,13 +1,18 @@
 #' abf2_load
 #'
 #' @param filename file path to the abf2 file.
+#' @param folder path to folder containing the abf2 file.
 #' @param abf_title a title assigned to the loaded file, default is filename.
 #'
 #' @return an abf object.
 #' @export
 #'
-abf2_load <- function(filename, abf_title) {
+abf2_load <- function(filename, folder, abf_title) {
 
+  if (!missing(folder) && !is.null(folder)) {
+    folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
+    filename <- paste0(folder, filename)
+  }
   fp <- file(filename, "rb")
 
   #Read header
@@ -202,7 +207,7 @@ abf2_load <- function(filename, abf_title) {
   }
 
   attr(data, "class") <- "abf"
-  if (missing(abf_title))
+  if (missing(abf_title) || is.null(abf_title))
     attr(data, "title") <- filename
   else
     attr(data, "title") <- as.character(abf_title)
@@ -234,9 +239,9 @@ abf2_load <- function(filename, abf_title) {
 #' @return a list of abf objects.
 #' @export
 #'
-abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist) {
+abf2_loadlist <- function(filelist, folder, attach_ext = TRUE, titlelist) {
 
-  if (folder != "") {
+  if (!missing(folder) && !is.null(folder)) {
     folder <- ifelse(endsWith(folder, "/"), folder, paste0(folder, "/"))
     filelist <- paste0(folder, filelist)
   }
@@ -245,7 +250,7 @@ abf2_loadlist <- function(filelist, folder = "", attach_ext = TRUE, titlelist) {
 
   abf_list <- lapply(filelist, abf2_load)
   #set titles
-  if (!missing(titlelist)) {
+  if (!missing(titlelist) && !is.null(titlelist)) {
     if (length(titlelist) == 1L) {
       for (i in seq_along(abf_list)) {
         attr(abf_list[[i]], "title") <- as.character(titlelist)

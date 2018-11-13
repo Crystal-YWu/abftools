@@ -16,6 +16,6 @@ an abf object
 }
 \description{
 In order to mimic the by-ref behaviour, when setting titles for a list of abf
-objects, a temp variable "i_____" in caller's scope is used an then removed.
+objects, a temp variable "i_____" in caller's scope is used and then removed.
 This may cause some trouble if you use i_____ in your code.
 }

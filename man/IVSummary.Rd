@@ -4,8 +4,7 @@
 \alias{IVSummary}
 \title{IVSummary calculates average current of a list of abf objects, within given intervals}
 \usage{
-IVSummary(abf_list, intv_list, current_channel = 0,
-  voltage_channel = 0)
+IVSummary(abf_list, intv_list, current_channel, voltage_channel)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}

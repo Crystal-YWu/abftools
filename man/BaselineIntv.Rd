@@ -4,7 +4,7 @@
 \alias{BaselineIntv}
 \title{Calculate baselines of an abf object.}
 \usage{
-BaselineIntv(abf, intv, episodes = 0, channel = 1, algo = "als", ...)
+BaselineIntv(abf, intv, episodes, channel = 1L, algo = "als", ...)
 }
 \arguments{
 \item{abf}{an abf object.}

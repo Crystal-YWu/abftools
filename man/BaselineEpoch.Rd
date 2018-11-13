@@ -4,8 +4,7 @@
 \alias{BaselineEpoch}
 \title{Calculate baselines of an abf object.}
 \usage{
-BaselineEpoch(abf, epoch, episodes = 0, channel = 1, algo = "als",
-  ...)
+BaselineEpoch(abf, epoch, episodes, channel = 1L, algo = "als", ...)
 }
 \arguments{
 \item{abf}{an abf object.}

@@ -40,10 +40,10 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
       tmp[1, ] <- tmp[1, ] + intv[1] - 1L
       tmp[2, ] <- tmp[2, ] + intv[1] - 1L
       #filter length
-      if (!missing(min_win)) {
+      if (!missing(min_win) && !is.null(min_win)) {
         tmp <- FilterMinIntervalSize(tmp, min_win)
       }
-      if (!missing(max_win)) {
+      if (!missing(max_win) && !is.null(max_win)) {
         tmp <- FilterMaxIntervalSize(tmp, max_win)
       }
     }
@@ -80,10 +80,10 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
                                  epoch_name = "B", backward_search = TRUE) {
 
   #figure out current channel and voltage channel
-  if (missing(current_channel)) {
+  if (missing(current_channel) || is.null(current_channel)) {
     current_channel <- GetFirstCurrentChan(abf)
   }
-  if (missing(voltage_channel)) {
+  if (missing(voltage_channel) || is.null(voltage_channel)) {
     voltage_channel <- GetFirstVoltageChan(abf)
   }
   if (is.na(current_channel)) {
@@ -97,14 +97,14 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
 
   #Default allowed voltage delta is 5% of max voltage setting
   meta <- get_meta(abf)
-  if (missing(allowed_voltage_delta)) {
+  if (missing(allowed_voltage_delta) || is.null(allowed_voltage_delta)) {
     v_settings <- meta$EpochPerDAC$fEpochInitLevel[epoch] +
       (seq_len(nEpi(abf)) - 1) * meta$EpochPerDAC$fEpochLevelInc[epoch]
     allowed_voltage_delta = max(abs(v_settings)) * 0.05
   }
 
   #Default minimal sampling size is 10ms/10000us scan
-  if (missing(min_sampling_size)) {
+  if (missing(min_sampling_size) || is.null(min_sampling_size)) {
     min_sampling_size <- floor(10000.0 / GetSamplingIntv(abf))
   }
   #Force min sampling size to 3, so that sd makes sense

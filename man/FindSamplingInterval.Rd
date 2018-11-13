@@ -4,8 +4,8 @@
 \alias{FindSamplingInterval}
 \title{FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.}
 \usage{
-FindSamplingInterval(abf, current_channel = 0, voltage_channel = 0,
-  min_sampling_size = 0, allowed_voltage_delta = 0, epoch_name = "B",
+FindSamplingInterval(abf, current_channel, voltage_channel,
+  min_sampling_size, allowed_voltage_delta, epoch_name = "B",
   backward_search = TRUE)
 }
 \arguments{
