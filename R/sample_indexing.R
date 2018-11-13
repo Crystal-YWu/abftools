@@ -51,7 +51,7 @@ ExcludeSample <- function(sample_index, ...) {
   cvalue <- list(...)
   df <- as.data.frame(sample_index)
 
-  idx <- rep(FALSE, nrow(df))
+  idx <- rep(TRUE, nrow(df))
   for (i in names(cvalue)) {
     if (i == "") {
       nvpair <- cvalue[[i]]
@@ -59,9 +59,9 @@ ExcludeSample <- function(sample_index, ...) {
         warning(paste0("Unnamed value ", nvpair, " ignored."))
         next
       }
-      idx <- idx | (unlist(df[nvpair[1]]) %in% nvpair[2])
+      idx <- idx & !(unlist(df[nvpair[1]]) %in% nvpair[2])
     } else {
-      idx <- idx | (unlist(df[i]) %in% cvalue[[i]])
+      idx <- idx & !(unlist(df[i]) %in% cvalue[[i]])
     }
   }
 
