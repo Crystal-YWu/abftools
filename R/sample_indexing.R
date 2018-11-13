@@ -24,9 +24,9 @@ SelectSample <- function(sample_index, ...) {
         warning(paste0("Unnamed value ", nvpair, " ignored."))
         next
       }
-      idx <- idx & (df[nvpair[1]] %in% nvpair[2])
+      idx <- idx & (unlist(df[nvpair[1]]) %in% nvpair[2])
     } else {
-      idx <- idx & (df[i] %in% cvalue[[i]])
+      idx <- idx & (unlist(df[i]) %in% cvalue[[i]])
     }
   }
 
@@ -59,9 +59,9 @@ ExcludeSample <- function(sample_index, ...) {
         warning(paste0("Unnamed value ", nvpair, " ignored."))
         next
       }
-      idx <- idx | (df[nvpair[1]] %in% nvpair[2])
+      idx <- idx | (unlist(df[nvpair[1]]) %in% nvpair[2])
     } else {
-      idx <- idx | (df[i] %in% cvalue[[i]])
+      idx <- idx | (unlist(df[i]) %in% cvalue[[i]])
     }
   }
 
