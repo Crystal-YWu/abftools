@@ -35,8 +35,8 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
     err_id_voltage_chan()
   }
 
-  current_means <- MultiIntervalMeans(abf_list, intv_list, current_channel)
-  voltage_means <- MultiIntervalMeans(abf_list, intv_list, voltage_channel)
+  current_means <- MultiIntervalMeans(abf_list, intv_list, current_channel, na.rm = TRUE)
+  voltage_means <- MultiIntervalMeans(abf_list, intv_list, voltage_channel, na.rm = TRUE)
 
   mean_current_means <- colMeans(current_means, na.rm = TRUE)
   mean_voltage_means <- colMeans(voltage_means, na.rm = TRUE)
@@ -198,13 +198,14 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 #' @param abf an abf object.
 #' @param intv OPTIONAL, an interval to mean over.
 #' @param desc_colnames Whether to use descriptive colnames, set to FALSE to use original channel names.
+#' @param na.rm Whether to remove NA values.
 #' @param ... Passed to arithmetic mean.
 #'
 #' @return A data.frame object.
 #' @export
 #' @method mean abf
 #'
-mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
+mean.abf <- function(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...) {
 
   if (missing(intv) || is.null(intv)) {
     intv <- Intv(1L, nPts(abf))
@@ -216,7 +217,7 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
   mask <- MaskIntv(intv)
   for (i in seq_len(nch))
     for (j in GetAvailEpisodes(abf)) {
-      ret[j, i] <- mean(abf[mask, j, i], ...)
+      ret[j, i] <- mean(abf[mask, j, i], na.rm = na.rm, ...)
     }
   if (desc_colnames) {
     colnames(ret) <- paste0(GetChannelDesc(abf), " (", GetChannelUnit(abf), ")")

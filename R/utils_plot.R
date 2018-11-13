@@ -60,3 +60,36 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
 
   return(df)
 }
+
+#' Crop undesired values from an abf object
+#'
+#' All values larger than max_value or smaller than min_value are replaced by NA
+#' during the process, which helps better plotting and ruling out undesired features
+#' such as sudden peak. Use with caution.
+#'
+#' @param abf an abf object.
+#' @param channel the channel to crop values
+#' @param max_value OPTIONAL, max allowed value
+#' @param min_value OPTIONAL, min allowed value
+#'
+#' @return an abf object with values cropped.
+#' @export
+#'
+CropValue <- function(abf, channel, max_value, min_value) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+  if (!AssertChannel(abf, channel)) {
+    err_channel()
+  }
+
+  if (!missing(max_value) && !is.null(max_value)) {
+    abf[abf > max_value] = NA
+  }
+  if (!missing(min_value) && !is.null(min_value)) {
+    abf[abf < min_value] = NA
+  }
+
+  return(abf)
+}

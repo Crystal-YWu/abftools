@@ -1,5 +1,5 @@
 UniYLim <- function(abf_list, channel, intv_list = NULL, blank = 0.0125) {
-browser()
+
   ret <- c(0, 0)
   for (i in seq_along(abf_list)) {
     if (is.null(intv_list)) {

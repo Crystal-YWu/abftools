@@ -4,7 +4,7 @@
 \alias{mean.abf}
 \title{Calculate mean values of an abf object.}
 \usage{
-\method{mean}{abf}(abf, intv, desc_colnames = TRUE, ...)
+\method{mean}{abf}(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
@@ -12,6 +12,8 @@
 \item{intv}{OPTIONAL, an interval to mean over.}
 
 \item{desc_colnames}{Whether to use descriptive colnames, set to FALSE to use original channel names.}
+
+\item{na.rm}{Whether to remove NA values.}
 
 \item{...}{Passed to arithmetic mean.}
 }
