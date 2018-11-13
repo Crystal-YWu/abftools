@@ -16,13 +16,10 @@ EpisodicInterval_f <- function(abf_list, intv_list, channel, f) {
     if (any(is.na(intv_list[[i]]))) {
       next
     } else {
-      mask <- seq(intv_list[[i]][1], intv_list[[i]][2])
-      #Do not use AvailEpisode to extract channel info, so we always have correct
-      #episodic order
+      mask <- MaskIntv(intv_list[[i]])
       ret <- f(abf_list[[i]][mask, , channel])
-      #Results are padded to left
-      nepi <- nEpi(abf_list[[i]])
-      for (j in seq_len(nepi))
+      epi <- GetAvailEpisodes(abf_list[[i]])
+      for (j in epi)
         m[i, j] <- ret[j]
     }
   }

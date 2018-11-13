@@ -126,7 +126,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
 AttachWaveform <- function(abf) {
 
   if (!IsAbf(abf)) {
-    err_class_abf(abf)
+    err_class_abf()
   }
 
   dac <- GetWaveformEnabledDAC(abf)

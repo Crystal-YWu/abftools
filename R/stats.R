@@ -1,7 +1,7 @@
 #' IVSummary calculates average current of a list of abf objects, within given intervals
 #'
 #' @param abf_list a list of abf objects.
-#' @param intv_list a list of intervals.
+#' @param intv_list OPTIONAL, a list of intervals.
 #' @param current_channel current channel id, 1-based.
 #' @param voltage_channel voltage channel id, 1-based.
 #'
@@ -10,6 +10,17 @@
 #'
 IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+  if (missing(intv_list) || is.null(intv_list)) {
+    intv_list = list()
+    for (i in seq_along(abf_list)) {
+      intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
+    }
+  } else if (!AssertLength(intv_list, length(abf_list))) {
+    err_assert_len("intv_list", "abf_list")
+  }
   #figure out current channel and voltage channel
   if (missing(current_channel) || is.null(current_channel)) {
     current_channel <- GetFirstCurrentChan(abf_list[[1]])
@@ -24,8 +35,8 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
     err_id_voltage_chan()
   }
 
-  current_means <- EpisodicIntervalMeans(abf_list, intv_list, current_channel)
-  voltage_means <- EpisodicIntervalMeans(abf_list, intv_list, voltage_channel)
+  current_means <- MultiIntervalMeans(abf_list, intv_list, current_channel)
+  voltage_means <- MultiIntervalMeans(abf_list, intv_list, voltage_channel)
 
   mean_current_means <- colMeans(current_means, na.rm = TRUE)
   mean_voltage_means <- colMeans(voltage_means, na.rm = TRUE)
@@ -40,7 +51,7 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 #' Average a list of abf objects.
 #'
 #' @param abf_list a list of abf objects.
-#' @param w a vector of weights for weighted average, leave 0 for arithmetic mean.
+#' @param w OPTIONAL, a vector of weights for weighted average.
 #'
 #' @return an averaged abf object, of which the protocol settings follow first element in abf_list.
 #' @export
@@ -49,9 +60,6 @@ AverageAbf <- function(abf_list, w) {
 
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
-  }
-  if (class(abf_list) == "abf") {
-    return(abf_list)
   }
 
   if (missing(w) || is.null(w)) {
@@ -62,10 +70,12 @@ AverageAbf <- function(abf_list, w) {
     }
     ret <- ret / n
   } else {
-    n <- length(abf_list)
-    if (n != length(w)) {
-      err_wrong_dim()
+
+    if (!AssertLength(w, length(abf_list))) {
+      err_assert_len("w", "abf_list")
     }
+
+    n <- length(abf_list)
     ret <- abf_list[[1]] * w[1]
     for (i in 2:n) {
       ret <- ret + abf_list[[i]] * w[i]
@@ -87,6 +97,10 @@ AverageAbf <- function(abf_list, w) {
 #' @export
 #'
 SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
 
   nch <- nChan(abf)
   nepi <- nEpi(abf)
@@ -160,7 +174,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 #'
 SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 
-  if (class(abf) == "abf") {
+  if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
         abf <- SmplAbf(abf, sampling_ratio, sampling_func)
@@ -193,15 +207,15 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
 
   if (missing(intv) || is.null(intv)) {
-    intv <- c(1, nPts(abf), nPts(abf))
+    intv <- Intv(1L, nPts(abf))
   }
 
-  ncols <- nChan(abf)
-  nrows <- nEpi(abf)
-  ret <- matrix(nrow = nrows, ncol = ncols)
+  nch <- nChan(abf)
+  nepi <- nEpi(abf)
+  ret <- matrix(NA, nrow = nepi, ncol = nch)
   mask <- MaskIntv(intv)
-  for (i in seq_len(ncols))
-    for (j in seq_len(nrows)) {
+  for (i in seq_len(nch))
+    for (j in GetAvailEpisodes(abf)) {
       ret[j, i] <- mean(abf[mask, j, i], ...)
     }
   if (desc_colnames) {
@@ -210,13 +224,17 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
     colnames(ret) <- GetChannelName(abf)
   }
 
+  if (nepi > 1L) {
+    rownames(ret) <- paste0("epi", seq_len(nepi))
+  }
+
   return(as.data.frame(ret))
 }
 
 #' Calculate mean values of multiple abf objects
 #'
 #' @param abf_list a list of abf objects.
-#' @param intv_list a list of intervals.
+#' @param intv_list OPTIONAL, a list of intervals.
 #' @param channel channel id, 1-based.
 #' @param na.rm wheter to remove na values..
 #'
@@ -225,11 +243,28 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, ...) {
 #'
 MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
+  if (!IsAbfList(abf_list)) {
+    err_class_abf_list()
+  }
+  if (missing(intv_list) || is.null(intv_list)) {
+    intv_list = list()
+    for (i in seq_along(abf_list)) {
+      intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
+    }
+  } else if (!AssertLength(intv_list, length(abf_list))) {
+    err_assert_len("intv_list", "abf_list")
+  }
+  for (tmp in abf_list) {
+    if (!AssertChannel(tmp, channel)) {
+      err_channel()
+    }
+  }
+
   colname <- c()
   for (i in seq_along(abf_list)) {
     colname[i] <- GetTitle(abf_list[[i]])
   }
-  ret <- as.data.frame(t(EpisodicIntervalMeans(abf_list, intv_list, channel, na.rm)))
+  ret <- as.data.frame(t(MultiIntervalMeans(abf_list, intv_list, channel, na.rm)))
   colnames(ret) <- colname
 
   return(ret)

@@ -9,7 +9,7 @@ IVSummary(abf_list, intv_list, current_channel, voltage_channel)
 \arguments{
 \item{abf_list}{a list of abf objects.}
 
-\item{intv_list}{a list of intervals.}
+\item{intv_list}{OPTIONAL, a list of intervals.}
 
 \item{current_channel}{current channel id, 1-based.}
 

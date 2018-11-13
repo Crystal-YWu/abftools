@@ -1,4 +1,4 @@
-#' EpisodicIntervalMeans calculates interval means of a list of abf objects
+#' MultiIntervalMeans calculates interval means of a list of abf objects
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list a list of intervals.
@@ -8,7 +8,7 @@
 #' @return a vector of calculated values.
 #' @export
 #'
-EpisodicIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
+MultiIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colMeans(x, na.rm)
 
@@ -22,7 +22,7 @@ EpisodicIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE
   return(mx)
 }
 
-#' EpisodicIntervalSds calculates interval standard deviations of a list of abf objects
+#' MultiIntervalSds calculates interval standard deviations of a list of abf objects
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list a list of intervals.
@@ -32,7 +32,7 @@ EpisodicIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE
 #' @return a vector of calculated values.
 #' @export
 #'
-EpisodicIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
+MultiIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) matrixStats::colSds(x, na.rm)
 
@@ -45,7 +45,7 @@ EpisodicIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) 
   return(mx)
 }
 
-#' EpisodicIntervalSems calculates interval SEM of a list of abf objects
+#' MultiIntervalSems calculates interval SEM of a list of abf objects
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list a list of intervals.
@@ -55,7 +55,7 @@ EpisodicIntervalSds <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) 
 #' @return a vector of calculated values.
 #' @export
 #'
-EpisodicIntervalSems <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
+MultiIntervalSems <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 
   f <- function(x) colSems(x, na.rm)
 

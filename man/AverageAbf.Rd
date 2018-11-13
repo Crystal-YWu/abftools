@@ -9,7 +9,7 @@ AverageAbf(abf_list, w)
 \arguments{
 \item{abf_list}{a list of abf objects.}
 
-\item{w}{a vector of weights for weighted average, leave 0 for arithmetic mean.}
+\item{w}{OPTIONAL, a vector of weights for weighted average.}
 }
 \value{
 an averaged abf object, of which the protocol settings follow first element in abf_list.

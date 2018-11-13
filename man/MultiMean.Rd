@@ -9,7 +9,7 @@ MultiMean(abf_list, intv_list, channel = 1, na.rm = TRUE)
 \arguments{
 \item{abf_list}{a list of abf objects.}
 
-\item{intv_list}{a list of intervals.}
+\item{intv_list}{OPTIONAL, a list of intervals.}
 
 \item{channel}{channel id, 1-based.}
 

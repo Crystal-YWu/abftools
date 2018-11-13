@@ -20,7 +20,7 @@ err_class_abf <- function() {
 
 err_class_abf_list <- function() {
 
-  msg <- "Only abf or a list of abf objects are supported"
+  msg <- "Only a list of abf objects are supported"
   err(msg)
 }
 
