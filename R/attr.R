@@ -204,6 +204,24 @@ GetPointsPerEpisode <- function(abf) {
   return(ret)
 }
 
+#' Get number of epochs.
+#'
+#' @param abf an abf object
+#'
+#' @return number of epochs.
+#' @export
+#'
+GetNumOfEpoch <- function(abf) {
+
+  meta <- get_meta(abf)
+  epdac <- meta$EpochPerDAC
+  if (is.null(epdac)) {
+    return(0L)
+  }
+
+  return(nrow(epdac))
+}
+
 #' Get number of channels.
 #'
 #' @param abf an abf object.
@@ -243,4 +261,16 @@ nPts <- function(abf) {
 nEpi <- function(abf) {
 
   return(GetEpisodesPerChannel(abf))
+}
+
+#' Get number of epochs.
+#'
+#' @param abf an abf object
+#'
+#' @return number of epochs.
+#' @export
+#'
+nEpoch <- function(abf) {
+
+  return(GetNumOfEpoch(abf))
 }
