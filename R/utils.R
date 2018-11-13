@@ -14,6 +14,33 @@ colSems <- function(df, na.rm = FALSE) {
   return(sds / sqn)
 }
 
+#' Generate an interval.
+#'
+#' Only two or the arguments are needed. If all are given, len will be ignored.
+#'
+#' @param startPos start position.
+#' @param endPos end position.
+#' @param len length of the interval.
+#'
+#' @return an interval.
+#' @export
+#'
+#' @examples
+Intv <- function(startPos, endPos, len) {
+
+  if (missing(startPos)) {
+    startPos <- endPos - len + 1L
+  }
+  if (missing(endPos)) {
+    endPos <- startPos + len - 1L
+  }
+  if (startPos >= endPos) {
+    err_intv_pos()
+  }
+  len <- endPos - startPos + 1L
+
+  return(c(startPos, endPos, len))
+}
 
 #' Set intervals, by-ref behaviour
 #'
