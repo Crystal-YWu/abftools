@@ -93,7 +93,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   npts_abf <- nPts(abf)
 
   #indices of the sampled points
-  idx_smpl <- seq.int(from = 1L, to = npts_abf, by = sampling_ratio)
+  idx_smpl <- seq(from = 1L, to = npts_abf, by = sampling_ratio)
   #npts for sampled abf
   npts <- length(idx_smpl)
   #copy sampled points to data
@@ -104,7 +104,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   #consistency with sampling_func of melt.abf
   #Solution 2. convert this part to Rcpp.
   if (!is.null(sampling_func)) {
-    for (chan in seq.int(nch)) {
+    for (chan in seq_len(nch)) {
       #for (epi in seq.int(nepi)) {
       #  for (i in seq.int(npts - 1L)) {
       #    mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
@@ -122,11 +122,11 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
       #mask <- seq.int(idx_smpl[npts], npts_abf)
       #tmp_values <- sapply(seq.int(nepi), function(x) sampling_func(abf[mask, x, chan]))
       #data[npts, , chan] <- tmp_values
-      for (i in seq.int(npts - 1L)) {
-        mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
+      for (i in seq_len(npts - 1L)) {
+        mask <- seq(idx_smpl[i], idx_smpl[i + 1] - 1L)
         data[i, , chan] <- sampling_func(abf[mask, , chan])
       }
-      mask <- seq.int(idx_smpl[npts], npts_abf)
+      mask <- seq(idx_smpl[npts], npts_abf)
       data[npts, , chan] <- sampling_func(abf[mask, , chan])
     }
   }

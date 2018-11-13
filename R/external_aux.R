@@ -13,7 +13,7 @@
 ExternalAlgoEpoch <- function(abf, epoch, episodes, channel, func, algo, ...) {
 
   if (episodes[1] == 0) {
-    episodes <- seq.int(nEpi(abf))
+    episodes <- seq_len(nEpi(abf))
   }
   if (is.character(epoch)) {
     epoch <- GetEpochId(epoch)
@@ -25,7 +25,7 @@ ExternalAlgoEpoch <- function(abf, epoch, episodes, channel, func, algo, ...) {
     y <- ExtractFrom(abf, epoch, i, channel)
     algo_ret[[i]] <- do.call(algo_f, list(y = y, ...))
   }
-  algo_names <- paste0("epi", seq.int(length(algo_ret)))
+  algo_names <- paste0("epi", seq_len(length(algo_ret)))
   names(algo_ret) <- algo_names
 
   return(algo_ret)
@@ -34,7 +34,7 @@ ExternalAlgoEpoch <- function(abf, epoch, episodes, channel, func, algo, ...) {
 ExternalAlgoIntv <- function(abf, intv, episodes, channel, func, algo, ...) {
 
   if (episodes[1] == 0) {
-    episodes <- seq.int(nEpi(abf))
+    episodes <- seq_len(nEpi(abf))
   }
   algo_f <- paste0(func, "_", algo)
   mask <- MaskIntv(intv)
@@ -54,7 +54,7 @@ ExternalAlgoIntv <- function(abf, intv, episodes, channel, func, algo, ...) {
 ExternalAlgoIntv_list <- function(abf, intv, episodes, channel, func, algo, ...) {
 
   if (episodes[1] == 0) {
-    episodes <- seq.int(nEpi(abf))
+    episodes <- seq_len(nEpi(abf))
   }
   algo_f <- paste0(func, "_", algo)
   mask <- MaskIntv(intv)
@@ -64,7 +64,7 @@ ExternalAlgoIntv_list <- function(abf, intv, episodes, channel, func, algo, ...)
     y <- abf[mask, i, channel]
     algo_ret[[i]] <- do.call(algo_f, list(y = y, ...))
   }
-  algo_names <- paste0("epi", seq.int(length(algo_ret)))
+  algo_names <- paste0("epi", seq_len(length(algo_ret)))
   names(algo_ret) <- algo_names
 
   return(algo_ret)

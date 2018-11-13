@@ -107,7 +107,7 @@ GetEpochIntervals <- function(abf, wf_dac_id = 0) {
   nepoch <- nrow(epdac)
   win <- array(0L, dim = c(3L, nepoch, nepi))
 
-  for (epi in seq.int(nepi)) {
+  for (epi in seq_len(nepi)) {
 
     epoch_len <- init_len + incr_len * (epi - 1L)
     #shift epoch end idx accroding to first holding length

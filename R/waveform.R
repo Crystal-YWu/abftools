@@ -33,7 +33,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac_id = 0) {
   #Parse episodes
   nepi <- nEpi(abf)
   if (episodes[1] == 0) {
-    episodes = seq.int(nepi)
+    episodes = seq_len(nepi)
   }
   if (max(episodes) > nepi) {
     err_epi("GetWaveform")
@@ -74,7 +74,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac_id = 0) {
   for (epi in episodes) {
     idx <- idx_1stpts
     mx_epi_idx <- mx_epi_idx + 1L
-    for (epoch in seq.int(nepoch)) {
+    for (epoch in seq_len(nepoch)) {
 
       Vin <- ifelse(nepi > 1L, mx[idx - 1L, mx_epi_idx], mx[idx - 1L])
       Vhi <- init_level[epoch] + incr_level[epoch] * (epi - 1L)
@@ -100,7 +100,7 @@ GetWaveform <- function(abf, episodes = 0, wf_dac_id = 0) {
                     err_wf_type("GetWaveform"))
 
       #copy tmp to mx
-      mask <- seq.int(from = idx, length.out = len)
+      mask <- seq(from = idx, length.out = len)
       #performance bottleneck is not this if, no need to move out from loop.
       if (nepi > 1L) {
         mx[mask, mx_epi_idx] <- tmp
@@ -156,13 +156,13 @@ wf_ramp <- function(len, Vin, Vhi){
   #waveform 2
 
   k <- (Vhi - Vin) / len
-  return(seq.int(len) * k + Vin)
+  return(seq_len(len) * k + Vin)
 }
 wf_pulse <- function(len, Vin, Vhi, period, width) {
   #waveform 3
 
   win <- rep(Vin, period)
-  win[seq.int(width)] <- Vhi
+  win[seq_len(width)] <- Vhi
 
   ret <- rep(win, length.out = len)
   return(ret)
@@ -186,7 +186,7 @@ wf_cos <- function(len, Vin, Vhi, period) {
 
   amp <- (Vin - Vhi) / 2
   f <- 1 / period
-  win <- amp * cos(2 * pi * f * seq.int(period)) - amp + Vin
+  win <- amp * cos(2 * pi * f * seq_len(period)) - amp + Vin
 
   ret <- rep(win, length.out = len)
   return(ret)

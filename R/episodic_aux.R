@@ -22,7 +22,7 @@ EpisodicInterval_f <- function(abf_list, intv_list, channel, f) {
       ret <- f(abf_list[[i]][mask, , channel])
       #Results are padded to left
       nepi <- nEpi(abf_list[[i]])
-      for (j in seq(nepi))
+      for (j in seq_len(nepi))
         m[i, j] <- ret[j]
     }
   }

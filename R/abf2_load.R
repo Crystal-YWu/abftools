@@ -80,7 +80,7 @@ abf2_load <- function(filename, abf_title = NULL) {
     chan_name <- c()
     chan_unit <- c()
     chan_desc <- c()
-    for (i in seq(chan_num)) {
+    for (i in seq_len(chan_num)) {
       idx <- section$ADC$lADCChannelNameIndex[i]
       chan_name[i] <- section$Strings[[idx]]
       idx <- section$ADC$lADCUnitsIndex[i]
@@ -118,7 +118,7 @@ abf2_load <- function(filename, abf_title = NULL) {
     signal_resol <- section$Protocol$fADCRange[1] / section$Protocol$lADCResolution[1]
     signal_scale <- rep(1, chan_num)
     signal_offset <- rep(0, chan_num)
-    for (i in seq(chan_num)) {
+    for (i in seq_len(chan_num)) {
       #instrument scale factor
       signal_scale[i] <- section$ADC$fInstrumentScaleFactor[i]
       #signal gain
@@ -173,7 +173,7 @@ abf2_load <- function(filename, abf_title = NULL) {
     data <- array(data = rawdata, dim = c(chan_per_epi, pts_per_chan, epi_per_run))
     #scale data if needed
     if (rawdata_int)
-      for (i in seq(chan_per_epi))
+      for (i in seq_len(chan_per_epi))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
 
     #data in memory is ordered in (chan, pts, epi) since we usually access
@@ -192,7 +192,7 @@ abf2_load <- function(filename, abf_title = NULL) {
     data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan, 1))
     #scale data if needed
     if (rawdata_int)
-      for (i in seq(chan_per_run))
+      for (i in seq_len(chan_per_run))
         data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
 
     data <- aperm(data, c(2, 3, 1))

@@ -27,7 +27,7 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win = 0 ,
   wf_delta <- abs(wf - abf[[channel]])
 
   ret <- list()
-  for (i in seq.int(episodes)) {
+  for (i in seq_len(episodes)) {
 
     intv <- epoch_intv[, epoch, episodes[i]]
 
@@ -145,9 +145,9 @@ FindSamplingInterval <- function(abf, current_channel = 0, voltage_channel = 0,
   }
 
   if (backward_search) {
-    itr <- seq.int(ncol(ovlp), 1L)
+    itr <- seq(ncol(ovlp), 1L)
   } else {
-    itr <- seq.int(ncol(ovlp))
+    itr <- seq_len(ncol(ovlp))
   }
   best_score <- rep(Inf, length(episodes))
   best_intv <- c(0, 0, 0)

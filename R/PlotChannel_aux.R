@@ -13,7 +13,7 @@ CollectAllChannel <- function(abf, colour, ...) {
   p <- list()
   n <- nChan(abf)
 
-  for (i in seq(n)) {
+  for (i in seq_len(n)) {
     p[[i]] <- PlotChannel(abf, i, colour, ...)
   }
 
@@ -25,7 +25,7 @@ CollectAllChannel_Intv <- function(abf, intv, colour, ...) {
   p <- list()
   n <- nChan(abf)
 
-  for (i in seq(n)) {
+  for (i in seq_len(n)) {
     p[[i]] <- PlotChannel_Intv(abf, intv, i, colour, ...)
   }
 
@@ -37,7 +37,7 @@ CollectAllChannel_Cursor <- function(abf, cursor, colour, ...) {
   p <- list()
   n <- nChan(abf)
 
-  for (i in seq(n)) {
+  for (i in seq_len(n)) {
     p[[i]] <- PlotChannel_Cursor(abf, cursor, i, colour, ...)
   }
 

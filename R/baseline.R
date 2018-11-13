@@ -22,7 +22,7 @@ GetBaseline <- function(abf, epoch, intv, episodes = 0, channel = 1, algo = "als
   baseline_f <- paste0("baseline_", algo)
   bl <- list()
   if (episodes[1] == 0) {
-    episodes <- seq.int(nEpi(abf))
+    episodes <- seq_len(nEpi(abf))
   }
   channel <- FirstElement(channel)
   for (i in episodes) {
@@ -88,7 +88,7 @@ baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10,
 
   #Calculate D
   m <- length(y)
-  diag_idx <- seq.int(m)
+  diag_idx <- seq_len(m)
 
   D <- diff(Matrix::Diagonal(m), differences = 2)
   lambda <- 10^lambda_pow10
@@ -101,7 +101,7 @@ baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10,
 
   cflag <- FALSE
 
-  for (i in seq.int(maxitr)) {
+  for (i in seq_len(maxitr)) {
     #W <- Diagonal(x = w)
     #solving sparseMatrix is much faster than Diagonal, W is sparse anyway
     W <- Matrix::sparseMatrix(i = diag_idx, j = diag_idx, x = w)

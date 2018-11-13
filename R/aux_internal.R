@@ -38,7 +38,7 @@ LogiToIntv <- function(logi) {
 IntvToLogi <- function(intv, full_length) {
 
   ret <- rep(FALSE, full_length)
-  for (i in seq.int(ncol(intv))) {
+  for (i in seq_len(ncol(intv))) {
     mask <- MaskIntv(intv[, i])
     ret[mask] <- TRUE
   }

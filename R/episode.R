@@ -176,7 +176,7 @@ RestoreEpisodes <- function(abf, episodes) {
 GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {
-    all_epi <- seq.int(nEpi(x))
+    all_epi <- seq_len(nEpi(x))
     avail_epi <- attr(x, "EpiAvail")
 
     return(all_epi[avail_epi])

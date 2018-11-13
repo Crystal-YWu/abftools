@@ -56,7 +56,7 @@ score_worst_half <- function(s1, best_s) {
   #half length + 1
   n <- length(best_s) %/% 2L + 1L
   o <- order(best_s, decreasing = TRUE)
-  mask <- o[seq.int(n)]
+  mask <- o[seq_len(n)]
 
   return(all(s1[mask] < best_s[mask]))
 }
