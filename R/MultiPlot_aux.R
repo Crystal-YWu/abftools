@@ -1,9 +1,9 @@
-MultiPlotP <- function(abf_list, channel, colour, time_unit,
+MultiPlotP <- function(abf_list, intv_list, channel, colour, time_unit,
                        num_label, title_label, unify_y, ...) {
 
   p <- list()
   if (unify_y) {
-    ylimit <- UniYLim(abf_list, channel)
+    ylimit <- UniYLim(abf_list, channel, intv_list)
     for (i in seq_along(abf_list))
       p[[i]] <- PlotChannel(abf_list[[i]], channel, colour, time_unit, ...) + ylim(ylimit)
   } else {

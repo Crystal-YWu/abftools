@@ -15,7 +15,7 @@
 MultiPlotChannel <- function(abf_list, channel = 1, colour = FALSE, time_unit = "tick",
                              num_label = FALSE, title_label = TRUE, unify_y = TRUE, ...) {
 
-  p <- MultiPlotP(abf_list, channel, colour, time_unit, num_label, title_label,
+  p <- MultiPlotP(abf_list, NULL, channel, colour, time_unit, num_label, title_label,
                   unify_y, ...)
 
   n <- ceiling(sqrt(length(abf_list)))
@@ -65,8 +65,8 @@ MultiPlotChannel_Intv <- function(abf_list, intv_list, channel = 1, colour = FAL
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ...) {
 
-  p <- MultiPlotP(abf_list, channel, colour, time_unit, num_label, title_label,
-                  unify_y, ...)
+  p <- MultiPlotP(abf_list, intv_list, channel, colour, time_unit, num_label,
+                  title_label, unify_y, ...)
   for (i in seq_along(p)) {
     #convert intv to time_unit
     intv <- TickToTime(abf_list[[i]], time_unit, intv_list[[i]])
@@ -122,8 +122,8 @@ MultiPlotChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour =
                                   time_unit = "tick", num_label = FALSE, title_label = TRUE,
                                   unify_y = TRUE, ...) {
 
-  p <- MultiPlotP(abf_list, channel, colour, time_unit, num_label, title_label,
-                  unify_y, ...)
+  p <- MultiPlotP(abf_list, cursor_list, channel, colour, time_unit, num_label,
+                  title_label, unify_y, ...)
   for (i in seq_along(p)) {
     #convert intv to time_unit
     cursor <- TickToTime(abf_list[[i]], time_unit, cursor_list[[i]])
@@ -175,7 +175,8 @@ MultiPeekChannel_Cursor <- function(abf_list, cursor_list, channel = 1, colour =
 MultiPlotChannel_Pub <- function(abf_list, channel = 1, time_unit = "s", title_label = FALSE,
                                  spacing = 0, ...) {
 
-  p <- MultiPlotP(abf_list, channel, FALSE, time_unit, FALSE, title_label, TRUE, ...)
+  p <- MultiPlotP(abf_list, NULL, channel, FALSE, time_unit, FALSE, title_label,
+                  TRUE, ...)
   for (i in seq_along(p))
     p[[i]] <- p[[i]] + theme_classic()
 
