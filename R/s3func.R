@@ -1,6 +1,7 @@
 #' Print an abf object
 #'
 #' @param x an abf object.
+#' @param ... not used.
 #'
 #' @return the abf object itself, invisibly.
 #' @export
@@ -64,16 +65,19 @@ AllEpisodesAvail <- function(abf) all(attr(abf, "EpiAvail"))
 #' Convert a channel of an abf object to data.frame
 #'
 #' @param x an abf object.
+#' @param row.names see as.data.frame
+#' @param optional see as.data.frame
 #' @param channel ADC channel id, 1-based.
+#' @param ... passed to as.data.frame
 #'
 #' @return a data frame of the channel data, with colname of epiX.
 #' @export
 #'
-as.data.frame.abf <- function(x, channel = 1) {
+as.data.frame.abf <- function(x, row.names = NULL, optional = FALSE, channel = 1, ...) {
 
-  df <- x[[channel]]
+  mx <- x[[channel]]
 
-  return(data.frame(df))
+  return(as.data.frame(mx, row.names, optional, ...))
 }
 
 #' Replacing channel data.

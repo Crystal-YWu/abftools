@@ -15,12 +15,14 @@
 #' @param sampling_ratio sampling ratio, default to 1 so that no sampling at all
 #' @param sampling_func a function, default to null so no processing sampled points
 #' @param time_unit time unit of the sampled data, can be tick, us, ms, s, min or hr
+#' @param ... other arguments passed to melt
+#' @param value.name OPTIONAL, name of the channel value, defaults to generated channel description.
 #'
 #' @return a melted data frame.
 #' @export
 #'
 melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NULL,
-                     time_unit = "tick") {
+                     time_unit = "tick", ..., value.name = NULL) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -30,7 +32,11 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
   }
 
   npts <- nPts(abf)
-  chan_desc <- GetChannelDesc(abf)[channel]
+  if (is.null(value.name)) {
+    value.name <- GetChannelDesc(abf)[channel]
+  } else {
+    value.name <- as.character(value.name)
+  }
 
   #extract channel data
   data <- as.data.frame(abf, channel)
@@ -56,7 +62,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
   }
   #bind time column
   df <- cbind(time = ctime, df)
-  df <- melt(df, id.vars = "time", variable.name = "Episode", value.name = chan_desc)
+  df <- melt(df, id.vars = "time", variable.name = "Episode", value.name = value.name, ...)
 
   return(df)
 }
