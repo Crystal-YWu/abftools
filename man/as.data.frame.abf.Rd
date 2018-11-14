@@ -4,12 +4,19 @@
 \alias{as.data.frame.abf}
 \title{Convert a channel of an abf object to data.frame}
 \usage{
-\method{as.data.frame}{abf}(x, channel = 1)
+\method{as.data.frame}{abf}(x, row.names = NULL, optional = FALSE,
+  channel = 1, ...)
 }
 \arguments{
 \item{x}{an abf object.}
 
+\item{row.names}{see as.data.frame}
+
+\item{optional}{see as.data.frame}
+
 \item{channel}{ADC channel id, 1-based.}
+
+\item{...}{passed to as.data.frame}
 }
 \value{
 a data frame of the channel data, with colname of epiX.

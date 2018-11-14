@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{an abf object.}
+
+\item{...}{not used.}
 }
 \value{
 the abf object itself, invisibly.

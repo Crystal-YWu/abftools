@@ -43,3 +43,65 @@ CollectAllChannel_Cursor <- function(abf, cursor, colour, ...) {
 
   return(p)
 }
+
+CollectCh <- function(abf, intv = NULL, curs = NULL, channel, colour, time_unit,
+                      auto_zoom, ...) {
+
+  #Data
+  df <- melt(abf, channel, time_unit = time_unit, ...)
+  chan_desc <- GetChannelDesc(abf)[channel]
+
+  #Plot
+  p <- ggplot(df, aes_string("time", as.name(chan_desc))) + theme_classic()
+  if (colour) {
+    p <- p + geom_line(aes_string(colour = "Episode"))
+  } else {
+    p <- p + geom_line(aes_string(group = "Episode"))
+  }
+
+  #intv/cursor
+  #check if NA intv is given
+  if (any(is.na(intv))) {
+    intv <- NULL
+  }
+  if (!is.null(intv)) {
+    intv <- TickToTime(abf, time_unit, intv)
+    p <- p + geom_vline(xintercept = intv[1:2], linetype = "dashed")
+  }
+  if (!is.null(curs)) {
+    curs <- TickToTime(abf, time_unit, curs)
+    p <- p + geom_vline(xintercept = curs, linetype = "dashed")
+  }
+
+  if (auto_zoom) {
+    ylimit <- GetYLimit(abf, intv = intv, curs = curs, channel = channel)
+    p <- p + ylim(ylimit)
+  }
+
+  #Labels
+  ydesc <- GetChannelDesc(abf)[channel]
+  yunit <- GetChannelUnit(abf)[channel]
+  xdesc <- "Time"
+  xunit <- time_unit
+
+  xlabel <- GetAxisLabel(xdesc, xunit)
+  ylabel <- GetAxisLabel(ydesc, yunit)
+  p <- p + xlab(xlabel) + ylab(ylabel)
+
+  #Good to go
+  return(p)
+}
+
+CollectAllCh <- function(abf, intv = NULL, curs = NULL, colour, time_unit, ...) {
+
+  nch <- nChan(abf)
+  plist <- list()
+
+  for (i in seq_len(nch)) {
+    plist[[i]] <- CollectCh(abf, intv, curs, i, colour, time_unit, ...)
+  }
+
+  return(plist)
+}
+
+GetAxisLabel <- function(desc, unit) paste0(desc, " (", unit, ")")

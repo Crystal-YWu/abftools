@@ -25,7 +25,6 @@ colSems <- function(df, na.rm = FALSE) {
 #' @return an interval.
 #' @export
 #'
-#' @examples
 Intv <- function(startPos, endPos, len) {
 
   if (missing(startPos)) {

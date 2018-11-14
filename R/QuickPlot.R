@@ -23,7 +23,8 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
       voltage <- colMeans(abf[[voltage_channel]][mask, ])
     }
 
-    return(qplot(x = voltage, y = current, geom = "line") + theme_bw())
+    return(qplot(x = voltage, y = current, geom = "line") + theme_classic())
+
   } else if (IsAbfList(abf)) {
 
     melted <- MeltAbfMean(abf, pos)
@@ -31,7 +32,7 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
     cname <- colnames(melted)
     xcol <- as.name(FirstElement(cname[startsWith(cname, "Voltage")]))
     ycol <- as.name(FirstElement(cname[startsWith(cname, "Current")]))
-    p <- ggplot(melted, aes_string(x = xcol, y = ycol)) + theme_bw()
+    p <- ggplot(melted, aes_string(x = xcol, y = ycol)) + theme_classic()
     if (colour) {
       p <- p + geom_line(aes_string(colour = "id"))
     } else {
@@ -41,6 +42,7 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
     p <- p + xlab(as.character(xcol)) + ylab(as.character(ycol))
 
     return(p)
+
   } else {
     err_class_abf_list()
   }

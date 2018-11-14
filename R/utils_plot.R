@@ -39,7 +39,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
   }
 
   #extract channel data
-  data <- as.data.frame(abf, channel)
+  data <- as.data.frame(abf, channel = channel)
   #channel index tick
   ctick <- seq(from = 1L, to = npts, by = sampling_ratio)
   #convert to time

@@ -4,23 +4,28 @@
 \alias{PeekChannel_Cursor}
 \title{Fast plot a channel with cursors.}
 \usage{
-PeekChannel_Cursor(abf, cursor, channel = 1, colour = FALSE,
-  time_unit = "tick", ratio = 50, ...)
+PeekChannel_Cursor(abf, cursor, channel = 1L, colour = FALSE,
+  time_unit = "tick", auto_zoom = FALSE, title = NULL, ratio = 50L,
+  ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{cursor}{cursors to plot.}
+\item{cursor}{cursors (a vector of positions) to plot on top.}
 
-\item{channel}{channel to plot, channel id is 1-based.}
+\item{channel}{channel to plot, 1-based.}
 
-\item{colour}{wheter to plot in coloured mode.}
+\item{colour}{whether to plot in coloured mode.}
 
-\item{time_unit}{time unit for the plot.}
+\item{time_unit}{time unit for x axis.}
 
-\item{ratio}{sampling ratio.}
+\item{auto_zoom}{whether to zoom in the plot automatically.}
 
-\item{...}{other arguments, see melt.abf for more details.}
+\item{title}{OPTIONAL, title of the plot.}
+
+\item{ratio}{OPTIONAL, sampling ratio}
+
+\item{...}{other arguments passed to melt, see melt.abf for more details.}
 }
 \value{
 a ggplot object.

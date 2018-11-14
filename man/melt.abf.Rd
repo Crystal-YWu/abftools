@@ -5,7 +5,7 @@
 \title{Melt channel data of an abf object into a data frame by sampling ratio.}
 \usage{
 \method{melt}{abf}(abf, channel = 1L, sampling_ratio = 1L,
-  sampling_func = NULL, time_unit = "tick")
+  sampling_func = NULL, time_unit = "tick", ..., value.name = NULL)
 }
 \arguments{
 \item{abf}{an abf object}
@@ -17,6 +17,10 @@
 \item{sampling_func}{a function, default to null so no processing sampled points}
 
 \item{time_unit}{time unit of the sampled data, can be tick, us, ms, s, min or hr}
+
+\item{...}{other arguments passed to melt}
+
+\item{value.name}{OPTIONAL, name of the channel value, defaults to generated channel description.}
 }
 \value{
 a melted data frame.

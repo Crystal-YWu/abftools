@@ -4,23 +4,28 @@
 \alias{PeekChannel_Intv}
 \title{Fast plot a channel with interval.}
 \usage{
-PeekChannel_Intv(abf, intv, channel = 1, colour = FALSE,
-  time_unit = "tick", ratio = 50, ...)
+PeekChannel_Intv(abf, intv, channel = 1L, colour = FALSE,
+  time_unit = "tick", auto_zoom = FALSE, title = NULL, ratio = 50L,
+  ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{intv}{an interval.}
+\item{intv}{an interval (a vector of c(start, end, len)) to plot on top.}
 
-\item{channel}{channel to plot, channel id is 1-based.}
+\item{channel}{channel to plot, 1-based.}
 
-\item{colour}{wheter to plot in coloured mode.}
+\item{colour}{whether to plot in coloured mode.}
 
-\item{time_unit}{time unit for the plot.}
+\item{time_unit}{time unit for x axis.}
 
-\item{ratio}{sampling ratio.}
+\item{auto_zoom}{whether to zoom in the plot automatically.}
 
-\item{...}{other arguments, see melt.abf for more details.}
+\item{title}{OPTIONAL, title of the plot.}
+
+\item{ratio}{OPTIONAL, sampling ratio}
+
+\item{...}{other arguments passed to melt, see melt.abf for more details.}
 }
 \value{
 a ggplot object.

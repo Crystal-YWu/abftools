@@ -2,25 +2,34 @@
 % Please edit documentation in R/PlotChannel.R
 \name{PlotChannel}
 \alias{PlotChannel}
-\title{Plot a channel.}
+\title{Plot a channel of an abf object.}
 \usage{
-PlotChannel(abf, channel = 1, colour = FALSE, time_unit = "tick",
-  ...)
+PlotChannel(abf, intv = NULL, cursor = NULL, channel = 1L,
+  colour = FALSE, time_unit = "tick", auto_zoom = FALSE,
+  title = NULL, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{channel}{channel to plot, channel id is 1-based.}
+\item{intv}{OPTIONAL, an interval (a vector of c(start, end, len)) to plot on top.}
 
-\item{colour}{wheter to plot in coloured mode.}
+\item{cursor}{OPTIONAL, cursors (a vector of positions) to plot on top.}
 
-\item{time_unit}{time unit for the plot.}
+\item{channel}{channel to plot, 1-based.}
 
-\item{...}{other arguments, see melt.abf for more details.}
+\item{colour}{whether to plot in coloured mode.}
+
+\item{time_unit}{time unit for x axis.}
+
+\item{auto_zoom}{whether to zoom in the plot automatically.}
+
+\item{title}{OPTIONAL, title of the plot.}
+
+\item{...}{other arguments passed to melt, see melt.abf for more details.}
 }
 \value{
 a ggplot object.
 }
 \description{
-Plot a channel.
+Plot a channel of an abf object.
 }
