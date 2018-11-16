@@ -4,18 +4,18 @@
 \alias{PeekChannel}
 \title{Fast plot a channel.}
 \usage{
-PeekChannel(abf, intv = NULL, cursor = NULL, channel = 1L,
+PeekChannel(abf, channel = 1L, intv = NULL, cursor = NULL,
   colour = FALSE, time_unit = "tick", auto_zoom = FALSE,
   title = NULL, ratio = 50L, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
+\item{channel}{channel to plot, 1-based.}
+
 \item{intv}{OPTIONAL, an interval (a vector of c(start, end, len)) to plot on top.}
 
 \item{cursor}{OPTIONAL, cursors (a vector of positions) to plot on top.}
-
-\item{channel}{channel to plot, 1-based.}
 
 \item{colour}{whether to plot in coloured mode.}
 

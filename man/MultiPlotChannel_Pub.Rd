@@ -4,8 +4,9 @@
 \alias{MultiPlotChannel_Pub}
 \title{Plot a channel of multiple abf objects, in a common publication standard.}
 \usage{
-MultiPlotChannel_Pub(abf_list, channel = 1, time_unit = "s",
-  title_label = FALSE, spacing = 0, ...)
+MultiPlotChannel_Pub(abf_list, channel = 1L, time_unit = "s",
+  manual_title = NULL, auto_title = FALSE, x_ticks_pos = c(0.2, 0.8),
+  ...)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
@@ -14,11 +15,13 @@ MultiPlotChannel_Pub(abf_list, channel = 1, time_unit = "s",
 
 \item{time_unit}{time unit to use in plot.}
 
-\item{title_label}{whether to show title for each abf object.}
+\item{manual_title}{titles for subplots.}
 
-\item{spacing}{tweak space between two plot.}
+\item{auto_title}{automatically add titles for subplots.}
 
-\item{...}{other arguments, see melt.abf for more details.}
+\item{x_ticks_pos}{a vector of positions (valued between 0 and 1) to show x ticks.}
+
+\item{...}{other arguments passed, see PlotChannel for more details.}
 }
 \value{
 a ggplot object.

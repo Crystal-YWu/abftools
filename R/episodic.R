@@ -8,7 +8,7 @@
 #' @return a vector of calculated values.
 #' @export
 #'
-MultiIntervalMeans <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
+MultiIntervalMeans <- function(abf_list, intv_list, channel = 1L, na.rm = TRUE) {
 
   f <- function(x) colMeans(x, na.rm)
 

@@ -4,7 +4,7 @@
 \alias{MultiIntervalMeans}
 \title{MultiIntervalMeans calculates interval means of a list of abf objects}
 \usage{
-MultiIntervalMeans(abf_list, intv_list, channel = 1, na.rm = TRUE)
+MultiIntervalMeans(abf_list, intv_list, channel = 1L, na.rm = TRUE)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}

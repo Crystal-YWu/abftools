@@ -2,32 +2,43 @@
 % Please edit documentation in R/MultiPlot.R
 \name{MultiPlotChannel}
 \alias{MultiPlotChannel}
-\title{Plot a channel of multiple abf objects.}
+\title{Plot channel/channels of multiple abf objects.}
 \usage{
-MultiPlotChannel(abf_list, channel = 1, colour = FALSE,
-  time_unit = "tick", num_label = FALSE, title_label = TRUE,
-  unify_y = TRUE, ...)
+MultiPlotChannel(abf_list, channel = 1L, intv = NULL, cursor = NULL,
+  colour = FALSE, time_unit = "tick", auto_zoom = FALSE,
+  manual_title = NULL, auto_title = FALSE, num_label = FALSE,
+  channel_arrange = "H", plot_arrange = "A", ...)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
 
-\item{channel}{channel id, 1-based.}
+\item{channel}{channel/channels to plot, 1-based.}
+
+\item{intv}{OPTIONAL, an interval (a vector of c(start, end, len))/a list of intervals to plot on top.}
+
+\item{cursor}{OPTIONAL, cursors (a vector of positions)/a list of cursors to plot on top.}
 
 \item{colour}{whether to plot in coloured mode.}
 
-\item{time_unit}{time unit to use in plot.}
+\item{time_unit}{time unit for x axis.}
 
-\item{num_label}{whether to show a numbered label of each abf object.}
+\item{auto_zoom}{whether to zoom in the plot automatically.}
 
-\item{title_label}{wheter to show title of each abf object.}
+\item{manual_title}{OPTIONAL, titles of every abf plot.}
 
-\item{unify_y}{wheter to unifier y scale of each abf object.}
+\item{auto_title}{OPTIONAL, whether to automatically add titles for every abf plot.}
 
-\item{...}{other arguments, see melt.abf for more details.}
+\item{num_label}{OPTIONAL, whether to add number label to every abf plot.}
+
+\item{channel_arrange}{arrangement of channel subplots.}
+
+\item{plot_arrange}{arrangement of abf plots.}
+
+\item{...}{}
 }
 \value{
 a ggplot object.
 }
 \description{
-Plot a channel of multiple abf objects.
+Plot channel/channels of multiple abf objects.
 }

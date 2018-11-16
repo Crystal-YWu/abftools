@@ -23,7 +23,7 @@ PlotAllChannel(abf, intv = NULL, cursor = NULL, colour = FALSE,
 
 \item{title}{OPTIONAL, title of the plot.}
 
-\item{arrange}{arrangement of the subplots, can be "H" (horizontal), "V" (vertical)}
+\item{arrange}{arrangement of the subplots, can be "H" (horizontal), "V" (vertical), "A" (auto)}
 
 \item{...}{other arguments passed to melt, see melt.abf for more details.}
 }

@@ -4,7 +4,8 @@
 \alias{MultiMean}
 \title{Calculate mean values of multiple abf objects}
 \usage{
-MultiMean(abf_list, intv_list, channel = 1, na.rm = TRUE)
+MultiMean(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
+  na.rm = TRUE)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
@@ -12,6 +13,8 @@ MultiMean(abf_list, intv_list, channel = 1, na.rm = TRUE)
 \item{intv_list}{OPTIONAL, a list of intervals.}
 
 \item{channel}{channel id, 1-based.}
+
+\item{ret.df}{whether to return a data.frame object, if set to FALSE a matrix is returned instead.}
 
 \item{na.rm}{wheter to remove na values..}
 }

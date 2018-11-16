@@ -197,17 +197,18 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
 #'
 #' @param abf an abf object.
 #' @param intv OPTIONAL, an interval to mean over.
-#' @param desc_colnames Whether to use descriptive colnames, set to FALSE to use original channel names.
-#' @param na.rm Whether to remove NA values.
-#' @param ... Passed to arithmetic mean.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
+#' @param desc_colnames whether to use descriptive colnames, set to FALSE to use original channel names.
+#' @param na.rm whether to remove NA values.
+#' @param ... passed to arithmetic mean.
 #'
 #' @return A data.frame object.
 #' @export
 #' @method mean abf
 #'
-mean.abf <- function(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...) {
+mean.abf <- function(abf, intv = NULL, ret.df = TRUE, desc_colnames = TRUE, na.rm = TRUE, ...) {
 
-  if (missing(intv) || is.null(intv)) {
+  if (is.null(intv)) {
     intv <- Intv(1L, nPts(abf))
   }
 
@@ -220,7 +221,7 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...) {
       ret[j, i] <- mean(abf[mask, j, i], na.rm = na.rm, ...)
     }
   if (desc_colnames) {
-    colnames(ret) <- paste0(GetChannelDesc(abf), " (", GetChannelUnit(abf), ")")
+    colnames(ret) <- GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf))
   } else {
     colnames(ret) <- GetChannelName(abf)
   }
@@ -229,7 +230,11 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...) {
     rownames(ret) <- paste0("epi", seq_len(nepi))
   }
 
-  return(as.data.frame(ret))
+  if (ret.df) {
+    ret <- as.data.frame(ret)
+  }
+
+  return(ret)
 }
 
 #' Calculate mean values of multiple abf objects
@@ -237,17 +242,19 @@ mean.abf <- function(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...) {
 #' @param abf_list a list of abf objects.
 #' @param intv_list OPTIONAL, a list of intervals.
 #' @param channel channel id, 1-based.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
 #' @param na.rm wheter to remove na values..
 #'
 #' @return A data.frame object.
 #' @export
 #'
-MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
+MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
+                      na.rm = TRUE) {
 
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
   }
-  if (missing(intv_list) || is.null(intv_list)) {
+  if (is.null(intv_list)) {
     intv_list = list()
     for (i in seq_along(abf_list)) {
       intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
@@ -255,6 +262,7 @@ MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
   } else if (!AssertLength(intv_list, abf_list)) {
     err_assert_len("intv_list", "abf_list")
   }
+  channel <- FirstElement(channel)
   for (tmp in abf_list) {
     if (!AssertChannel(tmp, channel)) {
       err_channel()
@@ -265,9 +273,12 @@ MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
   for (i in seq_along(abf_list)) {
     colname[i] <- GetTitle(abf_list[[i]])
   }
-  ret <- as.data.frame(t(MultiIntervalMeans(abf_list, intv_list, channel, na.rm)))
+  ret <- t(MultiIntervalMeans(abf_list, intv_list, channel, na.rm))
   colnames(ret) <- colname
 
+  if (ret.df) {
+    ret <- as.data.frame(ret)
+  }
   return(ret)
 }
 
@@ -275,30 +286,32 @@ MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list a list of intervals.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
 #' @param na.rm wheter to remove na values..
 #'
 #' @return A data.frame object.
 #' @export
 #'
-MultiMean_Current <- function(abf_list, intv_list, na.rm = TRUE) {
+MultiMean_Current <- function(abf_list, intv_list, ret.df = TRUE, na.rm = TRUE) {
 
   channel <- GetFirstCurrentChan(abf_list[[1]])
 
-  return(MultiMean(abf_list, intv_list, channel, na.rm))
+  return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
 }
 
 #' Calculate mean voltages of multiple abf objects
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list a list of intervals.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
 #' @param na.rm wheter to remove na values.
 #'
 #' @return A data.frame object.
 #' @export
 #'
-MultiMean_Voltage <- function(abf_list, intv_list, na.rm =TRUE) {
+MultiMean_Voltage <- function(abf_list, intv_list, ret.df = TRUE, na.rm =TRUE) {
 
   channel <- GetFirstVoltageChan(abf_list[[1]])
 
-  return(MultiMean(abf_list, intv_list, channel, na.rm))
+  return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
 }

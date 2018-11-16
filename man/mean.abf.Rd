@@ -4,18 +4,21 @@
 \alias{mean.abf}
 \title{Calculate mean values of an abf object.}
 \usage{
-\method{mean}{abf}(abf, intv, desc_colnames = TRUE, na.rm = TRUE, ...)
+\method{mean}{abf}(abf, intv = NULL, ret.df = TRUE,
+  desc_colnames = TRUE, na.rm = TRUE, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
 \item{intv}{OPTIONAL, an interval to mean over.}
 
-\item{desc_colnames}{Whether to use descriptive colnames, set to FALSE to use original channel names.}
+\item{ret.df}{whether to return a data.frame object, if set to FALSE a matrix is returned instead.}
 
-\item{na.rm}{Whether to remove NA values.}
+\item{desc_colnames}{whether to use descriptive colnames, set to FALSE to use original channel names.}
 
-\item{...}{Passed to arithmetic mean.}
+\item{na.rm}{whether to remove NA values.}
+
+\item{...}{passed to arithmetic mean.}
 }
 \value{
 A data.frame object.

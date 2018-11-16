@@ -148,3 +148,10 @@ err_channel <- function() {
 
   err(msg)
 }
+
+err_arrange <- function(arr) {
+
+  msg <- sprintf("Unknown arrangement %s.", as.character(arr))
+
+  err(msg)
+}

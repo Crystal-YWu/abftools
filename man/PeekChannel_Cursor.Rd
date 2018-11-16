@@ -4,16 +4,16 @@
 \alias{PeekChannel_Cursor}
 \title{Fast plot a channel with cursors.}
 \usage{
-PeekChannel_Cursor(abf, cursor, channel = 1L, colour = FALSE,
+PeekChannel_Cursor(abf, channel = 1L, cursor, colour = FALSE,
   time_unit = "tick", auto_zoom = FALSE, title = NULL, ratio = 50L,
   ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{cursor}{cursors (a vector of positions) to plot on top.}
-
 \item{channel}{channel to plot, 1-based.}
+
+\item{cursor}{cursors (a vector of positions) to plot on top.}
 
 \item{colour}{whether to plot in coloured mode.}
 

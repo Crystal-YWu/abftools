@@ -82,7 +82,7 @@ FirstElement <- function(x) {
                    " has length > 1 and only the first element will be used."))
   }
 
-  return(x[1])
+  return(x[[1]])
 }
 
 ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {

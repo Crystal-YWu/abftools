@@ -4,16 +4,16 @@
 \alias{PeekChannel_Intv}
 \title{Fast plot a channel with interval.}
 \usage{
-PeekChannel_Intv(abf, intv, channel = 1L, colour = FALSE,
+PeekChannel_Intv(abf, channel = 1L, intv, colour = FALSE,
   time_unit = "tick", auto_zoom = FALSE, title = NULL, ratio = 50L,
   ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{intv}{an interval (a vector of c(start, end, len)) to plot on top.}
-
 \item{channel}{channel to plot, 1-based.}
+
+\item{intv}{an interval (a vector of c(start, end, len)) to plot on top.}
 
 \item{colour}{whether to plot in coloured mode.}
 

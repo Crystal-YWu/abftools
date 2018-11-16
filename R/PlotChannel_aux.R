@@ -1,50 +1,4 @@
-GetChannelP <- function(abf, channel, ...) {
-
-  df <- melt(abf, channel, ...)
-  chan_desc <- GetChannelDesc(abf)[channel]
-
-  p <- ggplot(df, aes_string("time", as.name(chan_desc))) + theme_bw()
-
-  return(p)
-}
-
-CollectAllChannel <- function(abf, colour, ...) {
-
-  p <- list()
-  n <- nChan(abf)
-
-  for (i in seq_len(n)) {
-    p[[i]] <- PlotChannel(abf, i, colour, ...)
-  }
-
-  return(p)
-}
-
-CollectAllChannel_Intv <- function(abf, intv, colour, ...) {
-
-  p <- list()
-  n <- nChan(abf)
-
-  for (i in seq_len(n)) {
-    p[[i]] <- PlotChannel_Intv(abf, intv, i, colour, ...)
-  }
-
-  return(p)
-}
-
-CollectAllChannel_Cursor <- function(abf, cursor, colour, ...) {
-
-  p <- list()
-  n <- nChan(abf)
-
-  for (i in seq_len(n)) {
-    p[[i]] <- PlotChannel_Cursor(abf, cursor, i, colour, ...)
-  }
-
-  return(p)
-}
-
-CollectCh <- function(abf, intv = NULL, curs = NULL, channel, colour, time_unit,
+CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
                       auto_zoom, ...) {
 
   #Data
@@ -64,6 +18,8 @@ CollectCh <- function(abf, intv = NULL, curs = NULL, channel, colour, time_unit,
   if (any(is.na(intv))) {
     intv <- NULL
   }
+  #remove NAs from cursor
+  curs <- curs[!is.na(curs)]
   if (!is.null(intv)) {
     intv_tu <- TickToTime(abf, time_unit, intv)
     p <- p + geom_vline(xintercept = intv_tu[1:2], linetype = "dashed")
@@ -92,16 +48,25 @@ CollectCh <- function(abf, intv = NULL, curs = NULL, channel, colour, time_unit,
   return(p)
 }
 
-CollectAllCh <- function(abf, intv = NULL, curs = NULL, colour, time_unit, ...) {
+CollectAllCh <- function(abf, ...) {
 
   nch <- nChan(abf)
   plist <- list()
 
   for (i in seq_len(nch)) {
-    plist[[i]] <- CollectCh(abf, intv, curs, i, colour, time_unit, ...)
+    plist[[i]] <- CollectCh(abf, channel = i, ...)
   }
 
   return(plist)
 }
 
-GetAxisLabel <- function(desc, unit) paste0(desc, " (", unit, ")")
+ArrangePlot <- function(p, arrange) {
+
+  pg <- switch(substr(toupper(arrange), 1L, 1L),
+               H = plot_grid(plotlist = p, nrow = 1, align = "h"),
+               V = plot_grid(plotlist = p, ncol = 1, align = "v"),
+               A = plot_grid(plotlist = p),
+               err_arrange(arrange))
+
+  return(pg)
+}
