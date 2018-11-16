@@ -182,6 +182,19 @@ WrapMappingFunc <- function(map_func, abf_id_func = NULL, epi_id_func = NULL,
 }
 
 
+#' Convenient alias of WrapMappingFunc()
+#'
+#' @param ... See WrapMappingFunc for more details.
+#'
+#' @return a function of f(abf, intv)
+#' @export
+#'
+wrap <- function(...) {
+
+  WrapMappingFunc(...)
+}
+
+
 #' Apply a function over a list of abf objects.
 #'
 #' @param abf_list a list of abf objects.
