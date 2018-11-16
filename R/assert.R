@@ -2,19 +2,23 @@ IsAbf <- function(x) class(x) == "abf"
 
 IsAbfList <- function(x) {
 
-  if (class(x) != "list")
+  if (!is.list(x))
     return(FALSE)
   else
     return(all(sapply(x, function(y) class(y) == "abf")))
 }
 
 
-AssertLength <- function(x, ...) {
+AssertLength <- function(x, ..., explicit = NULL) {
 
-  len <- list(...)
+  args <- list(...)
   lenx <- length(x)
-  for (i in seq_along(len)) {
-    if (lenx == len[[i]]) {
+  if (any(lenx == explicit)) {
+    return(TRUE)
+  }
+  for (i in seq_along(args)) {
+    len <- length(args[[i]])
+    if (lenx == len) {
       return(TRUE)
     }
   }

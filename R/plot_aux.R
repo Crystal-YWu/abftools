@@ -39,7 +39,7 @@ GetYLimit <- function(abf, intv = NULL, curs = NULL, channel, blank = 0.0125) {
   if (IsAbf(abf)) {
     abf <- list(abf)
   }
-  if (class(intv) != "list") {
+  if (!is.list(itnv)) {
     intv <- list(intv)
   }
   if (class(curs) != "curs") {

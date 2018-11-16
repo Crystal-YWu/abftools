@@ -18,7 +18,7 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
     for (i in seq_along(abf_list)) {
       intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
     }
-  } else if (!AssertLength(intv_list, length(abf_list))) {
+  } else if (!AssertLength(intv_list, abf_list)) {
     err_assert_len("intv_list", "abf_list")
   }
   #figure out current channel and voltage channel
@@ -71,7 +71,7 @@ AverageAbf <- function(abf_list, w) {
     ret <- ret / n
   } else {
 
-    if (!AssertLength(w, length(abf_list))) {
+    if (!AssertLength(w, abf_list)) {
       err_assert_len("w", "abf_list")
     }
 
@@ -252,7 +252,7 @@ MultiMean <- function(abf_list, intv_list, channel = 1, na.rm = TRUE) {
     for (i in seq_along(abf_list)) {
       intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
     }
-  } else if (!AssertLength(intv_list, length(abf_list))) {
+  } else if (!AssertLength(intv_list, abf_list)) {
     err_assert_len("intv_list", "abf_list")
   }
   for (tmp in abf_list) {

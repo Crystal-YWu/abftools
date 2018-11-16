@@ -37,7 +37,7 @@ SetTitle <- function(abf, title) {
       invisible(abf)
     }))
   } else if (IsAbfList(abf)) {
-    if (!AssertLength(title, 1L, length(abf))) {
+    if (!AssertLength(title, abf, explicit = 1L)) {
       err_assert_len("title", "abf")
     }
     if (length(title) == 1L) {
