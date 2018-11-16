@@ -28,7 +28,7 @@ MultiPlotChannel_Pub <- function(abf_list, channel = 1L, time_unit = "s",
   manual_title <- unlist(manual_title)
   if (!is.null(manual_title)) {
     if (!AssertLength(manual_title, abf_list)) {
-      err_assert_len("manual_title", "abf_list")
+      err_assert_len(manual_title, abf_list)
     }
   } else if (auto_title) {
     manual_title <- unlist(GetTitle(abf_list))
@@ -97,7 +97,7 @@ MultiPlotChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
   #check intv and cursor
   if (is.list(intv)) {
     if (!AssertLength(intv, abf_list)) {
-      err_assert_len("intv", "abf_list")
+      err_assert_len(intv, abf_list)
     }
   } else {
     #convert intv to a list of intv with same length of abf_list
@@ -105,7 +105,7 @@ MultiPlotChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
   }
   if (is.list(cursor)) {
     if (!AssertLength(cursor, abf_list)) {
-      err_assert_len("cursor", "abf_list")
+      err_assert_len(cursor, abf_list)
     }
   } else {
     #convert cursor to a list of cursor with same length of abf_list
@@ -119,7 +119,7 @@ MultiPlotChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
   if (!is.null(manual_title)) {
     #subtitles are given, check length of subtitles
     if (!AssertLength(manual_title, abf_list)) {
-      err_assert_len("manual_title", "abf_list")
+      err_assert_len(manual_title, abf_list)
     }
     has_subtitles <- TRUE
   } else if (auto_title) {

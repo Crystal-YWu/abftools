@@ -19,7 +19,7 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
       intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
     }
   } else if (!AssertLength(intv_list, abf_list)) {
-    err_assert_len("intv_list", "abf_list")
+    err_assert_len(intv_list, abf_list)
   }
   #figure out current channel and voltage channel
   if (missing(current_channel) || is.null(current_channel)) {
@@ -72,7 +72,7 @@ AverageAbf <- function(abf_list, w) {
   } else {
 
     if (!AssertLength(w, abf_list)) {
-      err_assert_len("w", "abf_list")
+      err_assert_len(w, abf_list)
     }
 
     n <- length(abf_list)
@@ -191,52 +191,6 @@ SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   }
 }
 
-#' Calculate mean values of an abf object.
-#'
-#' Returns a data.frame object containing episodic mean values of each channel.
-#'
-#' @param abf an abf object.
-#' @param intv OPTIONAL, an interval to mean over.
-#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
-#' @param desc_colnames whether to use descriptive colnames, set to FALSE to use original channel names.
-#' @param na.rm whether to remove NA values.
-#' @param ... passed to arithmetic mean.
-#'
-#' @return A data.frame object.
-#' @export
-#' @method mean abf
-#'
-mean.abf <- function(abf, intv = NULL, ret.df = TRUE, desc_colnames = TRUE, na.rm = TRUE, ...) {
-
-  if (is.null(intv)) {
-    intv <- Intv(1L, nPts(abf))
-  }
-
-  nch <- nChan(abf)
-  nepi <- nEpi(abf)
-  ret <- matrix(NA, nrow = nepi, ncol = nch)
-  mask <- MaskIntv(intv)
-  for (i in seq_len(nch))
-    for (j in GetAvailEpisodes(abf)) {
-      ret[j, i] <- mean(abf[mask, j, i], na.rm = na.rm, ...)
-    }
-  if (desc_colnames) {
-    colnames(ret) <- GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf))
-  } else {
-    colnames(ret) <- GetChannelName(abf)
-  }
-
-  if (nepi > 1L) {
-    rownames(ret) <- paste0("epi", seq_len(nepi))
-  }
-
-  if (ret.df) {
-    ret <- as.data.frame(ret)
-  }
-
-  return(ret)
-}
-
 #' Calculate mean values of multiple abf objects
 #'
 #' @param abf_list a list of abf objects.
@@ -260,7 +214,7 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
       intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
     }
   } else if (!AssertLength(intv_list, abf_list)) {
-    err_assert_len("intv_list", "abf_list")
+    err_assert_len(intv_list, abf_list)
   }
   channel <- FirstElement(channel)
   for (tmp in abf_list) {
@@ -314,4 +268,63 @@ MultiMean_Voltage <- function(abf_list, intv_list, ret.df = TRUE, na.rm =TRUE) {
   channel <- GetFirstVoltageChan(abf_list[[1]])
 
   return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
+}
+
+
+#' Calculate mean values of an abf object.
+#'
+#' Returns a data.frame object containing episodic mean values of each channel.
+#'
+#' @param abf an abf object.
+#' @param intv OPTIONAL, an interval to mean over.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
+#' @param desc_colnames whether to use descriptive colnames, set to FALSE to use original channel names.
+#' @param na.rm whether to remove NA values.
+#' @param ... passed to arithmetic mean.
+#'
+#' @return A data.frame object.
+#' @export
+#' @method mean abf
+#'
+mean.abf <- function(abf, intv = NULL, ret.df = TRUE, desc_colnames = TRUE, na.rm = TRUE, ...) {
+
+  if (is.null(intv)) {
+    intv <- Intv(1L, nPts(abf))
+  }
+
+  nch <- nChan(abf)
+  nepi <- nEpi(abf)
+  ret <- matrix(NA, nrow = nepi, ncol = nch)
+  mask <- MaskIntv(intv)
+  for (i in seq_len(nch))
+    for (j in GetAvailEpisodes(abf)) {
+      ret[j, i] <- mean(abf[mask, j, i], na.rm = na.rm, ...)
+    }
+  if (desc_colnames) {
+    colnames(ret) <- GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf))
+  } else {
+    colnames(ret) <- GetChannelName(abf)
+  }
+
+  if (nepi > 1L) {
+    rownames(ret) <- paste0("epi", seq_len(nepi))
+  }
+
+  if (ret.df) {
+    ret <- as.data.frame(ret)
+  }
+
+  return(ret)
+}
+
+meanabf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, ...) {
+
+  if (use_chan_name) {
+    chan_id_func <- GetChannelName
+  } else {
+    chan_id_func <- DefaultChanLabel
+  }
+
+  f <- WrapMappingFunc(mean, abf_id_func = NULL, epi_id_func = NULL,
+                       chan_id_func = chan_id_func)
 }

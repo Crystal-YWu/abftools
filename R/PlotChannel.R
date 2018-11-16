@@ -39,7 +39,7 @@ PlotChannel <- function(abf, channel = 1L, intv = NULL, cursor = NULL,
     if (length(title) > 1L) {
       same_title = FALSE
       if (!AssertLength(title, channel)) {
-        err_assert_len("title", "channel")
+        err_assert_len(title, channel)
       }
     }
 

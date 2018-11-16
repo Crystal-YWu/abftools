@@ -38,7 +38,7 @@ SetTitle <- function(abf, title) {
     }))
   } else if (IsAbfList(abf)) {
     if (!AssertLength(title, abf, explicit = 1L)) {
-      err_assert_len("title", "abf")
+      err_assert_len(title, abf)
     }
     if (length(title) == 1L) {
       eval.parent(substitute({

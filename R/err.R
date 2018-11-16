@@ -130,7 +130,9 @@ err_internal_bug <- function(additional) {
 
 err_assert_len <- function(var, to_match) {
 
-  msg <- sprintf("Length of %s does not match %s.", var, to_match)
+  var_name <- as.character(substitute(var))
+  match_name <- as.character(substitute(to_match))
+  msg <- sprintf("Length of %s does not match %s.", var_name, match_name)
 
   err(msg)
 }
@@ -152,6 +154,21 @@ err_channel <- function() {
 err_arrange <- function(arr) {
 
   msg <- sprintf("Unknown arrangement %s.", as.character(arr))
+
+  err(msg)
+}
+
+err_not_func <- function(x) {
+
+  xname <- as.character(substitute(x))
+  msg <- sprintf("%s is not a function.", xname)
+
+  err(msg)
+}
+
+err_chan_id <- function() {
+
+  msg <- "Inconsistent channel identifiers."
 
   err(msg)
 }
