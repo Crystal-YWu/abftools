@@ -65,12 +65,12 @@ CollectCh <- function(abf, intv = NULL, curs = NULL, channel, colour, time_unit,
     intv <- NULL
   }
   if (!is.null(intv)) {
-    intv <- TickToTime(abf, time_unit, intv)
-    p <- p + geom_vline(xintercept = intv[1:2], linetype = "dashed")
+    intv_tu <- TickToTime(abf, time_unit, intv)
+    p <- p + geom_vline(xintercept = intv_tu[1:2], linetype = "dashed")
   }
   if (!is.null(curs)) {
-    curs <- TickToTime(abf, time_unit, curs)
-    p <- p + geom_vline(xintercept = curs, linetype = "dashed")
+    curs_tu <- TickToTime(abf, time_unit, curs)
+    p <- p + geom_vline(xintercept = curs_tu, linetype = "dashed")
   }
 
   if (auto_zoom) {
