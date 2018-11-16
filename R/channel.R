@@ -1,6 +1,22 @@
 GetFirstVoltageChan <- function(abf) match("Voltage", GetChannelDesc(abf))
 GetFirstCurrentChan <- function(abf) match("Current", GetChannelDesc(abf))
 
+#' Return all channels of an abf object.
+#'
+#' @param abf an abf object.
+#'
+#' @return a vector of channel ids.
+#' @export
+#'
+GetAllChannels <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
+  return(seq_len(nChan(abf)))
+}
+
 CheckChannelDim <- function(abf, channel_data) {
 
   d1 <- dim(abf)

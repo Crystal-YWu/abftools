@@ -99,3 +99,38 @@ CropValue <- function(abf, channel, max_value, min_value) {
 
   return(abf)
 }
+
+#' Get default channel label for every channel of an abf object.
+#'
+#' @param abf an abf object
+#'
+#' @return a vector of characters.
+#' @export
+#'
+DefaultChanLabel <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
+  return(GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf)))
+}
+
+#' Get default label for every episode of an abf object
+#'
+#' @param abf an abf object
+#'
+#' @return a vector of characters.
+#' @export
+#'
+DefaultEpiLabel <- function(abf) {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
+  nep <- nEpi(abf)
+  ret <- paste0("epi", seq_len(nep))
+
+  return(ret)
+}
