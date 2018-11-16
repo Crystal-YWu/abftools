@@ -103,6 +103,19 @@ ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
   return(y)
 }
 
+ExpandList <- function(x, ref) {
+
+  if (is.list(x)) {
+    if (!AssertLength(x, ref)) {
+      return(NULL)
+    }
+  } else {
+    x <- rep(list(x), length(ref))
+  }
+
+  return(x)
+}
+
 abf_list_copy_paste_place_holder <- function(abf) {
 
   if (IsAbf(abf)) {

@@ -273,51 +273,20 @@ MultiMean_Voltage <- function(abf_list, intv_list, ret.df = TRUE, na.rm =TRUE) {
 
 #' Calculate mean values of an abf object.
 #'
-#' Returns a data.frame object containing episodic mean values of each channel.
+#' Returns a matrix/data.frame containing episodic mean values of each channel.
 #'
 #' @param abf an abf object.
 #' @param intv OPTIONAL, an interval to mean over.
 #' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
-#' @param desc_colnames whether to use descriptive colnames, set to FALSE to use original channel names.
+#' @param use_chan_name whether to use channel names as colnames, set to TRUE to use descriptive names instead.
 #' @param na.rm whether to remove NA values.
 #' @param ... passed to arithmetic mean.
 #'
-#' @return A data.frame object.
+#' @return A matrix/data.frame.
 #' @export
 #' @method mean abf
 #'
-mean.abf <- function(abf, intv = NULL, ret.df = TRUE, desc_colnames = TRUE, na.rm = TRUE, ...) {
-
-  if (is.null(intv)) {
-    intv <- Intv(1L, nPts(abf))
-  }
-
-  nch <- nChan(abf)
-  nepi <- nEpi(abf)
-  ret <- matrix(NA, nrow = nepi, ncol = nch)
-  mask <- MaskIntv(intv)
-  for (i in seq_len(nch))
-    for (j in GetAvailEpisodes(abf)) {
-      ret[j, i] <- mean(abf[mask, j, i], na.rm = na.rm, ...)
-    }
-  if (desc_colnames) {
-    colnames(ret) <- GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf))
-  } else {
-    colnames(ret) <- GetChannelName(abf)
-  }
-
-  if (nepi > 1L) {
-    rownames(ret) <- paste0("epi", seq_len(nepi))
-  }
-
-  if (ret.df) {
-    ret <- as.data.frame(ret)
-  }
-
-  return(ret)
-}
-
-meanabf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, ...) {
+mean.abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.rm = TRUE, ...) {
 
   if (use_chan_name) {
     chan_id_func <- GetChannelName
@@ -326,5 +295,81 @@ meanabf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, ...
   }
 
   f <- WrapMappingFunc(mean, abf_id_func = NULL, epi_id_func = NULL,
-                       chan_id_func = chan_id_func)
+                       chan_id_func = chan_id_func, na.rm = na.rm, ...)
+  ret <- f(abf, intv)
+  rownames(ret) <- DefaultEpiLabel(abf)
+
+  if (ret.df) {
+    ret <- as.data.frame(ret)
+  }
+
+  return(ret)
 }
+
+#' Calculate standard deviation of an abf object.
+#'
+#' Returns a matrix/data.frame containing episodic sd of each channel.
+#'
+#' @param abf an abf object.
+#' @param intv OPTIONAL, an interval to calculate.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
+#' @param use_chan_name whether to use channel names as colnames, set to TRUE to use descriptive names instead.
+#' @param na.rm whether to remove NA values.
+#'
+#' @return A matrix/data.frame.
+#' @export
+#'
+sd_abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.rm = TRUE) {
+
+  if (use_chan_name) {
+    chan_id_func <- GetChannelName
+  } else {
+    chan_id_func <- DefaultChanLabel
+  }
+
+  f <- WrapMappingFunc(stats::sd, abf_id_func = NULL, epi_id_func = NULL,
+                       chan_id_func = chan_id_func, na.rm = na.rm)
+  ret <- f(abf, intv)
+  rownames(ret) <- DefaultEpiLabel(abf)
+
+  if (ret.df) {
+    ret <- as.data.frame(ret)
+  }
+
+  return(ret)
+}
+
+sem_func <- function(x, na.rm) stats::sd(x, na.rm) / sqrt(length(x))
+#' Calculate standard error of an abf object.
+#'
+#' Returns a matrix/data.frame containing episodic SEM of each channel.
+#'
+#' @param abf an abf object.
+#' @param intv OPTIONAL, an interval to calculate.
+#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
+#' @param use_chan_name whether to use channel names as colnames, set to TRUE to use descriptive names instead.
+#' @param na.rm whether to remove NA values.
+#'
+#' @return A matrix/data.frame.
+#' @export
+#'
+sem_abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.rm = TRUE) {
+
+  if (use_chan_name) {
+    chan_id_func <- GetChannelName
+  } else {
+    chan_id_func <- DefaultChanLabel
+  }
+
+  f <- WrapMappingFunc(sem_func, abf_id_func = NULL, epi_id_func = NULL,
+                       chan_id_func = chan_id_func, na.rm = na.rm)
+  ret <- f(abf, intv)
+  rownames(ret) <- DefaultEpiLabel(abf)
+
+  if (ret.df) {
+    ret <- as.data.frame(ret)
+  }
+
+  return(ret)
+}
+

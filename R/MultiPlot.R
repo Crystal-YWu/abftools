@@ -94,22 +94,14 @@ MultiPlotChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
       err_channel()
     }
   }
-  #check intv and cursor
-  if (is.list(intv)) {
-    if (!AssertLength(intv, abf_list)) {
-      err_assert_len(intv, abf_list)
-    }
-  } else {
-    #convert intv to a list of intv with same length of abf_list
-    intv <- rep(list(intv), length(abf_list))
+
+  intv <- ExpandList(intv, abf_list)
+  if (is.null(intv)) {
+    err_assert_len(intv, abf_list)
   }
-  if (is.list(cursor)) {
-    if (!AssertLength(cursor, abf_list)) {
-      err_assert_len(cursor, abf_list)
-    }
-  } else {
-    #convert cursor to a list of cursor with same length of abf_list
-    cursor <- rep(list(cursor), length(abf_list))
+  cursor <- ExpandList(cursor, abf_list)
+  if (is.null(cursor)) {
+    err_assert_len(cursor, abf_list)
   }
 
   #generate proper subtitles
