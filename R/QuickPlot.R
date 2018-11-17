@@ -27,17 +27,23 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
 
   } else if (IsAbfList(abf)) {
 
-    melted <- MeltAbfMean(abf, pos)
+    current_channel <- GetFirstCurrentChan(abf[[1]])
+    voltage_channel <- GetFirstVoltageChan(abf[[1]])
+
+    melted <- MeltAbfChannel(abf, channel = c(voltage_channel, current_channel),
+                             intv = pos, epi_id_func = NULL)
 
     cname <- colnames(melted)
-    xcol <- as.name(FirstElement(cname[startsWith(cname, "Voltage")]))
-    ycol <- as.name(FirstElement(cname[startsWith(cname, "Current")]))
+    xcol <- as.name(cname[2L])
+    ycol <- as.name(cname[3L])
     p <- ggplot(melted, aes_string(x = xcol, y = ycol)) + theme_classic()
     if (colour) {
       p <- p + geom_line(aes_string(colour = "id"))
     } else {
       p <- p + geom_line(aes_string(group = "id"))
     }
+    p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
+      geom_hline(yintercept = 0, linetype = "dashed")
     #Get rid of ``
     p <- p + xlab(as.character(xcol)) + ylab(as.character(ycol))
 
