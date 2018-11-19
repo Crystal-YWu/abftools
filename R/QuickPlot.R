@@ -104,24 +104,50 @@ QuickPlotTrace <- function(abf, channelX, episodeX, channelY, episodeY, intv) {
 #' @param df_summary an IV summary table from IVSummary()
 #' @param err_bar_width width of the error bar
 #' @param title OPTIONAL, title of the plot
+#' @param id If multiple IV summaries are to plot, id of the legend.
 #'
 #' @return a ggplot object.
 #' @export
 #'
-QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL) {
+QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, id = "Buffer") {
 
-  colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent")
-  p <- ggplot(data = df_summary, mapping = aes(x = Voltage, y = Current, group = 1))
-  p <- p + geom_line()
-  p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMCurrent, ymax = Current + SEMCurrent), width = err_bar_width)
-  p <- p + geom_point()
-  p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
-    geom_hline(yintercept = 0, linetype = "dashed")
-  p <- p + theme_classic()
+  if (class(df_summary) == "data.frame") {
 
-  if (!is.null(title)) {
-    p <- p + ggtitle(title)
+    colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent")
+    p <- ggplot(data = df_summary, mapping = aes(x = Voltage, y = Current, group = 1))
+    p <- p + geom_line()
+    p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMCurrent, ymax = Current + SEMCurrent), width = err_bar_width)
+    p <- p + geom_point()
+    p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
+      geom_hline(yintercept = 0, linetype = "dashed")
+    p <- p + theme_classic()
+
+    if (!is.null(title)) {
+      p <- p + ggtitle(title)
+    }
+    return(p)
+
+  } else {
+    df_melted <- NULL
+    for (i in seq_along(df_summary)) {
+      df <- cbind(names(df_summary)[i], df_summary[[i]])
+      colnames(df)[1] <- "id"
+      df_melted <- rbind(df_melted, df)
+    }
+    colnames(df) <- c(as.character(id), "Voltage", "SEMV", "Current", "SEMC")
+    p <- ggplot(data = df, mapping = aes_string(x = "Voltage", y = "Current", color = id))
+    p <- p + geom_line()
+    p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMC, ymax = Current + SEMC), width = err_bar_width)
+    p <- p + geom_point()
+    p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
+      geom_hline(yintercept = 0, linetype = "dashed")
+    p <- p + theme_classic()
+
+    if (!is.null(title)) {
+      p <- p + ggtitle(title)
+    }
+    return(p)
   }
 
-  return(p)
 }
+
