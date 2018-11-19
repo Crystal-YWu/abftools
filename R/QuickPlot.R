@@ -99,3 +99,29 @@ QuickPlotTrace <- function(abf, channelX, episodeX, channelY, episodeY, intv) {
 
   qplot(x = traceX, y = traceY, geom = "point") + theme_bw()
 }
+#' Quick plot an IV Summary table
+#'
+#' @param df_summary an IV summary table from IVSummary()
+#' @param err_bar_width width of the error bar
+#' @param title OPTIONAL, title of the plot
+#'
+#' @return a ggplot object.
+#' @export
+#'
+QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL) {
+
+  colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent")
+  p <- ggplot(data = df_summary, mapping = aes(x = Voltage, y = Current, group = 1))
+  p <- p + geom_line()
+  p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMCurrent, ymax = Current + SEMCurrent), width = err_bar_width)
+  p <- p + geom_point()
+  p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
+    geom_hline(yintercept = 0, linetype = "dashed")
+  p <- p + theme_classic()
+
+  if (!is.null(title)) {
+    p <- p + ggtitle(title)
+  }
+
+  return(p)
+}
