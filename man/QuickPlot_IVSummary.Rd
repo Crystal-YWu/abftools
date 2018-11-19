@@ -4,7 +4,8 @@
 \alias{QuickPlot_IVSummary}
 \title{Quick plot an IV Summary table}
 \usage{
-QuickPlot_IVSummary(df_summary, err_bar_width = 1.5, title = NULL)
+QuickPlot_IVSummary(df_summary, err_bar_width = 1.5, title = NULL,
+  id = "Buffer")
 }
 \arguments{
 \item{df_summary}{an IV summary table from IVSummary()}
@@ -12,6 +13,8 @@ QuickPlot_IVSummary(df_summary, err_bar_width = 1.5, title = NULL)
 \item{err_bar_width}{width of the error bar}
 
 \item{title}{OPTIONAL, title of the plot}
+
+\item{id}{If multiple IV summaries are to plot, id of the legend.}
 }
 \value{
 a ggplot object.
