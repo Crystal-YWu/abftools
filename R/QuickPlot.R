@@ -25,6 +25,8 @@ QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL) {
     }
 
     p <- qplot(x = voltage, y = current, geom = "line") + theme_classic()
+    p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
+      geom_hline(yintercept = 0, linetype = "dashed")
     if (!is.null(title)) {
       p <- p + ggtitle(title)
     }
