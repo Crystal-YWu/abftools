@@ -148,6 +148,7 @@ QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, i
     if (!is.null(title)) {
       p <- p + ggtitle(title)
     }
+
     return(p)
   }
 
