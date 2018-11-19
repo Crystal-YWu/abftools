@@ -25,6 +25,7 @@ OverlapEpisodicIntv <- function(episodic_intv, episodes, npts) {
 
 BinSearchIntv <- function(channel_data, intv, min_intv, f) {
 
+
   mask <- MaskIntv(intv)
   ret <- list()
   ret$score <- matrixStats::colMads(channel_data[mask, ])
@@ -39,10 +40,14 @@ BinSearchIntv <- function(channel_data, intv, min_intv, f) {
   intv_r <- c(mid_idx, intv[2], intv[2] - mid_idx + 1L)
 
   ret_r <- BinSearchIntv(channel_data, intv_r, min_intv , f)
+  ret_l <- BinSearchIntv(channel_data, intv_l, min_intv, f)
   if (f(ret_r$score, ret$score)) {
-    return(ret_r)
+    if (f(ret_l$score, ret_r$score)) {
+      return(ret_l)
+    } else {
+      return(ret_r)
+    }
   } else {
-    ret_l <- BinSearchIntv(channel_data, intv_l, min_intv, f)
     if (f(ret_l$score, ret$score)) {
       return(ret_l)
     } else {
@@ -58,5 +63,10 @@ score_worst_half <- function(s1, best_s) {
   o <- order(best_s, decreasing = TRUE)
   mask <- o[seq_len(n)]
 
-  return(all(s1[mask] < best_s[mask]))
+  return(all(s1[mask] <= best_s[mask]))
+}
+
+score_all <- function(s1, best_s) {
+
+  return(all(s1 <= best_s))
 }

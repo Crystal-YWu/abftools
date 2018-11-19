@@ -3,11 +3,12 @@
 #' @param abf an abf or a list of abf objects.
 #' @param pos an interval/cursor or a list of intervals/cursors.
 #' @param colour whether to plot in coloured mode.
+#' @param title OPTIONAL, title for the plot.
 #'
 #' @return a ggplot object.
 #' @export
 #'
-QuickPlotIV <- function(abf, pos, colour = FALSE) {
+QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL) {
 
   if (IsAbf(abf)) {
 
@@ -23,7 +24,12 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
       voltage <- colMeans(abf[[voltage_channel]][mask, ])
     }
 
-    return(qplot(x = voltage, y = current, geom = "line") + theme_classic())
+    p <- qplot(x = voltage, y = current, geom = "line") + theme_classic()
+    if (!is.null(title)) {
+      p <- p + ggtitle(title)
+    }
+
+    return(p)
 
   } else if (IsAbfList(abf)) {
 
@@ -46,6 +52,10 @@ QuickPlotIV <- function(abf, pos, colour = FALSE) {
       geom_hline(yintercept = 0, linetype = "dashed")
     #Get rid of ``
     p <- p + xlab(as.character(xcol)) + ylab(as.character(ycol))
+
+    if (!is.null(title)) {
+      p <- p + ggtitle(title)
+    }
 
     return(p)
 

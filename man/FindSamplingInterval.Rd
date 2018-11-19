@@ -6,7 +6,7 @@
 \usage{
 FindSamplingInterval(abf, current_channel, voltage_channel,
   min_sampling_size, max_sampling_size, allowed_voltage_delta,
-  epoch_name = "B", backward_search = TRUE)
+  epoch_name = "B", backward_search = TRUE, noisy_data = FALSE)
 }
 \arguments{
 \item{abf}{an abf object.}
@@ -24,6 +24,8 @@ FindSamplingInterval(abf, current_channel, voltage_channel,
 \item{epoch_name}{OPTIONAL, the epoch to search, defaults to B (second epoch).}
 
 \item{backward_search}{OPTIONAL, perform search along backward direction.}
+
+\item{noisy_data}{Set to TURE if data is noisy, may improve position of the predicted sampling interval.}
 }
 \value{
 a named vector of 3 numeric: interval start position, end position, length

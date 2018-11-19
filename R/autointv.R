@@ -87,6 +87,7 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 #' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage.
 #' @param epoch_name OPTIONAL, the epoch to search, defaults to B (second epoch).
 #' @param backward_search OPTIONAL, perform search along backward direction.
+#' @param noisy_data Set to TURE if data is noisy, may improve position of the predicted sampling interval.
 #'
 #' @return a named vector of 3 numeric: interval start position, end position, length
 #' @export
@@ -94,7 +95,7 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 FindSamplingInterval <- function(abf, current_channel, voltage_channel,
                                  min_sampling_size, max_sampling_size,
                                  allowed_voltage_delta, epoch_name = "B",
-                                 backward_search = TRUE) {
+                                 backward_search = TRUE, noisy_data = FALSE) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -183,9 +184,16 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
   best_score <- rep(Inf, length(episodes))
   best_intv <- c(0, 0, 0)
   channel_data <- abf[[current_channel]]
-  for (epi in itr) {
-    search_result <- BinSearchIntv(channel_data, ovlp[ , epi], min_sampling_size, score_worst_half)
-    if (score_worst_half(search_result$score, best_score)) {
+
+  if (noisy_data) {
+    ff <- score_worst_half
+  } else {
+    ff <- score_all
+  }
+
+  for (i in itr) {
+    search_result <- BinSearchIntv(channel_data, ovlp[ , i], min_sampling_size, ff)
+    if (ff(search_result$score, best_score)) {
       best_score <- search_result$score
       best_intv <- search_result$intv
     }

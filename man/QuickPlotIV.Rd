@@ -4,7 +4,7 @@
 \alias{QuickPlotIV}
 \title{Quick plot I-V curves at given position}
 \usage{
-QuickPlotIV(abf, pos, colour = FALSE)
+QuickPlotIV(abf, pos, colour = FALSE, title = NULL)
 }
 \arguments{
 \item{abf}{an abf or a list of abf objects.}
@@ -12,6 +12,8 @@ QuickPlotIV(abf, pos, colour = FALSE)
 \item{pos}{an interval/cursor or a list of intervals/cursors.}
 
 \item{colour}{whether to plot in coloured mode.}
+
+\item{title}{OPTIONAL, title for the plot.}
 }
 \value{
 a ggplot object.
