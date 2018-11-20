@@ -7,14 +7,16 @@
 #' @return an abf object.
 #' @export
 #'
-abf2_load <- function(filename, folder, abf_title) {
+abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
-  if (missing(abf_title) || is.null(abf_title)) {
-    abf_title <- as.character(filename)
+  if (is.null(abf_title)) {
+    #strip all leading path for abf_title
+    tmp <- strsplit(as.character(filename), "/", fixed = TRUE)[[1]]
+    abf_title <- tmp[length(tmp)]
   } else {
     abf_title <- as.character(abf_title)
   }
-  if (!missing(folder) && !is.null(folder)) {
+  if (!is.null(folder)) {
     folder <- AddSurfix(folder, "/")
     filename <- paste0(folder, filename)
   }
@@ -242,34 +244,24 @@ abf2_load <- function(filename, folder, abf_title) {
 #' @return a list of abf objects.
 #' @export
 #'
-abf2_loadlist <- function(filelist, folder, attach_ext = TRUE, titlelist) {
+abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist = NULL) {
 
   filelist <- as.character(unlist(filelist))
-  if (!missing(folder) && !is.null(folder)) {
-    folder <- AddSurfix(folder, "/")
-  } else {
-    folder <- NULL
+  if (!is.null(folder)) {
+    folder <- AddSurfix(as.character(folder), "/")
   }
-  if (attach_ext)
+  if (attach_ext) {
     filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
+  }
 
   abf_list <- lapply(filelist, function(x) abf2_load(x, folder, NULL))
+
   #set titles
-  if (!missing(titlelist) && !is.null(titlelist)) {
-    if (length(titlelist) == 1L) {
-      for (i in seq_along(abf_list)) {
-        attr(abf_list[[i]], "title") <- as.character(titlelist)
-      }
-    } else {
-      if (length(titlelist) != length(abf_list)) {
-        warning("abf2_loadlist: length of titlelist mismatches filelist, ignored.")
-      } else {
-        for (i in seq_along(abf_list)) {
-          attr(abf_list[[i]], "title") <- as.character(titlelist[[i]])
-        }
-      }
-    }
+  if (!is.null(titlelist)) {
+    titlelist <- as.character(unlist(titlelist))
+    SetTitle(abf_list, titlelist)
   }
+
 
   return(abf_list)
 }
