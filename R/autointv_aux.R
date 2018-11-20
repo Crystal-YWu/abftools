@@ -1,8 +1,13 @@
 allowed_delta_abs <- function(channel_data, delta) {
 
   d <- dim(channel_data)
-  ret <- array(data = abs(delta), dim = d)
 
+  episode <- d[2]
+  if (length(delta) != 1L && length(delta) != episode) {
+    err_assert_len(delta, episode)
+  }
+
+  ret <- matrix(data = abs(delta), nrow = d[1], ncol = d[2], byrow = TRUE)
   return(ret)
 }
 
@@ -36,8 +41,8 @@ BinSearchIntv <- function(channel_data, intv, min_intv, f) {
   }
 
   mid_idx <- (intv[1] + intv[2]) %/% 2L
-  intv_l <- c(intv[1], mid_idx, mid_idx - intv[1] + 1L)
-  intv_r <- c(mid_idx, intv[2], intv[2] - mid_idx + 1L)
+  intv_l <- Intv(intv[1], mid_idx)
+  intv_r <- Intv(mid_idx, intv[2])
 
   ret_r <- BinSearchIntv(channel_data, intv_r, min_intv , f)
   ret_l <- BinSearchIntv(channel_data, intv_l, min_intv, f)

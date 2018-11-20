@@ -11,7 +11,8 @@
 #' @return a list of intervals of which pass comparison.
 #' @export
 #'
-CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) {
+CmpWaveform <- function(abf, channel, epoch, delta, relative = FALSE,
+                        min_win = NULL, max_win = NULL) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -33,6 +34,8 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 
   episodes <- GetAvailEpisodes(abf)
   wf <- GetWaveform(abf, episodes)
+
+  delta <- unlist(delta)
   if (relative) {
     wf_allowed <- allowed_delta_rel(wf, delta)
   } else {
@@ -55,10 +58,10 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
       tmp[1, ] <- tmp[1, ] + intv[1] - 1L
       tmp[2, ] <- tmp[2, ] + intv[1] - 1L
       #filter length
-      if (!missing(min_win) && !is.null(min_win)) {
+      if (!is.null(min_win)) {
         tmp <- FilterMinIntervalSize(tmp, min_win)
       }
-      if (!missing(max_win) && !is.null(max_win)) {
+      if (!is.null(max_win)) {
         tmp <- FilterMaxIntervalSize(tmp, max_win)
       }
     }
@@ -85,16 +88,16 @@ CmpWaveform <- function(abf, channel, epoch, delta, relative, min_win, max_win) 
 #' @param min_sampling_size OPTIONAL, min size in points of a sampling interval.
 #' @param max_sampling_size OPTIONAL, max size in points of a sampling interval.
 #' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage.
-#' @param epoch_name OPTIONAL, the epoch to search, defaults to B (second epoch).
+#' @param epoch OPTIONAL, the epoch to search, defaults to B (second epoch).
 #' @param backward_search OPTIONAL, perform search along backward direction.
-#' @param noisy_data Set to TURE if data is noisy, may improve position of the predicted sampling interval.
+#' @param noisy_data OPTIONAL, set to TURE if data is noisy, may improve position of the predicted sampling interval.
 #'
 #' @return a named vector of 3 numeric: interval start position, end position, length
 #' @export
 #'
 FindSamplingInterval <- function(abf, current_channel, voltage_channel,
                                  min_sampling_size, max_sampling_size,
-                                 allowed_voltage_delta, epoch_name = "B",
+                                 allowed_voltage_delta, epoch = "B",
                                  backward_search = TRUE, noisy_data = FALSE) {
 
   if (!IsAbf(abf)) {
@@ -115,17 +118,25 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
     err_id_voltage_chan()
   }
 
-  epoch <- GetEpochId(epoch_name)
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
   if (!AssertEpoch(abf, epoch)) {
     err_epoch()
   }
 
-  #Default allowed voltage delta is 5% of max voltage setting
+  #Default allowed voltage delta is 5% of relative error
   meta <- get_meta(abf)
   if (missing(allowed_voltage_delta) || is.null(allowed_voltage_delta)) {
+
     v_settings <- meta$EpochPerDAC$fEpochInitLevel[epoch] +
       (seq_len(nEpi(abf)) - 1L) * meta$EpochPerDAC$fEpochLevelInc[epoch]
-    allowed_voltage_delta = max(abs(v_settings)) * 0.05
+    v_settings <- v_settings * 0.05
+    #workaround for zero v settings: set delta to mean.
+    idx_zero <- which(v_settings == 0)
+    v_settings[idx_zero] = mean(v_settings)
+
+    allowed_voltage_delta <- v_settings
   }
 
   #Default minimal sampling size is 10ms/10000us scan

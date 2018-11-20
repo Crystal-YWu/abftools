@@ -4,7 +4,8 @@
 \alias{CmpWaveform}
 \title{Compare epoch waveform setting to a channel data.}
 \usage{
-CmpWaveform(abf, channel, epoch, delta, relative, min_win, max_win)
+CmpWaveform(abf, channel, epoch, delta, relative = FALSE,
+  min_win = NULL, max_win = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
