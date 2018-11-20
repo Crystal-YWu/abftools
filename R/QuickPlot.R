@@ -4,66 +4,52 @@
 #' @param pos an interval/cursor or a list of intervals/cursors.
 #' @param colour whether to plot in coloured mode.
 #' @param title OPTIONAL, title for the plot.
+#' @param zero_intercept whether to add zero intercepts to the plot.
 #'
 #' @return a ggplot object.
 #' @export
 #'
-QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL) {
+QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL, zero_intercept = TRUE) {
+
+  if (!IsAbf(abf) && !IsAbfList(abf)) {
+    err_class_abf()
+  }
 
   if (IsAbf(abf)) {
-
     current_channel <- GetFirstCurrentChan(abf)
     voltage_channel <- GetFirstVoltageChan(abf)
-    if (length(pos) == 1) {
-      #a cursor
-      current <- abf[pos, , current_channel]
-      voltage <- abf[pos, , voltage_channel]
-    } else {
-      mask <- pos[1]:pos[2]
-      current <- colMeans(abf[[current_channel]][mask, ])
-      voltage <- colMeans(abf[[voltage_channel]][mask, ])
-    }
-
-    p <- qplot(x = voltage, y = current, geom = "line") + theme_classic()
-    p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
-      geom_hline(yintercept = 0, linetype = "dashed")
-    if (!is.null(title)) {
-      p <- p + ggtitle(title)
-    }
-
-    return(p)
-
-  } else if (IsAbfList(abf)) {
-
+  } else {
     current_channel <- GetFirstCurrentChan(abf[[1]])
     voltage_channel <- GetFirstVoltageChan(abf[[1]])
+  }
 
-    melted <- MeltAbfChannel(abf, channel = c(voltage_channel, current_channel),
-                             intv = pos, epi_id_func = NULL)
+  melted <- MeltAbfChannel(abf, channel = c(voltage_channel, current_channel),
+                           intv = pos, epi_id_func = NULL)
 
-    cname <- colnames(melted)
-    xcol <- as.name(cname[2L])
-    ycol <- as.name(cname[3L])
-    p <- ggplot(melted, aes_string(x = xcol, y = ycol)) + theme_classic()
-    if (colour) {
-      p <- p + geom_line(aes_string(colour = "id"))
-    } else {
-      p <- p + geom_line(aes_string(group = "id"))
-    }
+  cname <- colnames(melted)
+  xcol <- as.name(cname[2L])
+  ycol <- as.name(cname[3L])
+  p <- ggplot(melted, aes_string(x = xcol, y = ycol)) + theme_classic()
+  if (colour) {
+    p <- p + geom_line(aes_string(colour = "id"))
+  } else {
+    p <- p + geom_line(aes_string(group = "id"))
+  }
+
+  #Add zero intercepts
+  if (zero_intercept) {
     p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
       geom_hline(yintercept = 0, linetype = "dashed")
-    #Get rid of ``
-    p <- p + xlab(as.character(xcol)) + ylab(as.character(ycol))
-
-    if (!is.null(title)) {
-      p <- p + ggtitle(title)
-    }
-
-    return(p)
-
-  } else {
-    err_class_abf_list()
   }
+
+  #Get rid of ``
+  p <- p + xlab(as.character(xcol)) + ylab(as.character(ycol))
+
+  if (!is.null(title)) {
+    p <- p + ggtitle(title)
+  }
+
+  return(p)
 
 }
 
