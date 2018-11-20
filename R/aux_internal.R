@@ -1,4 +1,15 @@
-MaskIntv <- function(intv) intv[1]:intv[2]
+MaskIntv <- function(intv) {
+  #TODO: A good solution to distinguish intv and curs
+
+  if (length(intv) == 2L) {
+    return(intv[1]:intv[2])
+  }
+  if (length(intv) == 3L && (intv[2] - intv[1] + 1 == intv[3])) {
+    return(intv[1]:intv[2])
+  }
+
+  return(intv)
+}
 
 OvlpIntv <- function(intv1, intv2) {
 

@@ -38,7 +38,9 @@ Intv <- function(startPos, endPos, len) {
   }
   len <- endPos - startPos + 1L
 
-  return(c(startPos, endPos, len))
+  intv <- c(startPos, endPos, len)
+  names(intv) <- c("startPos", "endPos", "length")
+  return(intv)
 }
 
 #' Set intervals, by-ref behaviour
@@ -60,7 +62,7 @@ SetIntv <- function(intv, startPos, endPos) {
   }
 
   eval.parent(substitute({
-    intv <- c(startPos, endPos, endPos - startPos + 1L)
+    intv <- Intv(startPos, endPos)
   }))
 }
 

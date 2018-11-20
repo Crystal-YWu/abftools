@@ -212,6 +212,8 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
 
   if (best_intv[3] > max_sampling_size) {
     best_intv <- Intv(endPos = best_intv[2], len = max_sampling_size)
+  } else {
+    best_intv <- Intv(startPos = best_intv[1], endPos = best_intv[2])
   }
 
   return(best_intv)
