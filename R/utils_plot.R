@@ -74,7 +74,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
 #' such as sudden peak. Use with caution.
 #'
 #' @param abf an abf object.
-#' @param channel the channel to crop values
+#' @param channel the channel to crop values.
 #' @param max_value OPTIONAL, max allowed value
 #' @param min_value OPTIONAL, min allowed value
 #'
@@ -125,12 +125,16 @@ DefaultChanLabel <- function(abf) {
 #'
 DefaultEpiLabel <- function(abf) {
 
-  if (!IsAbf(abf)) {
+  if (IsAbf(abf)) {
+    nep <- nEpi(abf)
+  } else if (is.numeric(abf)) {
+    nep <- as.integer(abf)
+  } else {
     err_class_abf()
   }
 
-  nep <- nEpi(abf)
   ret <- paste0("epi", seq_len(nep))
 
   return(ret)
 }
+

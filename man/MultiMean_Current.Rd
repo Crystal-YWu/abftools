@@ -4,12 +4,13 @@
 \alias{MultiMean_Current}
 \title{Calculate mean currents of multiple abf objects}
 \usage{
-MultiMean_Current(abf_list, intv_list, ret.df = TRUE, na.rm = TRUE)
+MultiMean_Current(abf_list, intv_list = NULL, ret.df = TRUE,
+  na.rm = TRUE)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
 
-\item{intv_list}{a list of intervals.}
+\item{intv_list}{OPTIONAL, a list of intervals.}
 
 \item{ret.df}{whether to return a data.frame object, if set to FALSE a matrix is returned instead.}
 

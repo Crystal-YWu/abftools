@@ -2,9 +2,9 @@
 % Please edit documentation in R/episodic.R
 \name{MultiIntervalSems}
 \alias{MultiIntervalSems}
-\title{MultiIntervalSems calculates interval SEM of a list of abf objects}
+\title{MultiIntervalSems calculates interval SEM of a channel in a list of abf objects}
 \usage{
-MultiIntervalSems(abf_list, intv_list, channel = 1, na.rm = TRUE)
+MultiIntervalSems(abf_list, intv_list, channel = 1L, na.rm = TRUE)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
@@ -19,5 +19,5 @@ MultiIntervalSems(abf_list, intv_list, channel = 1, na.rm = TRUE)
 a vector of calculated values.
 }
 \description{
-MultiIntervalSems calculates interval SEM of a list of abf objects
+MultiIntervalSems calculates interval SEM of a channel in a list of abf objects
 }

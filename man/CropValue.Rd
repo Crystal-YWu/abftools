@@ -9,7 +9,7 @@ CropValue(abf, channel, max_value, min_value)
 \arguments{
 \item{abf}{an abf object.}
 
-\item{channel}{the channel to crop values}
+\item{channel}{the channel to crop values.}
 
 \item{max_value}{OPTIONAL, max allowed value}
 

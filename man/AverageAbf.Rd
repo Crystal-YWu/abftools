@@ -4,7 +4,7 @@
 \alias{AverageAbf}
 \title{Average a list of abf objects.}
 \usage{
-AverageAbf(abf_list, w)
+AverageAbf(abf_list, w = NULL)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}

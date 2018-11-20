@@ -56,7 +56,7 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 #' @return an averaged abf object, of which the protocol settings follow first element in abf_list.
 #' @export
 #'
-AverageAbf <- function(abf_list, w) {
+AverageAbf <- function(abf_list, w = NULL) {
 
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
@@ -208,12 +208,8 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
   }
+  intv_list <- ExpandList(intv_list, abf_list)
   if (is.null(intv_list)) {
-    intv_list = list()
-    for (i in seq_along(abf_list)) {
-      intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
-    }
-  } else if (!AssertLength(intv_list, abf_list)) {
     err_assert_len(intv_list, abf_list)
   }
   channel <- FirstElement(channel)
@@ -239,14 +235,14 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
 #' Calculate mean currents of multiple abf objects
 #'
 #' @param abf_list a list of abf objects.
-#' @param intv_list a list of intervals.
+#' @param intv_list OPTIONAL, a list of intervals.
 #' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
 #' @param na.rm wheter to remove na values..
 #'
 #' @return A data.frame object.
 #' @export
 #'
-MultiMean_Current <- function(abf_list, intv_list, ret.df = TRUE, na.rm = TRUE) {
+MultiMean_Current <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm = TRUE) {
 
   channel <- GetFirstCurrentChan(abf_list[[1]])
 
@@ -256,14 +252,14 @@ MultiMean_Current <- function(abf_list, intv_list, ret.df = TRUE, na.rm = TRUE) 
 #' Calculate mean voltages of multiple abf objects
 #'
 #' @param abf_list a list of abf objects.
-#' @param intv_list a list of intervals.
+#' @param intv_list OPTIONAL, a list of intervals.
 #' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
 #' @param na.rm wheter to remove na values.
 #'
 #' @return A data.frame object.
 #' @export
 #'
-MultiMean_Voltage <- function(abf_list, intv_list, ret.df = TRUE, na.rm =TRUE) {
+MultiMean_Voltage <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm =TRUE) {
 
   channel <- GetFirstVoltageChan(abf_list[[1]])
 
@@ -278,7 +274,7 @@ MultiMean_Voltage <- function(abf_list, intv_list, ret.df = TRUE, na.rm =TRUE) {
 #' @param abf an abf object.
 #' @param intv OPTIONAL, an interval to mean over.
 #' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
-#' @param use_chan_name whether to use channel names as colnames, set to TRUE to use descriptive names instead.
+#' @param use_chan_name whether to use channel names as colnames, set to FALSE to use descriptive names instead.
 #' @param na.rm whether to remove NA values.
 #' @param ... passed to arithmetic mean.
 #'
@@ -313,7 +309,7 @@ mean.abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na
 #' @param abf an abf object.
 #' @param intv OPTIONAL, an interval to calculate.
 #' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
-#' @param use_chan_name whether to use channel names as colnames, set to TRUE to use descriptive names instead.
+#' @param use_chan_name whether to use channel names as colnames, set to FALSE to use descriptive names instead.
 #' @param na.rm whether to remove NA values.
 #'
 #' @return A matrix/data.frame.
@@ -347,7 +343,7 @@ sem_func <- function(x, na.rm) stats::sd(x, na.rm) / sqrt(length(x))
 #' @param abf an abf object.
 #' @param intv OPTIONAL, an interval to calculate.
 #' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
-#' @param use_chan_name whether to use channel names as colnames, set to TRUE to use descriptive names instead.
+#' @param use_chan_name whether to use channel names as colnames, set to FALSE to use descriptive names instead.
 #' @param na.rm whether to remove NA values.
 #'
 #' @return A matrix/data.frame.

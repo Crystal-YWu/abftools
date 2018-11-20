@@ -2,7 +2,7 @@
 % Please edit documentation in R/episodic.R
 \name{MultiIntervalMeans}
 \alias{MultiIntervalMeans}
-\title{MultiIntervalMeans calculates interval means of a list of abf objects}
+\title{MultiIntervalMeans calculates interval means of a channel in a list of abf objects}
 \usage{
 MultiIntervalMeans(abf_list, intv_list, channel = 1L, na.rm = TRUE)
 }
@@ -19,5 +19,5 @@ MultiIntervalMeans(abf_list, intv_list, channel = 1L, na.rm = TRUE)
 a vector of calculated values.
 }
 \description{
-MultiIntervalMeans calculates interval means of a list of abf objects
+MultiIntervalMeans calculates interval means of a channel in a list of abf objects
 }

@@ -10,13 +10,22 @@ EpisodicInterval_f <- function(abf_list, intv_list, channel, f) {
     nepi <- max(nepi, nEpi(abf_list[[i]]))
   }
   m <- matrix(NA, nrow = n, ncol = nepi)
-  colnames(m) <- paste0("epi", seq_len(nepi))
+  colnames(m) <- DefaultEpiLabel(nepi)
+  rnames <- c()
+  for (i in seq_along(abf_list)) {
+    rnames[i] <- GetTitle(abf_list[[i]])
+  }
+  rownames(m) <- rnames
 
   for (i in seq_along(abf_list)) {
     if (any(is.na(intv_list[[i]]))) {
       next
     } else {
-      mask <- MaskIntv(intv_list[[i]])
+      if (is.null(intv_list[[i]])) {
+        mask <- seq_len(nEpi(abf_list[[i]]))
+      } else {
+        mask <- MaskIntv(intv_list[[i]])
+      }
       ret <- f(abf_list[[i]][mask, , channel])
       epi <- GetAvailEpisodes(abf_list[[i]])
       for (j in epi)

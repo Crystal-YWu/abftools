@@ -2,9 +2,9 @@
 % Please edit documentation in R/episodic.R
 \name{MultiIntervalSds}
 \alias{MultiIntervalSds}
-\title{MultiIntervalSds calculates interval standard deviations of a list of abf objects}
+\title{MultiIntervalSds calculates interval standard deviations of a channel in a list of abf objects}
 \usage{
-MultiIntervalSds(abf_list, intv_list, channel = 1, na.rm = TRUE)
+MultiIntervalSds(abf_list, intv_list, channel = 1L, na.rm = TRUE)
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
@@ -19,5 +19,5 @@ MultiIntervalSds(abf_list, intv_list, channel = 1, na.rm = TRUE)
 a vector of calculated values.
 }
 \description{
-MultiIntervalSds calculates interval standard deviations of a list of abf objects
+MultiIntervalSds calculates interval standard deviations of a channel in a list of abf objects
 }

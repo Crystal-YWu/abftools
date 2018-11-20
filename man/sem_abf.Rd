@@ -14,7 +14,7 @@ sem_abf(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE,
 
 \item{ret.df}{whether to return a data.frame object, if set to FALSE a matrix is returned instead.}
 
-\item{use_chan_name}{whether to use channel names as colnames, set to TRUE to use descriptive names instead.}
+\item{use_chan_name}{whether to use channel names as colnames, set to FALSE to use descriptive names instead.}
 
 \item{na.rm}{whether to remove NA values.}
 }
