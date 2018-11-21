@@ -1,47 +1,53 @@
-unpack_arg <- function(f, ...) {
+#' Packing arguments in function call
+#'
+#' This is a helper function that can be handy when mapping function calls to
+#' multiple data. It wraps a function f, which accepts multiple arguments, into
+#' a new function that accept a vector as its argument.
+#'
+#' @param f a function
+#' @param ... other arguments passed to f
+#'
+#' @return a function that accepts a vector argument
+#' @export
+#'
+#' @examples
+#' ivpair <- c(10, 50)
+#' resistance <- function(v, i) v / i
+#' f <- PackArgs(resistance)
+#' r1 <- resistance(ivpair[1], ivpair[2])
+#' r2 <- f(ivpair)
+#'
+PackArgs <- function(f, ...) {
 
   dots <- list(...)
-  unpacked <- function(vec) {
+  packed <- function(vec) {
     do.call(f, c(as.list(vec), dots))
   }
 
-  return(unpacked)
+  return(packed)
 }
 
-abfmap <- function(abf, f, along = 1L, intv = NULL, unpack_args = FALSE,
-                   drop_dim = FALSE) {
+#' Mapping function to an nd-array along specific axis.
+#'
+#' @param x an nd-array.
+#' @param f a function to map.
+#' @param along the axis to map the function to.
+#' @param pack_args whether to pack arguments for f.
+#' @param ... other argumetns passed to f.
+#'
+#' @return an array (dimension depending on returned dimension of f)
+#' @export
+#'
+mapnd <- function(x, f, along = 1L, pack_args = FALSE, ...) {
 
+  ndim <- seq_len(length(dim(x)))
+  margin <- ndim[-along]
 
-}
-
-map3d <- function(x, f, along = 1L) {
-
-  perm_in <- switch(along,
-                    c(1, 2, 3), #do not perm
-                    c(2, 1, 3),
-                    c(3, 1, 2))
-  perm_out <- switch(along,
-                     c(1, 2, 3), #do not perm
-                     c(2, 1, 3),
-                     c(3, 1, 2))
-
-  if (along == 1L) {
-    tmp <- x
+  if (pack_args) {
+    packed <- PackArgs(f, ...)
+    ret <- apply(x, margin, packed)
   } else {
-    tmp <- aperm(x, perm_in)
-  }
-  test <- f(tmp[, 1L, 1L])
-  n <- length(test)
-
-  itrs <- dim(tmp)
-  ret <- array(NA, dim = c(n, itrs[2], itrs[3]))
-  for (i in seq_len(itrs[3])) {
-    for (j in seq_len(itrs[2])) {
-      ret[, j, i] <- f(tmp[, j, i])
-    }
-  }
-  if (along != 1L) {
-    ret <- aperm(ret, perm_out)
+    ret <- apply(x, margin, f, ...)
   }
 
   return(ret)
@@ -97,10 +103,8 @@ WrapMappingFunc <- function(map_func, abf_id_func = NULL, epi_id_func = NULL,
     }
 
     #map
-    for (i in seq_len(nch))
-      for (j in GetAvailEpisodes(abf)) {
-        ret[j, i] <- map_func(abf[mask, j, channel[i]], ...)
-      }
+    ret <- mapnd(x = abf[mask, ,channel], f = map_func, along = 1L,
+                 pack_args = FALSE, ...)
 
     #additioinal cols and colnames
     ids <- NULL
@@ -144,3 +148,4 @@ wrap <- function(...) {
 
   WrapMappingFunc(...)
 }
+
