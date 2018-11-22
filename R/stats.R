@@ -291,13 +291,9 @@ mean.abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na
   }
 
   f <- WrapMappingFunc(mean, abf_id_func = NULL, epi_id_func = NULL,
-                       chan_id_func = chan_id_func, na.rm = na.rm, ...)
+                       chan_id_func = chan_id_func, ret.df = ret.df, na.rm = na.rm, ...)
   ret <- f(abf, intv)
   rownames(ret) <- DefaultEpiLabel(abf)
-
-  if (ret.df) {
-    ret <- as.data.frame(ret)
-  }
 
   return(ret)
 }
@@ -324,13 +320,9 @@ sd_abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.r
   }
 
   f <- WrapMappingFunc(stats::sd, abf_id_func = NULL, epi_id_func = NULL,
-                       chan_id_func = chan_id_func, na.rm = na.rm)
+                       chan_id_func = chan_id_func, ret.df = ret.df, na.rm = na.rm)
   ret <- f(abf, intv)
   rownames(ret) <- DefaultEpiLabel(abf)
-
-  if (ret.df) {
-    ret <- as.data.frame(ret)
-  }
 
   return(ret)
 }
@@ -358,13 +350,9 @@ sem_abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.
   }
 
   f <- WrapMappingFunc(sem_func, abf_id_func = NULL, epi_id_func = NULL,
-                       chan_id_func = chan_id_func, na.rm = na.rm)
+                       chan_id_func = chan_id_func, ret.df = ret.df, na.rm = na.rm)
   ret <- f(abf, intv)
   rownames(ret) <- DefaultEpiLabel(abf)
-
-  if (ret.df) {
-    ret <- as.data.frame(ret)
-  }
 
   return(ret)
 }

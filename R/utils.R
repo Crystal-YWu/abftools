@@ -126,8 +126,8 @@ abfapply <- function(abf_list, FUN, ..., channel = 1L, intv = NULL, gen_names = 
     err_assert_len(intv, abf_list)
   }
 
-  f <- WrapMappingFunc(FUN, abf_id_func = NULL, epi_id_func = NULL,
-                       chan_id_func = NULL, channel = channel, ...)
+  f <- WrapMappingFunc(FUN, channel = channel, abf_id_func = NULL, epi_id_func = NULL,
+                       chan_id_func = NULL, ...)
   ret <- NULL
   for (i in seq_along(abf_list)) {
     ret <- cbind(ret, f(abf_list[[i]], intv[[i]]))

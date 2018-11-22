@@ -172,3 +172,18 @@ err_chan_id <- function() {
 
   err(msg)
 }
+
+err_invalid_axis <- function(axis) {
+
+  msg <- sprintf("Invalid axis %s.", axis)
+
+  err(msg)
+}
+
+err_wrap_func_dim <- function(func) {
+
+  fname <- as.character(substitute(func))
+  msg <- sprintf("Returned value of %s have length > 1. Please use mapnd() instead.", fname)
+
+  err(msg)
+}

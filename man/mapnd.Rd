@@ -4,14 +4,16 @@
 \alias{mapnd}
 \title{Mapping function to an nd-array along specific axis.}
 \usage{
-mapnd(x, f, along = 1L, pack_args = FALSE, ...)
+mapnd(x, f, along = 1L, MARGIN = NULL, pack_args = FALSE, ...)
 }
 \arguments{
 \item{x}{an nd-array.}
 
 \item{f}{a function to map.}
 
-\item{along}{the axis to map the function to.}
+\item{along}{the axis to map the function to (dims to collapse). Ignored if MARGIN is given}
+
+\item{MARGIN}{OPTIONAL, the dimensions to apply f over (dims to preserve).}
 
 \item{pack_args}{whether to pack arguments for f.}
 

@@ -66,20 +66,6 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
     err_assert_len(intv, abf)
   }
 
-  #check functions
-  if (!is.function(map_func)) {
-    err_not_func(map_func)
-  }
-  if (!is.null(abf_id_func) && !is.function(abf_id_func)) {
-    err_not_func(abf_id_func)
-  }
-  if (!is.null(epi_id_func) && !is.function(epi_id_func)) {
-    err_not_func(epi_id_func)
-  }
-  if (!is.null(chan_id_func) && !is.function(chan_id_func)) {
-    err_not_func(chan_id_func)
-  }
-
   #check channel ids
   channel_id <- chan_id_func(abf[[1]])[channel]
   for (tmp in abf) {
@@ -89,8 +75,9 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
     }
   }
 
-  f <- WrapMappingFunc(map_func, abf_id_func, epi_id_func, chan_id_func,
-                       channel, ...)
+  f <- WrapMappingFunc(map_func, channel = channel, abf_id_func = abf_id_func,
+                       epi_id_func = epi_id_func, chan_id_func = chan_id_func,
+                       ret.df = TRUE, ...)
   melted <- NULL
   for (i in seq_along(abf)) {
     tmp <- f(abf[[i]], intv[[i]])

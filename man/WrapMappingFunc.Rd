@@ -5,7 +5,7 @@
 \title{Wrap a mapping function to batch process abf channel data.}
 \usage{
 WrapMappingFunc(map_func, abf_id_func = NULL, epi_id_func = NULL,
-  chan_id_func = DefaultChanLabel, channel, ...)
+  chan_id_func = DefaultChanLabel, ret.df = TRUE, channel, ...)
 }
 \arguments{
 \item{map_func}{a mapping function to process abf channel data, such as mean, sum etc.}
@@ -15,6 +15,8 @@ WrapMappingFunc(map_func, abf_id_func = NULL, epi_id_func = NULL,
 \item{epi_id_func}{OPTIONAL, a function accepts an abf object and returns a vector of identifiers of all episodes.}
 
 \item{chan_id_func}{OPTIONAL, a function accepts an abf object and returns a vectors of identifiers of all channels.}
+
+\item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE}
 
 \item{channel}{OPTIONAL, a channel/channels to process.}
 
