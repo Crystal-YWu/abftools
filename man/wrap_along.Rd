@@ -4,7 +4,8 @@
 \alias{wrap_along}
 \title{Convenient alias of WrapMappingFuncAlong()}
 \usage{
-wrap_along(...)
+wrap_along(..., abf_id_func = NULL, epi_id_func = DefaultEpiLabel,
+  chan_id_func = DefaultChanLabel, time_unit = "ms", ret.df = TRUE)
 }
 \arguments{
 \item{...}{See WrapMappingFuncAlong for more details.}

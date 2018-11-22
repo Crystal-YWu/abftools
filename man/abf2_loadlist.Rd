@@ -8,7 +8,7 @@ abf2_loadlist(filelist, folder = NULL, attach_ext = TRUE,
   titlelist = NULL)
 }
 \arguments{
-\item{filelist}{a list of file name.}
+\item{filelist}{a list of file name or a data.frame like object with a column named FileName/filename.}
 
 \item{folder}{OPTIONAL, the path to the folder of the files, if filelist contains full path, leave this to empty.}
 

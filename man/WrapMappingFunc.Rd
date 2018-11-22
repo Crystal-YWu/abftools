@@ -4,11 +4,14 @@
 \alias{WrapMappingFunc}
 \title{Wrap a mapping function to batch process abf channel data.}
 \usage{
-WrapMappingFunc(map_func, abf_id_func = NULL, epi_id_func = NULL,
-  chan_id_func = DefaultChanLabel, ret.df = TRUE, channel, ...)
+WrapMappingFunc(map_func, channel, abf_id_func = NULL,
+  epi_id_func = NULL, chan_id_func = DefaultChanLabel, ret.df = TRUE,
+  ...)
 }
 \arguments{
 \item{map_func}{a mapping function to process abf channel data, such as mean, sum etc.}
+
+\item{channel}{OPTIONAL, a channel/channels to process.}
 
 \item{abf_id_func}{OPTIONAL, a function accepts an abf object and returns an identifier of the objects.}
 
@@ -17,8 +20,6 @@ WrapMappingFunc(map_func, abf_id_func = NULL, epi_id_func = NULL,
 \item{chan_id_func}{OPTIONAL, a function accepts an abf object and returns a vectors of identifiers of all channels.}
 
 \item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE}
-
-\item{channel}{OPTIONAL, a channel/channels to process.}
 
 \item{...}{further arguments passed to map_func}
 }

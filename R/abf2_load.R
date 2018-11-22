@@ -236,7 +236,7 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
 #' abf2_loadlist
 #'
-#' @param filelist a list of file name.
+#' @param filelist a list of file name or a data.frame like object with a column named FileName/filename.
 #' @param folder OPTIONAL, the path to the folder of the files, if filelist contains full path, leave this to empty.
 #' @param attach_ext automatically add ".abf" extension to filelist if not present.
 #' @param titlelist OPTIONAL, a list of titles, a single title to be assigned to all loaded files.
@@ -246,13 +246,22 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 #'
 abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist = NULL) {
 
-  filelist <- as.character(unlist(filelist))
-  if (!is.null(folder)) {
-    folder <- AddSurfix(as.character(folder), "/")
+  if ("FileName" %in% names(filelist)) {
+    tmp <- as.data.frame(filelist)
+    filelist <- as.character(unlist(tmp$FileName))
+  } else if ("filename" %in% names(filelist)) {
+    tmp <- as.data.frame(filelist)
+    filelist <- as.character(unlist(tmp$filename))
+  } else{
+    filelist <- as.character(unlist(filelist))
+    if (!is.null(folder)) {
+      folder <- AddSurfix(as.character(folder), "/")
+    }
+    if (attach_ext) {
+      filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
+    }
   }
-  if (attach_ext) {
-    filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
-  }
+
 
   abf_list <- lapply(filelist, function(x) abf2_load(x, folder, NULL))
 
