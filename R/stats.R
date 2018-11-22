@@ -145,6 +145,9 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
     }
   }
 
+  old_samp_intv <- GetSamplingIntv(abf)
+  new_samp_intv <- old_samp_intv * sampling_ratio
+
   #copy meta
   attr(data, "class") <- "abf"
   attr(data, "title") <- GetTitle(abf)
@@ -152,11 +155,12 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   attr(data, "ChannelName") <- GetChannelName(abf)
   attr(data, "ChannelUnit") <- GetChannelUnit(abf)
   attr(data, "ChannelDesc") <- GetChannelDesc(abf)
-  attr(data, "SamplingInterval") <- GetSamplingIntv(abf)
+  attr(data, "SamplingInterval") <- new_samp_intv
   attr(data, "EpiAvail") <- attr(abf, "EpiAvail")
 
   #alter meta
   meta <- get_meta(abf)
+  meta$Protocol$fADCSequenceInterval <- new_samp_intv
   meta$Protocol$lNumSamplesPerEpisode <- npts * nch
   attr(data, "meta") <- meta
 
