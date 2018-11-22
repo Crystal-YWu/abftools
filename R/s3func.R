@@ -38,9 +38,9 @@ print.abf <- function(x, ...) {
 
   channel <- FirstElement(channel)
 
-  d <- dim(x)
-  if (channel > d[3])
-    stop(paste0("Extract channel: channel ", channel, " not available."))
+  if (!AssertChannel(x, channel)) {
+    err_channel()
+  }
 
   epi <- GetAvailEpisodes(x)
   #in case of only one episode
@@ -56,7 +56,8 @@ print.abf <- function(x, ...) {
     #2d matrix
     df <- x[, epi, channel]
   }
-  colnames(df) <- paste0("epi", epi)
+  epi_names <- DefaultEpiLabel(x)
+  colnames(df) <- epi_names[epi]
 
   return(df)
 }
