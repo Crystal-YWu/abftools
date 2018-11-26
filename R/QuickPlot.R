@@ -11,7 +11,7 @@
 #' @export
 #'
 QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL, legend_title = NULL,
-                        zero_intercept = FALSE, zero_axes = TRUE) {
+                        zero_intercept = TRUE, zero_axes = TRUE) {
 
   if (!IsAbf(abf) && !IsAbfList(abf)) {
     err_class_abf()
@@ -52,8 +52,8 @@ QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL, legend_title = N
       geom_hline(yintercept = 0, linetype = "dashed")
   }
   if (zero_axes) {
-    p <- p + ZeroAxes(melted[, 2], melted[, 3],
-                      labs[voltage_channel], labs[current_channel])
+    p <- p + ZeroAxes(xlimit = melted[, 2], ylimit = melted[, 3],
+                      xlabel = labs[voltage_channel], ylabel = labs[current_channel])
   }
 
   #Get rid of ``
@@ -112,7 +112,7 @@ QuickPlotTrace <- function(abf, channelX, episodeX, channelY, episodeY, intv) {
 #' @export
 #'
 QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, legend_title = NULL,
-                                zero_intercept = FALSE, zero_axes = TRUE) {
+                                zero_intercept = TRUE, zero_axes = TRUE) {
 
   if (class(df_summary) == "data.frame") {
 
