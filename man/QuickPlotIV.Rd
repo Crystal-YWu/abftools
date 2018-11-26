@@ -5,7 +5,7 @@
 \title{Quick plot I-V curves at given position}
 \usage{
 QuickPlotIV(abf, pos, colour = FALSE, title = NULL,
-  zero_intercept = TRUE)
+  zero_intercept = FALSE, zero_axes = TRUE)
 }
 \arguments{
 \item{abf}{an abf or a list of abf objects.}
@@ -17,6 +17,8 @@ QuickPlotIV(abf, pos, colour = FALSE, title = NULL,
 \item{title}{OPTIONAL, title for the plot.}
 
 \item{zero_intercept}{whether to add zero intercepts to the plot.}
+
+\item{zero_axes}{whether to plot axes at 0.}
 }
 \value{
 a ggplot object.
