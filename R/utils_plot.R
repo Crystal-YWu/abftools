@@ -138,3 +138,89 @@ DefaultEpiLabel <- function(abf) {
   return(ret)
 }
 
+
+#' Shift the axes of a ggplot object to 0
+#'
+#' @param xlimit limit of x values
+#' @param ylimit limit of y values
+#' @param xlabel label of x axis
+#' @param ylabel label of y axis
+#' @param xticks number of ticks of x axis
+#' @param yticks number of ticks of y axis
+#' @param textsize size of axis label size
+#'
+#' @return a list of ggplot object
+#' @export
+#'
+ZeroAxes <- function(xlimit, ylimit, xlabel, ylabel, xticks = 5, yticks = 5,
+                     textsize = 5) {
+
+  #remove xy axes
+  theme_axis <- theme(axis.title.x = element_blank(),
+                      axis.text.x = element_blank(),
+                      axis.line.x = element_blank(),
+                      axis.ticks.x = element_blank(),
+                      axis.title.y = element_blank(),
+                      axis.text.y = element_blank(),
+                      axis.line.y = element_blank(),
+                      axis.ticks.y = element_blank())
+
+
+
+  x_axis <- geom_hline(yintercept = 0)
+
+  #x_incr <- (max(xlimit) - min(xlimit)) / xticks
+  #y_incr <- (max(ylimit) - min(ylimit)) / yticks
+
+  x_tick <- pretty(c(min(xlimit), max(xlimit)), xticks)
+  x_tick <- x_tick[x_tick >= min(xlimit)]
+  x_tick <- x_tick[x_tick <= max(xlimit)]
+  y_tick <- pretty(c(min(ylimit), max(ylimit)), yticks)
+  y_tick <- y_tick[y_tick >= min(ylimit)]
+  y_tick <- y_tick[y_tick <= max(ylimit)]
+
+  xlabel_posx <- min(xlimit)# + x_incr
+  xlabel_posy <- 0
+  x_label <- annotate("text", x = xlabel_posx, y = xlabel_posy, label = xlabel, size = textsize,
+                      hjust = 0, vjust = -1.5)
+  #shape 3 hack
+  x_pts <- annotate("point", x = x_tick, y = rep(0, length(x_tick)), shape = 3)
+
+  ylabel_posx <- 0
+  ylabel_posy <- min(ylimit)# + y_incr
+  y_label <- annotate("text", x = ylabel_posx, y = ylabel_posy, label = ylabel, size = textsize,
+                      angle = 90, hjust = 0, vjust = -1.5)
+  #shape 3 hack
+  y_pts <- annotate("point", x = rep(0, length(y_tick)), y = y_tick, shape = 3)
+
+  x_tick_lab <- NULL
+  for (x in x_tick) {
+    if (x == 0) {
+      next
+    }
+    tmp <- annotate("text", x = x, y = 0, label = as.character(x),
+                    hjust = 0.5, vjust = 1.5)
+    x_tick_lab <- c(x_tick_lab, tmp)
+  }
+  y_tick_lab <- NULL
+  for (y in y_tick) {
+    if (y == 0) {
+      next
+    }
+    tmp <- annotate("text", x = 0, y = y, label = as.character(y),
+                    angle = 90, hjust = 0.5, vjust = 1.5)
+    y_tick_lab <- c(y_tick_lab, tmp)
+  }
+
+  y_axis <- geom_vline(xintercept = 0)
+
+  list(theme_axis,
+       x_axis,
+       y_axis,
+       x_label,
+       y_label,
+       x_pts,
+       y_pts,
+       x_tick_lab,
+       y_tick_lab)
+}
