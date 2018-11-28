@@ -116,10 +116,11 @@ QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, l
 
   if (class(df_summary) == "data.frame") {
 
-    colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent", "NSample")
+    colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent")
     p <- ggplot(data = df_summary, mapping = aes(x = Voltage, y = Current, group = 1))
     p <- p + geom_line()
-    p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMCurrent, ymax = Current + SEMCurrent), width = err_bar_width)
+    p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMCurrent, ymax = Current + SEMCurrent),
+                           width = err_bar_width)
     p <- p + geom_point()
     if (zero_intercept) {
       p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
@@ -146,11 +147,12 @@ QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, l
       colnames(df)[1] <- "id"
       df_melted <- rbind(df_melted, df)
     }
-    colnames(df_melted) <- c("id", "Voltage", "SEMV", "Current", "SEMC", "NSample")
+    colnames(df_melted) <- c("id", "Voltage", "SEMV", "Current", "SEMC")
 
     p <- ggplot(data = df_melted, mapping = aes_string(x = "Voltage", y = "Current", color = "id"))
     p <- p + geom_line()
-    p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMC, ymax = Current + SEMC), width = err_bar_width)
+    p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMC, ymax = Current + SEMC),
+                           width = err_bar_width)
     p <- p + geom_point()
     if (!zero_axes && zero_intercept) {
       p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
