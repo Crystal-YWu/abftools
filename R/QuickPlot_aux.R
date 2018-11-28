@@ -82,7 +82,7 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
                        ret.df = TRUE, ...)
   melted <- NULL
   for (i in seq_along(abf)) {
-    if (na.intv.rm && is.na(intv[[i]])) {
+    if (na.intv.rm && any(is.na(intv[[i]]))) {
       #exclude NA intv
       next
     }
