@@ -6,7 +6,7 @@
 \usage{
 MeltAbfChannel(abf, channel, intv = NULL, map_func = mean,
   abf_id_func = GetTitle, epi_id_func = DefaultEpiLabel,
-  chan_id_func = DefaultChanLabel, ...)
+  chan_id_func = DefaultChanLabel, na.intv.rm = TRUE, ...)
 }
 \arguments{
 \item{abf}{an abf/list of abf objects.}
@@ -22,6 +22,8 @@ MeltAbfChannel(abf, channel, intv = NULL, map_func = mean,
 \item{epi_id_func}{OPTIONAL, a function accepts an abf object and returns a vector of identifiers of all episodes.}
 
 \item{chan_id_func}{OPTIONAL, a function accepts an abf object and returns a vectors of identifiers of all channels.}
+
+\item{na.intv.rm}{whether to remove NA intervals passed.}
 
 \item{...}{further arguments passed to map_func.}
 }

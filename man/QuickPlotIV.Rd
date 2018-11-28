@@ -5,7 +5,7 @@
 \title{Quick plot I-V curves at given position}
 \usage{
 QuickPlotIV(abf, pos, colour = FALSE, title = NULL,
-  zero_intercept = FALSE, zero_axes = TRUE)
+  legend_title = NULL, zero_intercept = TRUE, zero_axes = TRUE)
 }
 \arguments{
 \item{abf}{an abf or a list of abf objects.}
