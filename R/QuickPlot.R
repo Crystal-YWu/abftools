@@ -116,7 +116,7 @@ QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, l
 
   if (class(df_summary) == "data.frame") {
 
-    colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent")
+    colnames(df_summary) <- c("Voltage", "SEMVoltage", "Current", "SEMCurrent", "NSample")
     p <- ggplot(data = df_summary, mapping = aes(x = Voltage, y = Current, group = 1))
     p <- p + geom_line()
     p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMCurrent, ymax = Current + SEMCurrent), width = err_bar_width)
@@ -146,7 +146,7 @@ QuickPlot_IVSummary <- function(df_summary, err_bar_width = 1.5, title = NULL, l
       colnames(df)[1] <- "id"
       df_melted <- rbind(df_melted, df)
     }
-    colnames(df_melted) <- c("id", "Voltage", "SEMV", "Current", "SEMC")
+    colnames(df_melted) <- c("id", "Voltage", "SEMV", "Current", "SEMC", "NSample")
 
     p <- ggplot(data = df_melted, mapping = aes_string(x = "Voltage", y = "Current", color = "id"))
     p <- p + geom_line()

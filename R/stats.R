@@ -43,8 +43,11 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
   sem_current_means <- colSems(current_means, na.rm = TRUE)
   sem_voltage_means <- colSems(voltage_means, na.rm = TRUE)
 
-  df <- data.frame(mean_voltage_means, sem_voltage_means, mean_current_means, sem_current_means)
-  colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current")
+  nsamples <- rep(length(abf_list), length(mean_voltage_means))
+
+  df <- data.frame(mean_voltage_means, sem_voltage_means, mean_current_means,
+                   sem_current_means, nsamples)
+  colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current", "Num Samples")
   return(df)
 }
 
