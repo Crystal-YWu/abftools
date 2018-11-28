@@ -32,6 +32,7 @@ MeltAbfMean <- function(abflist, intvlist) {
 #' @param abf_id_func OPTIONAL, a function accepts an abf object and returns an identifier of the objects.
 #' @param epi_id_func OPTIONAL, a function accepts an abf object and returns a vector of identifiers of all episodes.
 #' @param chan_id_func OPTIONAL, a function accepts an abf object and returns a vectors of identifiers of all channels.
+#' @param na.intv.rm whether to remove NA intervals passed.
 #' @param ... further arguments passed to map_func.
 #'
 #' @return a melted data frame
@@ -41,7 +42,8 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
                            map_func = mean,
                            abf_id_func = GetTitle,
                            epi_id_func = DefaultEpiLabel,
-                           chan_id_func = DefaultChanLabel, ...) {
+                           chan_id_func = DefaultChanLabel,
+                           na.intv.rm = TRUE, ...) {
 
   #convert abf, intv to lists and check lengths
   if (IsAbf(abf)) {
@@ -80,6 +82,10 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
                        ret.df = TRUE, ...)
   melted <- NULL
   for (i in seq_along(abf)) {
+    if (na.intv.rm && is.na(intv[[i]])) {
+      #exclude NA intv
+      next
+    }
     tmp <- f(abf[[i]], intv[[i]])
     melted <- rbind(melted, tmp)
   }
