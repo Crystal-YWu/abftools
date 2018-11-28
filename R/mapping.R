@@ -152,7 +152,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     }
 
     mask_time = integer()
-    if (is.null(intv)) {
+    if (is.null(intv) || is.na(intv)) {
       mask_time <- seq_len(nPts(abf))
     } else {
       mask_time <- MaskIntv(intv)
