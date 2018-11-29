@@ -246,23 +246,42 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 #'
 abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist = NULL) {
 
-  if ("FileName" %in% names(filelist)) {
-    tmp <- as.data.frame(filelist)
-    filelist <- as.character(unlist(tmp$FileName))
-  } else if ("filename" %in% names(filelist)) {
-    tmp <- as.data.frame(filelist)
-    filelist <- as.character(unlist(tmp$filename))
-  } else{
-    filelist <- as.character(unlist(filelist))
-    if (!is.null(folder)) {
-      folder <- AddSurfix(as.character(folder), "/")
+  names(filelist) <- tolower(names(filelist))
+
+  if (is.object(filelist)) {
+    #filename
+    if ("filename" %in% names(filelist)) {
+      extracted <- filelist$filename
+    } else
+    #filenames
+    if ("filenames" %in% names(filelist)) {
+      extracted <- filelist$filenames
+    } else
+    #file
+    if ("file" %in% names(filelist)) {
+      extracted <- filelist$file
+    } else
+    #files
+    if ("files" %in% names(filelist)) {
+      extracted <- filelist$files
+    } else {
+      #use first column directly
+      extracted <- filelist[[1]]
     }
-    if (attach_ext) {
-      filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
-    }
+  } else {
+    extracted <- filelist
   }
 
+  filelist <- as.character(unlist(extracted))
 
+  if (!is.null(folder)) {
+    folder <- AddSurfix(as.character(folder), "/")
+  }
+  if (attach_ext) {
+    filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
+  }
+
+  #load abf
   abf_list <- lapply(filelist, function(x) abf2_load(x, folder, NULL))
 
   #set titles
@@ -270,7 +289,6 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist 
     titlelist <- as.character(unlist(titlelist))
     SetTitle(abf_list, titlelist)
   }
-
 
   return(abf_list)
 }
