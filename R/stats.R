@@ -18,8 +18,11 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
     for (i in seq_along(abf_list)) {
       intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
     }
-  } else if (!AssertLength(intv_list, abf_list)) {
-    err_assert_len(intv_list, abf_list)
+  } else {
+    intv_list <- ExpandList(intv_list, abf_list)
+    if (is.null(intv_list)) {
+      err_assert_len(intv_list, abf_list)
+    }
   }
   #figure out current channel and voltage channel
   if (missing(current_channel) || is.null(current_channel)) {
