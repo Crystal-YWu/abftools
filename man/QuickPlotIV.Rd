@@ -5,7 +5,8 @@
 \title{Quick plot I-V curves at given position}
 \usage{
 QuickPlotIV(abf, pos, colour = FALSE, title = NULL,
-  legend_title = NULL, zero_intercept = TRUE, zero_axes = TRUE)
+  legend_title = NULL, zero_intercept = TRUE, zero_axes = TRUE,
+  line_size = 0.5)
 }
 \arguments{
 \item{abf}{an abf or a list of abf objects.}
@@ -16,9 +17,13 @@ QuickPlotIV(abf, pos, colour = FALSE, title = NULL,
 
 \item{title}{OPTIONAL, title for the plot.}
 
+\item{legend_title}{OPTIONAL, title of the legend.}
+
 \item{zero_intercept}{whether to add zero intercepts to the plot.}
 
 \item{zero_axes}{whether to plot axes at 0.}
+
+\item{line_size}{size of lines}
 }
 \value{
 a ggplot object.
