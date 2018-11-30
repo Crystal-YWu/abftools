@@ -43,12 +43,16 @@ print.abf <- function(x, ...) {
   }
 
   epi <- GetAvailEpisodes(x)
-  mx <- x[, epi, channel, drop = FALSE]
-
   epi_names <- DefaultEpiLabel(x)
+
+  npts <- nPts(x)
+  nepi <- length(epi)
+
+  mx <- x[, epi, channel]
+  dim(mx) <- c(npts, nepi)
   colnames(mx) <- epi_names[epi]
 
-  return(df)
+  return(mx)
 }
 AllEpisodesAvail <- function(abf) all(attr(abf, "EpiAvail"))
 
