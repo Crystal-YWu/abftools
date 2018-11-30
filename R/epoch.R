@@ -130,5 +130,7 @@ GetEpochIntervals <- function(abf, wf_dac_ch) {
 
   }
 
+  dimnames(win) <- list(c("startPos", "endPos", "length"), NULL, NULL)
+
   return(win)
 }

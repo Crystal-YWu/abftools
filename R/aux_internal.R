@@ -4,7 +4,7 @@ MaskIntv <- function(intv) {
   if (length(intv) == 2L) {
     return(intv[1]:intv[2])
   }
-  if (length(intv) == 3L && (intv[2] - intv[1] + 1 == intv[3])) {
+  if (length(intv) == 3L && (intv[2] - intv[1] + 1L == intv[3])) {
     return(intv[1]:intv[2])
   }
 
@@ -35,14 +35,14 @@ ShftIntv <- function(intv, pts) {
 LogiToIntv <- function(logi) {
 
   r <- rle(logi)
-  idx_end <- cumsum(r$lengths)
-  idx_start <- idx_end - r$lengths + 1
+  endPos <- cumsum(r$lengths)
+  startPos <- endPos - r$lengths + 1
   #exploit that logi is logical
-  idx_start <- idx_start[r$values]
-  idx_end <- idx_end[r$values]
-  win_length <- r$lengths[r$values]
+  startPos <- startPos[r$values]
+  endPos <- endPos[r$values]
+  length <- r$lengths[r$values]
 
-  win <- rbind(idx_start, idx_end, win_length)
+  win <- rbind(startPos, endPos, length)
   return(win)
 }
 
