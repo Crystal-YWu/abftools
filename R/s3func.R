@@ -43,21 +43,10 @@ print.abf <- function(x, ...) {
   }
 
   epi <- GetAvailEpisodes(x)
-  #in case of only one episode
-  if (length(epi) == 1) {
-    #1d vector
-    df <- x[, epi, channel]
-    #2d matrix
-    df <- matrix(df, ncol = 1)
-  } else if (AllEpisodesAvail(x)) {
-    #2d matrix
-    df <- x[, , channel]
-  } else {
-    #2d matrix
-    df <- x[, epi, channel]
-  }
+  mx <- x[, epi, channel, drop = FALSE]
+
   epi_names <- DefaultEpiLabel(x)
-  colnames(df) <- epi_names[epi]
+  colnames(mx) <- epi_names[epi]
 
   return(df)
 }
