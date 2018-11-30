@@ -159,30 +159,31 @@ QuickPlot_IVSummary <- function(df_summary, title = NULL, legend_title = NULL,
     }
     colnames(df_melted) <- c("id", "Voltage", "SEMV", "Current", "SEMC")
 
-    p <- ggplot(data = df_melted, mapping = aes(x = Voltage, y = Current, color = id))
+    p <- ggplot(data = df_melted, mapping = aes(x = Voltage, y = Current,
+                                                colour = id, shape = id))
     p <- p + geom_line(size = line_size)
-
     p <- p + geom_errorbar(mapping = aes(ymin = Current - SEMC, ymax = Current + SEMC),
                            size = err_bar_size, width = err_bar_width)
-
-    p <- p + geom_point(mapping = aes(shape = id), size = marker_size)
+    p <- p + geom_point(size = marker_size)
 
     if (!zero_axes && zero_intercept) {
       p <- p + geom_vline(xintercept = 0, linetype = "dashed") +
         geom_hline(yintercept = 0, linetype = "dashed")
     }
 
+    p <- p + theme_classic()
     if (is.null(legend_title)) {
       p <- p + theme(legend.title = element_blank())
     } else {
-      p <- p + labs(`colour` = as.character(legend_title))
+      p <- p + labs(colour = as.character(legend_title),
+                    shape = as.character(legend_title))
     }
 
     if (!is.null(title)) {
       p <- p + ggtitle(title)
     }
 
-    p <- p + theme_classic()
+
     if (zero_axes) {
       p <- p + ZeroAxes(xlimit = df_melted[, 2], ylimit = df_melted[, 4],
                         xlabel = "Voltage", ylabel = "Current")
