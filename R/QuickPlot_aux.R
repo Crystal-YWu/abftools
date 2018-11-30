@@ -69,11 +69,13 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
   }
 
   #check channel ids
-  channel_id <- chan_id_func(abf[[1]])[channel]
-  for (tmp in abf) {
-    tmp <- chan_id_func(tmp)[channel]
-    if (!all(channel_id == tmp)) {
-      err_chan_id()
+  if (is.function(chan_id_func)) {
+    channel_id <- chan_id_func(abf[[1]])[channel]
+    for (tmp in abf) {
+      tmp <- chan_id_func(tmp)[channel]
+      if (!all(channel_id == tmp)) {
+        err_chan_id()
+      }
     }
   }
 
