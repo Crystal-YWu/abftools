@@ -245,7 +245,7 @@ be easily row bound for plotting and consequent data processing.
 ```r
 
 channel_labels <- c("Voltage", "Current")
-f <- wrap(mean, epi_id_func = DefaultEpiLabel, chan_id_func = DefaultChanLabel,
+f <- wrap(mean, epi_id_func = DefaultEpiLabel, chan_id_func = channel_labels,
           #add an abf id column to identify each abf object
           abf_id_func = GetTitle)
 result <- lapply(abf_list, f)
