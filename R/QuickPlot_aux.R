@@ -1,26 +1,92 @@
-MeltAbfMean <- function(abflist, intvlist) {
+ParseDataFrameIV <- function(df) {
 
-  domean <- function(abf, intv) {
-    ret <- mean(abf, intv)
-    ret <- cbind(GetTitle(abf), ret)
-    colnames(ret)[1] <- "id"
+  dict <- list()
+  dict$Voltage <- "voltage"
+  dict$Current <- "current"
+  dict$SEMC <- c("semc", "sem c")
+  dict$SEMV <- c("semv", "sem v")
 
-    return(ret)
+  ExtractDataFrame(df, dict)
+}
+
+#' Extract from a data.frame
+#'
+#' Extract columns from a data.frame by matching colnames from a named list. See
+#' ParseDataFrameIV for example usage.
+#'
+#' @param df data.frame
+#' @param dict named list
+#' @param match_func a functio to match
+#' @param lower_case whether to lower cases of colnames
+#'
+#' @return a data.frame
+#' @keywords internal
+ExtractDataFrame <- function(df, dict, match_func = startsWith, lower_case = TRUE) {
+
+  parsed <- list()
+
+  cnames <- colnames(df)
+  if (lower_case) {
+    cnames <- tolower(cnames)
   }
+  dnames <- names(dict)
 
-  melted <- NULL
-  if (missing(intvlist) || is.null(intvlist)) {
-    intvlist <- rep(NULL, length(abflist))
-  }
-  for (i in seq_along(abflist)) {
-    if (is.null(melted)) {
-      melted <- domean(abflist[[i]], intvlist[[i]])
+  n <- length(cnames)
+
+  for (i in seq_along(dict)) {
+
+    to_match_list <- dict[[i]]
+    matched <- rep(FALSE, n)
+    for (to_match in to_match_list) {
+      matched <- matched | match_func(cnames, to_match)
     }
-    tmp <- domean(abflist[[i]], intvlist[[i]])
-    melted <- rbind(melted, tmp)
+
+    var_name <- dnames[i]
+    matched <- which(matched)
+    if (length(matched)) {
+      matched_msg <- paste0("Matched columns: ", toString(cnames[matched]))
+      matched <- FirstElement(matched, matched_msg)
+      parsed[[var_name]] <- df[, matched]
+    } else {
+      parsed[[var_name]] <- NA
+    }
+
   }
 
-  return(melted)
+  data.frame(parsed)
+}
+
+EnforceListNames <- function(x) {
+
+  n <- length(x)
+  xnames <- names(x)
+
+  default_names <- paste0("item", seq_len(n))
+
+  if (is.null(xnames)) {
+    names(x) <- default_names
+  } else {
+    replace_names <- ifelse(xnames == "", default_names, xnames)
+    names(x) <- replace_names
+  }
+
+  x
+}
+
+#Slow but should work.
+BindDataFrameList <- function(x) {
+
+  df <- NULL
+  for (id in names(x)) {
+
+    x[[id]] <- cbind(id, x[[id]])
+    colnames(x[[id]])[1] <- "id"
+    rownames(x[[id]]) <- NULL
+
+    df <- rbind(df, x[[id]])
+  }
+
+  df
 }
 
 #' Melt channel data of abf objects.

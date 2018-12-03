@@ -85,12 +85,16 @@ FilterMaxIntervalPos <- function(interval, max_intv_pos) {
   return(interval[ , mask, drop = FALSE])
 }
 
-FirstElement <- function(x) {
+FirstElement <- function(x, elaborate = NULL) {
 
   x_name <- deparse(substitute(x))
   if (length(x) > 1L) {
-    warning(paste0(x_name,
-                   " has length > 1 and only the first element will be used."))
+    msg <- sprintf("%s has length > 1 and only the first element will be used.",
+                   x_name)
+    if (!is.null(elaborate)) {
+      msg <- sprintf("%s %s", msg, as.character(elaborate))
+    }
+    warning(msg)
   }
 
   return(x[[1]])

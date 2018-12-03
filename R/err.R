@@ -187,3 +187,14 @@ err_wrap_func_dim <- function(func) {
 
   err(msg)
 }
+
+err_quick_plot <- function(elaborate = NULL) {
+
+  if (!is.null(elaborate)) {
+    msg <- sprintf("Don't know how to plot: %s", elaborate)
+  } else {
+    msg <- "Don't know how to plot."
+  }
+
+  err(msg)
+}
