@@ -133,7 +133,8 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     err_not_func(map_func)
   }
 
-  along <- FirstElement(unlist(along))
+  msg <- "Use mapnd() to avoid ambiguity in returned dimensions."
+  along <- FirstElement(unlist(along), msg)
   if (is.character(along)) {
     along <- switch(substr(toupper(along), 1L, 1L),
                     T = 1L,
@@ -143,6 +144,104 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
   }
   if (along > 3L || along < 1L) {
     err_invalid_axis(along)
+  }
+
+  dim_warn <- FALSE
+
+  parse_dim_info <- function(abf, mask_time, mask_epi, mask_chan) {
+
+    #unique id
+    abf_id <- NULL
+    if (!is.null(abf_id_func)) {
+      if (is.function(abf_id_func)) {
+        abf_id <- abf_id_func(abf)
+      } else {
+        abf_id <- abf_id_func
+      }
+    }
+
+    #dim 1
+    time_id <- TickToTime(abf, time_unit, mask_time)
+
+    #dim 2
+    epi_id <- NULL
+    if (!is.null(epi_id_func)) {
+      if (is.function(epi_id_func)) {
+        epi_id <- epi_id_func(abf)[mask_epi]
+      } else {
+        epi_id <- unlist(epi_id_func)[mask_epi]
+      }
+    }
+
+    #dim 3
+    chan_id <- NULL
+    if (!is.null(chan_id_func)) {
+      if (is.function(chan_id_func)) {
+        chan_id <- chan_id_func(abf)[mask_chan]
+      } else {
+        chan_id <- unlist(chan_id_func)[mask_chan]
+      }
+    }
+
+    dim_info <- list()
+    dim_info$abf_id <- abf_id
+    dim_info$time_id <- time_id
+    dim_info$epi_id <- epi_id
+    dim_info$chan_id <- chan_id
+
+    dim_info
+  }
+  parse_col_info <- function(dim_info, mask_epi, mask_chan) {
+
+    col_names <- NULL
+    col_extra <- NULL
+
+    #add an extra column of id
+    if (!is.null(dim_info$abf_id)) {
+      col_names <- "id"
+      col_extra <- dim_info$abf_id
+    }
+
+    if (along == 1L) {
+      #along time, columns -> channels, rows -> episodes
+      if (!is.null(dim_info$epi_id)) {
+        #add an extra column of episode id if epi_id is present.
+        col_names <- c(col_names, "Episode")
+        col_extra <- cbind(col_extra, dim_info$epi_id)
+      }
+      #col_names of values (channels)
+      if (is.null(dim_info$chan_id)) {
+        dim_info$chan_id <- as.character(mask_chan)
+      }
+      col_names <- c(col_names, dim_info$chan_id)
+    } else {
+      #along episode/channel, rows -> time
+      #add an extra column of time.
+      col_names <- c(col_names, "Time")
+      col_extra <- cbind(col_extra, dim_info$time_id)
+
+      if (along == 2L) {
+        #col_names of values (channels)
+        if (is.null(dim_info$chan_id)) {
+          dim_info$chan_id <- as.character(mask_chan)
+        }
+        col_names <- c(col_names, dim_info$chan_id)
+      }
+
+      if (along == 3L) {
+        #col_names of values (episodes)
+        if (is.null(dim_info$epi_id)) {
+          dim_info$epi_id <- as.character(mask_epi)
+        }
+        col_names <- c(col_names, dim_info$epi_id)
+      }
+    }
+
+    col_info <- list()
+    col_info$col_names <- col_names
+    col_info$col_extra <- col_extra
+
+    col_info
   }
 
   f <- function(abf, intv = NULL, episode, channel) {
@@ -176,84 +275,27 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       }
     }
 
+    #extract data
     xdata <- abf[mask_time, mask_epi, mask_chan, drop = FALSE]
+    #apply to map_func
     ret <- mapnd(x = xdata, f = map_func, along = along, pack_args = pack_args, ...)
+    #get dimension info
+    dim_info <- parse_dim_info(abf, mask_time, mask_epi, mask_chan)
+
     if (length(dim(ret)) > 2L) {
+      #instead of being collapsed, selected dim is expanded.
       err_wrap_func_dim(map_func)
-    }
-    if (ret.df) {
-      ret <- as.data.frame(ret)
-    }
-
-    #time id is implicit only if along != 1L, and the only id doesn't change
-    #ret type to data.frame since numeric
-    time_id <- TickToTime(abf, time_unit, mask_time)
-    #character ids
-    abf_id <- NULL
-    if (!is.null(abf_id_func)) {
-      if (is.function(abf_id_func)) {
-        abf_id <- abf_id_func(abf)
-      } else {
-        abf_id <- abf_id_func
-      }
-    }
-    epi_id <- NULL
-    if (!is.null(epi_id_func)) {
-      if (is.function(epi_id_func)) {
-        epi_id <- epi_id_func(abf)[mask_epi]
-      } else {
-        epi_id <- unlist(epi_id_func)[mask_epi]
-      }
-    }
-    chan_id <- NULL
-    if (!is.null(chan_id_func)) {
-      if (is.function(chan_id_func)) {
-        chan_id <- chan_id_func(abf)[mask_chan]
-      } else {
-        chan_id <- unlist(chan_id_func)[mask_chan]
-      }
-    }
-
-    col_names <- NULL
-    col_ids <- NULL
-    if (!is.null(abf_id)) {
-      col_names <- "id"
-      col_ids <- abf_id
-    }
-    if (along == 1L) {
-      #dim time is collapsed
-      if (!is.null(epi_id)) {
-        col_names <- c(col_names, "Episode")
-        col_ids <- cbind(col_ids, epi_id)
-      }
-      #col_names of values
-      if (is.null(chan_id)) {
-        chan_id <- as.character(mask_chan)
-      }
-      col_names <- c(col_names, chan_id)
     } else {
-      #time id is always present when not along 1L
-      col_names <- c(col_names, "Time")
-      col_ids <- cbind(col_ids, time_id)
-      if (along == 2L) {
-        #col_names of values
-        if (is.null(chan_id)) {
-          chan_id <- as.character(mask_chan)
-        }
-        col_names <- c(col_names, chan_id)
+      #selected dim is collapsed, returning 2-d data
+      if (ret.df) {
+        ret <- as.data.frame(ret)
       }
-      if (along == 3L) {
-        #col_names of values
-        if (is.null(epi_id)) {
-          epi_id <- as.character(mask_epi)
-        }
-        col_names <- c(col_names, epi_id)
+      col_info <- parse_col_info(dim_info, mask_epi, mask_chan)
+      if (!is.null(col_info$col_extra)) {
+        ret <- cbind(col_info$col_extra, ret)
       }
+      colnames(ret) <- col_info$col_names
     }
-    if (!is.null(col_ids)) {
-      ret <- cbind(col_ids, ret)
-    }
-    colnames(ret) <- col_names
 
     return(ret)
   }
