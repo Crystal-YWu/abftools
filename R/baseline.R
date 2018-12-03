@@ -116,9 +116,9 @@ baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10,
   m <- length(y)
   diag_idx <- seq_len(m)
 
-  D <- diff(Matrix::Diagonal(m), differences = 2)
+  D <- Matrix::diff(Matrix::Diagonal(m), differences = 2)
   lambda <- 10^lambda_pow10
-  Delta <- lambda * t(D) %*% D
+  Delta <- lambda * Matrix::t(D) %*% D
 
   w <- rep(1, m)
   np <- 1 - p
