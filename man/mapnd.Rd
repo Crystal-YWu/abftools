@@ -2,7 +2,7 @@
 % Please edit documentation in R/mapping.R
 \name{mapnd}
 \alias{mapnd}
-\title{Mapping function to an nd-array along specific axis.}
+\title{Mapping function to an nd-array along specific axes.}
 \usage{
 mapnd(x, f, along = 1L, MARGIN = NULL, pack_args = FALSE, ...)
 }
@@ -23,5 +23,5 @@ mapnd(x, f, along = 1L, MARGIN = NULL, pack_args = FALSE, ...)
 an array (dimension depending on returned dimension of f)
 }
 \description{
-Mapping function to an nd-array along specific axis.
+Mapping function to an nd-array along specific axes.
 }

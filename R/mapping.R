@@ -27,7 +27,7 @@ PackArgs <- function(f, ...) {
   return(packed)
 }
 
-#' Mapping function to an nd-array along specific axis.
+#' Mapping function to an nd-array along specific axes.
 #'
 #' @param x an nd-array.
 #' @param f a function to map.
