@@ -1,3 +1,250 @@
+#' Quick plot various type of data.
+#'
+#' QuickPlot automatically select proper plotting functions according to the type
+#' of data and arguments provided. You can always try QuickPlot first if you don't
+#' know how to plot or what plotting function to use before consulting manual.
+#'
+#' When plotting an abf object, the type of generated plot is determined by this
+#' logic: 1. Whether the abf object has only one channel, if so, a channel plot is
+#' generated. 2. Whether time_unit is given, if so, plot all channels and convert
+#' x axis to time_unit. 3. Whether the abf object has only one episode, if so, a
+#' channel plot of time unit "tick" is generated.
+#'
+#' @param data data to plot, QuickPlot will try its best to figure out how to plot.
+#' @param pos positions to sample and calculate values, can be interval or cursor.
+#' @param intv interval compatible with PlotChannel(), also used to sample and
+#' calculate values.
+#' @param cursor cursor compatible with PlotChannel(), also used to sample and
+#' calculate values.
+#' @param time_unit unit of time.
+#' @param colour whether to plot in colour mode.
+#' @param title OPTIONAL, title for the plot.
+#' @param legend_title OPTIONAL, legend title for the plot.
+#' @param zero_intercept whether to add zero intercepts.
+#' @param zero_axes whether to force position axes at 0.
+#' @param line_size size of lines.
+#' @param marker_size size of markers, not used when plotting abf objects.
+#' @param err_bar_size size of error bars, not used when plotting abf objects.
+#' @param err_bar_width width of error bars, not used when plotting abf objects.
+#' @param ... not used.
+#'
+#' @return a ggplot object
+#' @export
+#'
+QuickPlot <- function(data, ...) {
+
+  UseMethod("QuickPlot", data)
+}
+
+#' @rdname QuickPlot
+#' @export
+#'
+QuickPlot.default <- function(data, ...) {
+
+  err_quick_plot()
+}
+
+#' @rdname QuickPlot
+#' @export
+#'
+#' @method QuickPlot abf
+#'
+QuickPlot.abf <- function(abf, pos, intv = NULL, cursor = NULL, time_unit,
+                          colour = FALSE, title = NULL, legend_title = NULL,
+                          zero_intercept = TRUE, zero_axes = TRUE,
+                          line_size = 0.5) {
+
+
+  if (missing(time_unit)) {
+
+    if (nChan(abf) == 1L || nEpi(abf) == 1L) {
+      #time_unit is not defined, but only one channel/episode,
+      #only time series is possible
+      p <- PeekAllChannel(abf, intv = intv, cursor = cursor, colour = colour,
+                          auto_zoom = TRUE)
+    } else {
+      abf <- list(abf)
+
+      #parse pos
+      #TODO: potential performance implication
+      if (missing(pos)) {
+        pos <- NULL
+      }
+      if (!is.null(pos)) {
+        pos <- MaskIntv(pos)
+      }
+      if (!is.null(intv)) {
+        pos <- c(pos, MaskIntv(intv))
+      }
+      if (!is.null(cursor)) {
+        pos <- c(pos, cursor)
+      }
+      pos <- unique(pos)
+
+      p <- QuickPlot.list(abf, pos = pos, colour = colour,
+                     title = title, legend_title = legend_title,
+                     zero_intercept = zero_intercept, zero_axes = zero_axes,
+                     line_size = line_size)
+    }
+
+  } else {
+
+    if (!missing(pos) && !is.null(pos)) {
+      warning("Argument pos is ignored. Please use intv or cursor for time series plots.")
+    }
+
+    #time_unit is explicitly defined, plot time series.
+    p <- PeekAllChannel(abf, intv = intv, cursor = cursor, colour = colour,
+                        time_unit = time_unit, auto_zoom = TRUE)
+  }
+
+  p
+}
+
+#' @rdname QuickPlot
+#' @export
+#'
+#' @method QuickPlot data.frame
+#'
+QuickPlot.data.frame <- function(ivsummary, colour = FALSE,
+                                 title = NULL, legend_title = NULL,
+                                 zero_intercept = TRUE, zero_axes = TRUE,
+                                 line_size = 0.5, marker_size = line_size * 4,
+                                 err_bar_size = line_size / 1.5,
+                                 err_bar_width = marker_size * 1.5) {
+
+  ivsummary <- list(ivsummary)
+
+  QuickPlot.list(ivsummary, colour = colour,
+                 title = title, legend_title = legend_title,
+                 zero_intercept = zero_intercept, zero_axes = zero_axes,
+                 line_size = line_size, marker_size = marker_size,
+                 err_bar_size = err_bar_size, err_bar_width = err_bar_width)
+}
+
+#' @rdname QuickPlot
+#' @export
+#'
+#' @method QuickPlot list
+#'
+QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
+                           title = NULL, legend_title = NULL,
+                           zero_intercept = TRUE, zero_axes = TRUE,
+                           line_size = 0.5, marker_size = line_size * 4,
+                           err_bar_size = line_size / 1.5,
+                           err_bar_width = marker_size * 1.5) {
+
+  #Data
+  if (IsListOf(data, "abf")) {
+
+    pos <- ExpandList(pos, data)
+    if (is.null(pos)) {
+      err_assert_len(pos, data)
+    }
+
+    plt_data <- list()
+    for (i in seq_along(data)) {
+      abf <- data[[i]]
+      intv <- pos[[i]]
+      plt_data[[GetTitle(abf)]] <- ParseDataFrameIV(mean(abf, intv = intv))
+    }
+
+    #Extract unit information from first abf object
+    chan_label <- DefaultChanLabel(data[[1]])
+    chan_v <- GetFirstVoltageChan(data[[1]])
+    chan_c <- GetFirstCurrentChan(data[[1]])
+
+    x_label <- chan_label[chan_v]
+    y_label <- chan_label[chan_c]
+
+  } else if (IsListOf(data, "data.frame")) {
+
+    plt_data <- lapply(data, ParseDataFrameIV)
+    for (i in seq_along(plt_data)) {
+      if (all(is.na(plt_data[[i]]$Voltage))) {
+        err_quick_plot("No voltage data found.")
+      }
+      if (all(is.na(plt_data[[i]]$Current))) {
+        err_quick_plot("No voltage data found.")
+      }
+    }
+    plt_data <- EnforceListNames(plt_data)
+
+    #We do not have unit information in this case
+    x_label <- "Voltage"
+    y_label <- "Current"
+
+  } else {
+
+    err_quick_plot("Element type not supported.")
+  }
+
+  #row bind data
+  df <- BindDataFrameList(plt_data)
+  err_bar <- any(!is.na(df$SEMC))
+
+  #Mapping
+  if (colour) {
+    if (err_bar) {
+      p <- ggplot(df, aes(x = Voltage, y = Current, colour = id, shape = id))
+    } else {
+      p <- ggplot(df, aes(x = Voltage, y = Current, colour = id))
+    }
+  } else {
+    if (err_bar) {
+      p <- ggplot(df, aes(x = Voltage, y = Current, group = id, shape = id))
+    } else {
+      p <- ggplot(df, aes(x = Voltage, y = Current, group = id))
+    }
+  }
+
+  #Plotting
+
+  #plot lines
+  p <- p + geom_line(size = line_size)
+
+  #plot error bars
+  if (err_bar) {
+    #SEM Current is available
+    p <- p +
+      geom_point(size = marker_size) +
+      geom_errorbar(aes(ymin = Current - SEMC, ymax = Current + SEMC),
+                    size = err_bar_size, width = err_bar_width)
+  }
+
+  #plot axes
+  p <- p + theme_classic()
+  if (zero_axes) {
+    p <- p + ZeroAxes(xlimit = df$Voltage, ylimit = df$Current,
+                      xlabel = x_label, ylabel = y_label)
+  } else {
+    p <- p +
+      geom_vline(xintercept = 0, linetype = "dashed") +
+      geom_hline(yintercept = 0, linetype = "dashed") +
+      xlab(x_label) +
+      ylab(y_label)
+  }
+
+  #plot titles
+  if (!is.null(title)) {
+    p <- p + ggtitle(as.character(title))
+  }
+  if (is.null(legend_title)) {
+    p <- p + theme(legend.title = element_blank())
+  } else {
+    p <- p + labs(colour = as.character(legend_title),
+                  shape = as.character(legend_title),
+                  group = as.character(legend_title))
+  }
+
+  #remove legend if only one item
+  if (length(plt_data) == 1L) {
+    p <- p + theme(legend.position = "none")
+  }
+
+  p
+}
+
 #' Quick plot I-V curves at given position
 #'
 #' @param abf an abf or a list of abf objects.
