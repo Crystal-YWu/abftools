@@ -89,8 +89,8 @@ FirstElement <- function(x, elaborate = NULL) {
 
   x_name <- deparse(substitute(x))
   if (length(x) > 1L) {
-    msg <- sprintf("%s has length > 1 and only the first element will be used.",
-                   x_name)
+    msg <- sprintf("%s has length > 1 and only the first element (%s) will be used.",
+                   x_name, toString(x[[1]]))
     if (!is.null(elaborate)) {
       msg <- sprintf("%s %s", msg, as.character(elaborate))
     }
