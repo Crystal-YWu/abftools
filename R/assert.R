@@ -2,12 +2,16 @@ IsAbf <- function(x) class(x) == "abf"
 
 IsAbfList <- function(x) {
 
+  IsListOf(x, "abf")
+}
+
+IsListOf <- function(x, cls) {
+
   if (!is.list(x))
     return(FALSE)
   else
-    return(all(sapply(x, function(y) class(y) == "abf")))
+    return(all(sapply(x, function(item) all(cls %in% class(item)))))
 }
-
 
 AssertLength <- function(x, ..., explicit = NULL) {
 
