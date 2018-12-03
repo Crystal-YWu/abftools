@@ -73,20 +73,19 @@ EnforceListNames <- function(x) {
   x
 }
 
-#Slow but should work.
+#Now a bit faster. But still much slower than rbindlist
+#However I would prefer less dependency.
 BindDataFrameList <- function(x) {
 
-  df <- NULL
-  for (id in names(x)) {
-
-    x[[id]] <- cbind(id, x[[id]])
-    colnames(x[[id]])[1] <- "id"
-    rownames(x[[id]]) <- NULL
-
-    df <- rbind(df, x[[id]])
+  id <- NULL
+  for (idx in names(x)) {
+    n <- nrow(x[[idx]])
+    id <- c(id, rep(idx, n))
   }
 
-  df
+  df <- do.call(rbind, x)
+
+  cbind(id, df)
 }
 
 #' Melt channel data of abf objects.
