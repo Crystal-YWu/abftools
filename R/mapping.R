@@ -98,11 +98,7 @@ WrapMappingFunc <- function(map_func, channel, abf_id_func = NULL, epi_id_func =
   return(f)
 }
 
-#' Convenient alias of WrapMappingFunc()
-#'
-#' @param ... See WrapMappingFunc for more details.
-#'
-#' @return a function of f(abf, intv)
+#' @rdname WrapMappingFunc
 #' @export
 #'
 wrap <- function(...) {
@@ -111,6 +107,25 @@ wrap <- function(...) {
 }
 
 #' Wrap a mapping function along specific axis to batch process abf data.
+#'
+#' The wrapped function has a signature of f(abf, intv = NULL, episode, channel)
+#' see details for more details.
+#'
+#' Arguments of the wrapped function f(abf, intv = NULL, episode, channel):
+#'
+#' abf   a abf object
+#'
+#' intv   OPTIONAL, a time interval to calcaulte. If NULL, the whole timespan is used.
+#'
+#' episode   OPTIONAL, a vector of episodes to calculate. If missing, all episodes are used.
+#'
+#' channel   OPTIONAL, a vector of channels to calculate. If missing, all channels are used.
+#'
+#'
+#' Dimensional order of precedence: time < episode < channel (same as abf objects).
+#' If the mapping function spans multiple dimensions, result will be permutated
+#' to preserve the order. Meanwhile, a warning will be thrown for the first time
+#' wrapped function is called, notifying which dim will be expanded for the user.
 #'
 #' @param map_func a mapping function.
 #' @param along the axis to process along. Can be "time" (1L), "episode" (2L) or "channel" (3L).
@@ -122,7 +137,7 @@ wrap <- function(...) {
 #' @param ret.df wheter to return a data.frame, a matrix is returned instead if set to FALSE
 #' @param ... further arguments passed to map_func
 #'
-#' @return a function of f(abf, intv, episode, channel)
+#' @return a function
 #' @export
 #'
 WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
@@ -148,7 +163,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
 
   dim_warn <- FALSE
 
-  parse_dim_info <- function(abf, mask_time, mask_epi, mask_chan) {
+  parse_dim_info <- function(abf, mask_time, mask_epi, mask_chan, dim_exp) {
 
     #unique id
     abf_id <- NULL
@@ -161,7 +176,12 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     }
 
     #dim 1
-    time_id <- TickToTime(abf, time_unit, mask_time)
+    if (!dim_exp) {
+      time_id <- TickToTime(abf, time_unit, mask_time)
+    } else {
+      time_id <- mask_time
+    }
+
 
     #dim 2
     epi_id <- NULL
@@ -280,11 +300,46 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     #apply to map_func
     ret <- mapnd(x = xdata, f = map_func, along = along, pack_args = pack_args, ...)
     #get dimension info
-    dim_info <- parse_dim_info(abf, mask_time, mask_epi, mask_chan)
+    dim_exp <- length(dim(ret)) > 2L
+    dim_info <- parse_dim_info(abf, mask_time, mask_epi, mask_chan, dim_exp)
 
-    if (length(dim(ret)) > 2L) {
+    if (dim_exp) {
+      extra_dim <- length(dim(ret)) - 2L
+
       #instead of being collapsed, selected dim is expanded.
-      err_wrap_func_dim(map_func)
+      if (!dim_warn) {
+        #give a warning for the first time called.
+        msg_dim <- switch(along, "Time", "Episode", "Channel")
+        msg_ndim <- extra_dim
+        msg <- sprintf("Returned values of mapping function have lengths > 1. %s axis is expanded to %d dimensions.",
+                       msg_dim, msg_ndim)
+        warning(msg)
+        dim_warn <<- TRUE
+      }
+
+      #depending on dim along, attach dimnames to returned array.
+      dim_name <- list()
+      if (along == 1L) {
+        #..., episode, channel
+        dim_name[[1L + extra_dim]] <- dim_info$epi_id
+        dim_name[[2L + extra_dim]] <- dim_info$chan_id
+        dimnames(ret) <- dim_name
+        #do not need to permutate
+      } else if (along == 2L) {
+        #..., time, channel
+        dim_name[[1L + extra_dim]] <- dim_info$time_id
+        dim_name[[2L + extra_dim]] <- dim_info$chan_id
+        dimnames(ret) <- dim_name
+        #permutate dimensions
+        ret <- aperm(ret, c(1L + extra_dim, seq_len(extra_dim), 2 + extra_dim))
+      } else {
+        #..., time, episode
+        dim_name[[1L + extra_dim]] <- dim_info$time_id
+        dim_name[[2L + extra_dim]] <- dim_info$epi_id
+        dimnames(ret) <- dim_name
+        #permutate dimensions
+        ret <- aperm(ret, c(1L + extra_dim, 2 + extra_dim, seq_len(extra_dim)))
+      }
     } else {
       #selected dim is collapsed, returning 2-d data
       if (ret.df) {
@@ -297,17 +352,13 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       colnames(ret) <- col_info$col_names
     }
 
-    return(ret)
+    ret
   }
 
   return(f)
 }
 
-#' Convenient alias of WrapMappingFuncAlong()
-#'
-#' @param ... See WrapMappingFuncAlong for more details.
-#'
-#' @return a function of f(abf, intv, episode, channel)
+#' @rdname WrapMappingFuncAlong
 #' @export
 #'
 wrap_along <- function(..., abf_id_func = NULL,

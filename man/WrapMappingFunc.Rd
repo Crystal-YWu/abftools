@@ -2,11 +2,14 @@
 % Please edit documentation in R/mapping.R
 \name{WrapMappingFunc}
 \alias{WrapMappingFunc}
+\alias{wrap}
 \title{Wrap a mapping function to batch process abf channel data.}
 \usage{
 WrapMappingFunc(map_func, channel, abf_id_func = NULL,
   epi_id_func = NULL, chan_id_func = DefaultChanLabel, ret.df = TRUE,
   ...)
+
+wrap(...)
 }
 \arguments{
 \item{map_func}{a mapping function to process abf channel data, such as mean, sum etc.}
