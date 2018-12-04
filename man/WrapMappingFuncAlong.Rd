@@ -7,7 +7,7 @@
 \usage{
 WrapMappingFuncAlong(map_func, along = "time", pack_args = FALSE,
   abf_id_func = NULL, epi_id_func = NULL, chan_id_func = NULL,
-  time_unit = "tick", ret.df = TRUE, ...)
+  time_unit = "tick", ret.df = TRUE, dim_warn = TRUE, ...)
 
 wrap_along(..., abf_id_func = NULL, epi_id_func = DefaultEpiLabel,
   chan_id_func = DefaultChanLabel, time_unit = "ms", ret.df = TRUE)
@@ -28,6 +28,8 @@ wrap_along(..., abf_id_func = NULL, epi_id_func = DefaultEpiLabel,
 \item{time_unit}{convert time unit of the return time axis.}
 
 \item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE}
+
+\item{dim_warn}{whether to warn about dimension expansion.}
 
 \item{...}{further arguments passed to map_func}
 }

@@ -135,6 +135,7 @@ wrap <- function(...) {
 #' @param chan_id_func OPTIONAL, a function accepts an abf object and returns a vectors of identifiers of all channels.
 #' @param time_unit convert time unit of the return time axis.
 #' @param ret.df wheter to return a data.frame, a matrix is returned instead if set to FALSE
+#' @param dim_warn whether to warn about dimension expansion.
 #' @param ... further arguments passed to map_func
 #'
 #' @return a function
@@ -142,7 +143,7 @@ wrap <- function(...) {
 #'
 WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
                                  abf_id_func = NULL, epi_id_func = NULL, chan_id_func = NULL,
-                                 time_unit = "tick", ret.df = TRUE, ...) {
+                                 time_unit = "tick", ret.df = TRUE, dim_warn = TRUE, ...) {
 
   if (!is.function(map_func)) {
     err_not_func(map_func)
@@ -161,7 +162,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     err_invalid_axis(along)
   }
 
-  dim_warn <- FALSE
+  warned_once <- !dim_warn
 
   parse_dim_info <- function(abf, mask_time, mask_epi, mask_chan, dim_exp) {
 
@@ -176,10 +177,10 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     }
 
     #dim 1
-    if (!dim_exp) {
-      time_id <- TickToTime(abf, time_unit, mask_time)
-    } else {
-      time_id <- mask_time
+    time_id <- TickToTime(abf, time_unit, mask_time)
+    if (dim_exp && time_unit != "tick" && !warned_once) {
+      msg <- sprintf("Time dim unit is converted to %s.", time_unit)
+      warning(msg)
     }
 
 
@@ -307,18 +308,18 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       extra_dim <- length(dim(ret)) - 2L
 
       #instead of being collapsed, selected dim is expanded.
-      if (!dim_warn) {
+      if (!warned_once) {
         #give a warning for the first time called.
         msg_dim <- switch(along, "Time", "Episode", "Channel")
         msg_ndim <- extra_dim
         msg <- sprintf("Returned values of mapping function have lengths > 1. %s axis is expanded to %d dimensions.",
                        msg_dim, msg_ndim)
         warning(msg)
-        dim_warn <<- TRUE
+        warned_once <<- TRUE
       }
 
       #depending on dim along, attach dimnames to returned array.
-      dim_name <- list()
+      dim_name <- dimnames(ret)
       if (along == 1L) {
         #..., episode, channel
         dim_name[[1L + extra_dim]] <- dim_info$epi_id
