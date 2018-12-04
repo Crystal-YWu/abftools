@@ -16,7 +16,7 @@ QuickPlot(data, ...)
   time_unit, colour = FALSE, title = NULL, legend_title = NULL,
   zero_intercept = TRUE, zero_axes = TRUE, line_size = 0.5)
 
-\method{QuickPlot}{data.frame}(ivsummary, colour = FALSE, title = NULL,
+\method{QuickPlot}{data.frame}(df, colour = FALSE, title = NULL,
   legend_title = NULL, zero_intercept = TRUE, zero_axes = TRUE,
   line_size = 0.5, marker_size = line_size * 4,
   err_bar_size = line_size/1.5, err_bar_width = marker_size * 1.5)

@@ -1,6 +1,9 @@
-ParseDataFrameIV <- function(df) {
+ParseDataFrameIV <- function(df, has_id = FALSE) {
 
   dict <- list()
+  if (has_id) {
+    dict$id <- "id"
+  }
   dict$Voltage <- "voltage"
   dict$Current <- "current"
   dict$SEMC <- c("semc", "sem c")

@@ -106,16 +106,16 @@ QuickPlot.abf <- function(abf, pos, intv = NULL, cursor = NULL, time_unit,
 #'
 #' @method QuickPlot data.frame
 #'
-QuickPlot.data.frame <- function(ivsummary, colour = FALSE,
+QuickPlot.data.frame <- function(df, colour = FALSE,
                                  title = NULL, legend_title = NULL,
                                  zero_intercept = TRUE, zero_axes = TRUE,
                                  line_size = 0.5, marker_size = line_size * 4,
                                  err_bar_size = line_size / 1.5,
                                  err_bar_width = marker_size * 1.5) {
 
-  ivsummary <- list(ivsummary)
+  df <- list(df)
 
-  QuickPlot.list(ivsummary, colour = colour,
+  QuickPlot.list(df, colour = colour,
                  title = title, legend_title = legend_title,
                  zero_intercept = zero_intercept, zero_axes = zero_axes,
                  line_size = line_size, marker_size = marker_size,
@@ -133,6 +133,9 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
                            line_size = 0.5, marker_size = line_size * 4,
                            err_bar_size = line_size / 1.5,
                            err_bar_width = marker_size * 1.5) {
+
+  #whether column id is present in data
+  id_present <- FALSE
 
   #Data
   if (IsListOf(data, "abf")) {
@@ -157,9 +160,11 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
     x_label <- chan_label[chan_v]
     y_label <- chan_label[chan_c]
 
-  } else if (IsListOf(data, "data.frame")) {
+  } else if (IsListOf(data, "data.frame") || IsListOf(data, "matrix")) {
 
-    plt_data <- lapply(data, ParseDataFrameIV)
+    id_present <-  all(sapply(data,
+                              function(x) match("id", colnames(x), nomatch = 0L) > 0L))
+    plt_data <- lapply(data, ParseDataFrameIV, has_id = id_present)
     for (i in seq_along(plt_data)) {
       if (all(is.na(plt_data[[i]]$Voltage))) {
         err_quick_plot("No voltage data found.")
@@ -168,7 +173,9 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
         err_quick_plot("No voltage data found.")
       }
     }
-    plt_data <- EnforceListNames(plt_data)
+    if (!id_present) {
+      plt_data <- EnforceListNames(plt_data)
+    }
 
     #We do not have unit information in this case
     x_label <- "Voltage"
@@ -180,7 +187,11 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
   }
 
   #row bind data
-  df <- BindDataFrameList(plt_data)
+  if (id_present) {
+    df <- do.call(rbind, plt_data)
+  } else {
+    df <- BindDataFrameList(plt_data)
+  }
   err_bar <- any(!is.na(df$SEMC))
 
   #Mapping
@@ -238,7 +249,7 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
   }
 
   #remove legend if only one item
-  if (length(plt_data) == 1L) {
+  if (!id_present && length(plt_data) == 1L) {
     p <- p + theme(legend.position = "none")
   }
 
