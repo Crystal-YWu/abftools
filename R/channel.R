@@ -1,5 +1,7 @@
-GetFirstVoltageChan <- function(abf) match("Voltage", GetChannelDesc(abf))
-GetFirstCurrentChan <- function(abf) match("Current", GetChannelDesc(abf))
+GetVoltageChan <- function(abf) which(GetChannelDesc(abf) == "Voltage")
+GetCurrentChan <- function(abf) which(GetChannelDesc(abf) == "Current")
+GetFirstVoltageChan <- function(abf) FirstElement(GetVoltageChan(abf))
+GetFirstCurrentChan <- function(abf) FirstElement(GetCurrentChan(abf))
 
 #' Return all channels of an abf object.
 #'
