@@ -26,10 +26,10 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
   }
   #figure out current channel and voltage channel
   if (missing(current_channel) || is.null(current_channel)) {
-    current_channel <- GetFirstCurrentChan(abf_list[[1]])
+    current_channel <- GetFirstCurrentChan(abf_list)
   }
   if (missing(voltage_channel) || is.null(voltage_channel)) {
-    voltage_channel <- GetFirstVoltageChan(abf_list[[1]])
+    voltage_channel <- GetFirstVoltageChan(abf_list)
   }
   if (is.na(current_channel)) {
     err_id_current_chan()
@@ -52,45 +52,6 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
                    sem_current_means, nsamples)
   colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current", "Num Samples")
   return(df)
-}
-
-#' Average a list of abf objects.
-#'
-#' @param abf_list a list of abf objects.
-#' @param w OPTIONAL, a vector of weights for weighted average.
-#'
-#' @return an averaged abf object, of which the protocol settings follow first element in abf_list.
-#' @export
-#'
-AverageAbf <- function(abf_list, w = NULL) {
-
-  if (!IsAbfList(abf_list)) {
-    err_class_abf_list()
-  }
-
-  if (missing(w) || is.null(w)) {
-    n <- length(abf_list)
-    ret <- abf_list[[1]]
-    for (i in 2:n) {
-      ret <- ret + abf_list[[i]]
-    }
-    ret <- ret / n
-  } else {
-
-    if (!AssertLength(w, abf_list)) {
-      err_assert_len(w, abf_list)
-    }
-
-    n <- length(abf_list)
-    ret <- abf_list[[1]] * w[1]
-    for (i in 2:n) {
-      ret <- ret + abf_list[[i]] * w[i]
-    }
-    ret <- ret / sum(w)
-  }
-
-
-  return(ret)
 }
 
 #' Sample abf object to reduce data points.
@@ -254,7 +215,7 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
 #'
 MultiMean_Current <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm = TRUE) {
 
-  channel <- GetFirstCurrentChan(abf_list[[1]])
+  channel <- GetFirstCurrentChan(abf_list)
 
   return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
 }
@@ -271,7 +232,7 @@ MultiMean_Current <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm =
 #'
 MultiMean_Voltage <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm =TRUE) {
 
-  channel <- GetFirstVoltageChan(abf_list[[1]])
+  channel <- GetFirstVoltageChan(abf_list)
 
   return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
 }

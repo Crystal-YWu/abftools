@@ -198,3 +198,18 @@ err_quick_plot <- function(elaborate = NULL) {
 
   err(msg)
 }
+
+err_channel_data <- function(chan) {
+
+  msg <- sprintf("Cannot find channel data: %s.", toString(chan))
+
+  err(msg)
+}
+
+err_channel_config <- function(x) {
+
+  xname <- as.character(substitute(x))
+  msg <- sprintf("Elements of %s have different channel configuration.", xname)
+
+  err(msg)
+}

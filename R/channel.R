@@ -1,7 +1,82 @@
-GetVoltageChan <- function(abf) which(GetChannelDesc(abf) == "Voltage")
-GetCurrentChan <- function(abf) which(GetChannelDesc(abf) == "Current")
-GetFirstVoltageChan <- function(abf) FirstElement(GetVoltageChan(abf))
-GetFirstCurrentChan <- function(abf) FirstElement(GetCurrentChan(abf))
+#' Get voltage channel id.
+#'
+#' @param abf an abf object or a list of abf objects.
+#'
+#' @return a vector of voltage channel id.
+#' @export
+#'
+GetVoltageChan <- function(abf) {
+
+  if (IsAbf(abf)) {
+    ans <- which(GetChannelDesc(abf) == "Voltage")
+    if (!length(ans)) {
+      err_id_voltage_chan()
+    }
+  } else if (IsAbfList(abf)) {
+    ans <- unique(lapply(abf, GetVoltageChan))
+    if (length(ans) > 1L) {
+      err_channel_config(abf)
+    } else {
+      ans <- unlist(ans)
+    }
+  } else {
+    err_class_abf()
+  }
+
+  ans
+}
+
+#' Get current channel id.
+#'
+#' @param abf an abf object or a list of abf objects.
+#'
+#' @return a vector of current channel id.
+#' @export
+#'
+GetCurrentChan <- function(abf) {
+
+  if (IsAbf(abf)) {
+    ans <- which(GetChannelDesc(abf) == "Current")
+    if (!length(ans)) {
+      err_id_voltage_chan()
+    }
+  } else if (IsAbfList(abf)) {
+    ans <- unique(lapply(abf, GetCurrentChan))
+    if (length(ans) > 1L) {
+      err_channel_config(abf)
+    } else {
+      ans <- unlist(ans)
+    }
+  } else {
+    err_class_abf()
+  }
+
+  ans
+}
+
+#' Get first voltage channel id.
+#'
+#' @param abf an abf object or a list of abf objects.
+#'
+#' @return an integer id of first voltage channel.
+#' @export
+#'
+GetFirstVoltageChan <- function(abf) {
+
+  FirstElement(GetVoltageChan(abf))
+}
+
+#' Get first current channel id.
+#'
+#' @param abf an abf object or a list of abf objects.
+#'
+#' @return an integer id of first current channel.
+#' @export
+#'
+GetFirstCurrentChan <- function(abf) {
+
+  FirstElement(GetCurrentChan(abf))
+}
 
 #' Return all channels of an abf object.
 #'

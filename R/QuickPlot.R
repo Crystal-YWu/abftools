@@ -153,9 +153,9 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
     }
 
     #Extract unit information from first abf object
+    chan_v <- GetFirstVoltageChan(data)
+    chan_c <- GetFirstCurrentChan(data)
     chan_label <- DefaultChanLabel(data[[1]])
-    chan_v <- GetFirstVoltageChan(data[[1]])
-    chan_c <- GetFirstCurrentChan(data[[1]])
 
     x_label <- chan_label[chan_v]
     y_label <- chan_label[chan_c]
@@ -276,13 +276,11 @@ QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL, legend_title = N
     err_class_abf()
   }
 
+  current_channel <- GetFirstCurrentChan(abf)
+  voltage_channel <- GetFirstVoltageChan(abf)
   if (IsAbf(abf)) {
-    current_channel <- GetFirstCurrentChan(abf)
-    voltage_channel <- GetFirstVoltageChan(abf)
     labs <- DefaultChanLabel(abf)
   } else {
-    current_channel <- GetFirstCurrentChan(abf[[1]])
-    voltage_channel <- GetFirstVoltageChan(abf[[1]])
     labs <- DefaultChanLabel(abf[[1]])
   }
 
