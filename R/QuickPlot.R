@@ -162,8 +162,7 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
 
   } else if (IsListOf(data, "data.frame") || IsListOf(data, "matrix")) {
 
-    id_present <-  all(sapply(data,
-                              function(x) match("id", colnames(x), nomatch = 0L) > 0L))
+    id_present <-  all(sapply(data, function(x) "id" %in% colnames(x)))
     plt_data <- lapply(data, ParseDataFrameIV, has_id = id_present)
     for (i in seq_along(plt_data)) {
       if (all(is.na(plt_data[[i]]$Voltage))) {

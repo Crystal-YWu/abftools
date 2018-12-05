@@ -57,7 +57,7 @@ MultiPlotChannel_Pub <- function(abf_list, channel = 1L, time_unit = "s",
                              axis.ticks.y = element_blank())
   }
 
-  return(plot_grid(plotlist = p, nrow = 1, align = "h"))
+  ArrangePlot(p, "h")
 }
 
 #' Plot channel/channels of multiple abf objects.
@@ -148,8 +148,7 @@ MultiPlotChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
     plist[[i]] <- subp
   }
 
-  p <- ArrangePlot(plist, plot_arrange)
-  return(p)
+  ArrangePlot(plist, plot_arrange)
 }
 
 #' Fast plot channel/channels of multiple abf objects.
@@ -183,5 +182,5 @@ MultiPeekChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
                         num_label = num_label, channel_arrange = channel_arrange,
                         plot_arrange = plot_arrange, sampling_ratio = ratio, ...)
 
-  return(p)
+  p
 }

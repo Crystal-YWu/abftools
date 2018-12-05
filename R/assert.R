@@ -7,10 +7,20 @@ IsAbfList <- function(x) {
 
 IsListOf <- function(x, cls) {
 
-  if (!is.list(x))
+  if (!is.list(x)) {
     return(FALSE)
-  else
+  } else {
     return(all(sapply(x, function(item) all(cls %in% class(item)))))
+  }
+}
+
+IsListContains <- function(x, cls) {
+
+  if (!is.list(x)) {
+    return(FALSE)
+  } else {
+    return(all(sapply(x, function(item) any(cls %in% class(item)))))
+  }
 }
 
 AssertLength <- function(x, ..., explicit = NULL) {

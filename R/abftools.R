@@ -1,5 +1,5 @@
 ##' @import ggplot2
-##' @import cowplot
+##' @importFrom cowplot plot_grid
 ##' @importFrom stats sd
 ##' @importFrom reshape2 melt
 ##' @importFrom matrixStats colSds colMads

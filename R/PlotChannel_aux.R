@@ -63,9 +63,9 @@ CollectAllCh <- function(abf, ...) {
 ArrangePlot <- function(p, arrange) {
 
   pg <- switch(substr(toupper(arrange), 1L, 1L),
-               H = plot_grid(plotlist = p, nrow = 1, align = "h"),
-               V = plot_grid(plotlist = p, ncol = 1, align = "v"),
-               A = plot_grid(plotlist = p),
+               H = cowplot::plot_grid(plotlist = p, nrow = 1, align = "h"),
+               V = cowplot::plot_grid(plotlist = p, ncol = 1, align = "v"),
+               A = cowplot::plot_grid(plotlist = p),
                err_arrange(arrange))
 
   return(pg)
