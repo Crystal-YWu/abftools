@@ -38,21 +38,22 @@ read_struct_n <- function(fp, struct.def, fptr = NULL, n = 1L) {
       ss <- struct.def$ssize[i]
       sz <- sizeof[tp]
 
-      if ( startsWith(tp, "int") | (tp == "char") ) {
+      if ((tp == "int16") || (tp == "int32") || (tp == "int8") ||
+          (tp == "int64") || (tp == "char")) {
         if (is.null(result[[fd]])) {
           result[[fd]] <- rep(0L, n)
         }
         #read a signed integer: char, int8, int16, int32, int64
         result[[fd]][idx] <- readBin(fp, what = "integer", size = sz, signed = TRUE)
       }
-      else if ( (tp == "float") | (tp == "double") ) {
+      else if ( (tp == "float") || (tp == "double") ) {
         if (is.null(result[[fd]])) {
           result[[fd]] <- rep(0.0, n)
         }
         #read a floating point numbers: float, double
         result[[fd]][idx] <- readBin(fp, what = "numeric", size = sz)
       }
-      else if ( startsWith(tp, "uint") | (tp == "uchar") ) {
+      else if ( startsWith(tp, "uint") || (tp == "uchar") ) {
         #read an unsigned integer:
         #this gets a little bit tricky because R does not support unsigned long
         if ( sz == 4 ) {
@@ -127,9 +128,8 @@ read_section <- function(fp, section.info, section.def, df = TRUE) {
   #pre-allocate result data.frame
   n <- section.info$llNumEntries
   ans <- read_struct_n(fp, section.def, fptr, n = n)
-
   if (df) {
-    data.frame(ans)
+    as.data.frame(do.call(cbind, ans))
   } else {
     ans
   }
