@@ -53,10 +53,10 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
     stop("ADC section: no entries recorded.")
   }
   if (section_info$DAC$llNumEntries > 0) {
-    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def)
+    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def, df = FALSE)
   }
   if (section_info$Epoch$llNumEntries > 0) {
-    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def)
+    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def, df = FALSE)
   }
   if (section_info$EpochPerDAC$llNumEntries > 0) {
     epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
