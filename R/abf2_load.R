@@ -109,7 +109,9 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
     for (i in seq_len(nevent)) {
       idx <- seq.int(from = idx_start[i], to = idx_end[i])
-      tmp[,,i] <- data[idx]
+      event_data <- data[idx]
+      length(event_data) <- max_length
+      tmp[,,i] <- event_data
     }
     data <- tmp
 
