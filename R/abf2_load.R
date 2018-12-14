@@ -23,109 +23,51 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
   fp <- file(filename, "rb")
 
-  #Read header
-  header <- read_struct_n(fp, ABF2.Header.def)
-  if (header$fFileSignature != "ABF2") {
-    close(fp)
-    stop("Only ABF2 file format is supported.")
-  }
+  header <- abf2_head(fp)
+  section_info <- abf2_section_info(fp)
+  section <- abf2_section(fp, section_info)
 
-  #Read all sections info
-  section_info <- list()
-  for (i in seq_along(ABF2.SectionInfoList)) {
-    section_name <- ABF2.SectionInfoList[i]
-    section_info[[section_name]] <- read_struct_n(fp, ABF2.SectionInfo.def)
-  }
-
-  #Read all supported sections
-  section <- list()
-  #These sections are quite important, if not presented throw a warning.
-  if (section_info$Protocol$llNumEntries > 0) {
-    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def, df = FALSE)
-  } else {
-    close(fp)
-    stop("Protocol section: no entries recorded.")
-  }
-  if (section_info$ADC$llNumEntries > 0) {
-    section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def)
-  } else {
-    close(fp)
-    stop("ADC section: no entries recorded.")
-  }
-  if (section_info$DAC$llNumEntries > 0) {
-    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def, df = FALSE)
-  }
-  if (section_info$Epoch$llNumEntries > 0) {
-    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def, df = FALSE)
-  }
-  if (section_info$EpochPerDAC$llNumEntries > 0) {
-    epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
-    #sort EpochPerDAC prior to saving to meta, so we don't need to re-sort this
-    #everytime calling epoch.R functions.
-    section$EpochPerDAC <- epdac[order(epdac$nDACNum, epdac$nEpochNum), ]
-  }
-  if (section_info$SynchArray$llNumEntries > 0) {
-    section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
-  }
-
-
-  #We do not need these miscellaneous sections
-  #if (section_info$Math$llNumEntries > 0)
-  #  section$Math <- read_section(fp, section_info$Math, ABF2.Math.def)
-  #if (section_info$StatsRegion$llNumEntries > 0)
-  #  section$StatsRegion <- read_section(fp, section_info$StatsRegion, ABF2.StatsRegion.def)
-  #if (section_info$UserList$llNumEntries > 0)
-  #  section$UserList <- read_section(fp, section_info$UserList, ABF2.UserList.def)
-
-  #Read strings section
-  if (section_info$Strings$llNumEntries > 0) {
-    section$Strings <- read_str_section(fp, section_info$Strings)
-  } else {
-    warning("Strings section: no entries recorded.")
-  }
-  #Throw warning if read strings do not match llNumEntries.
-  if (length(section$Strings) != section_info$String$llNumEntries) {
-    warning("Strings section: llNumEntries and actual entries read do not match.")
-  }
+  #sampling interval
+  sample_interval_us <- section$Protocol$fADCSequenceInterval
+  tu_per_tick <- ifelse(section$Protocol$fSynchTimeUnit == 1,
+                        yes = sample_interval_us,
+                        no = section$Protocol$fSynchTimeUnit)
+  lStart_tick <- section$SynchArray$lStart / tu_per_tick
+  section$SynchArray <- cbind(section$SynchArray, lStart_tick)
 
   chan_num <- nrow(section$ADC)
   chan_name <- rep("", chan_num)
   chan_unit <- rep("", chan_num)
   chan_desc <- rep("", chan_num)
-  if (section_info$Strings$llNumEntries != 0) {
+  if (!is.null(section$Strings)) {
     for (i in seq_len(chan_num)) {
       idx <- section$ADC$lADCChannelNameIndex[i]
-      chan_name[i] <- section$Strings[[idx]]
+      if (idx != 0) {
+        chan_name[i] <- section$Strings[idx]
+      } else {
+        #skip if the channel is unnamed.
+        next
+      }
       idx <- section$ADC$lADCUnitsIndex[i]
-      chan_unit[i] <- section$Strings[[idx]]
-      if (endsWith(chan_unit[i], "V") ||
-          grepl("vol", chan_unit[i], fixed = TRUE) ||
-          grepl("Vol", chan_unit[i], fixed = TRUE)) {
+      if (idx != 0) {
+        chan_unit[i] <- section$Strings[[idx]]
+      }
+      if (endsWith(toupper(chan_unit[i]), "V") ||
+          grepl("VO", toupper(chan_unit[i]), fixed = TRUE)) {
         chan_desc[i] <- "Voltage"
-      } else if (endsWith(chan_unit[i], "A") ||
-                 grepl("amp", chan_unit[i], fixed = TRUE) ||
-                 grepl("Amp", chan_unit[i], fixed = TRUE)) {
+      } else if (endsWith(toupper(chan_unit[i]), "A") ||
+                 grepl("AM", toupper(chan_unit[i]), fixed = TRUE)) {
         chan_desc[i] <- "Current"
       } else {
-        chan_desc[i] <- chan_name[i]
+        chan_desc[i] <- gsub("\\s", "_", chan_name[i])
       }
     }
   }
 
-  #As reported here: (Not verified)
-  #https://forums.ni.com/t5/LabVIEW/Axon-ABF-amp-ABF2-Files/td-p/3708907
-  if (chan_num > 4)
-    warning("More than 4 channels are recorded.")
-
   #Read data section
-  #Basic sanity check
   data_int <- section_info$Data$uBytes == 2
-  if (section_info$Data$uBytes == 2 || section_info$Data$uByte == 4) {
-    data <- read_data_section(fp, section_info$Data)
-  } else {
-    close(fp)
-    stop("Data section: unknown data record type.")
-  }
+  data <- read_data_section(fp, section_info$Data)
+
   #Scaling and offset of rawdata
   if (data_int) {
     signal_resol <- section$Protocol$fADCRange / section$Protocol$lADCResolution
@@ -141,28 +83,17 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
       #telegraph addit gain
       if (section$ADC$nTelegraphEnable[i])
         signal_scale[i] <- signal_scale[i] * section$ADC$fTelegraphAdditGain[i]
-      signal_scale[i] <-  1 / signal_scale[i]
+      signal_scale[i] <- 1.0 / signal_scale[i]
       #offsets: instrument & signal
       signal_offset[i] <- section$ADC$fInstrumentOffset[i] - section$ADC$fSignalOffset[i]
     }
   }
-
-  #sampling interval
-  sample_interval_us <- section$Protocol$fADCSequenceInterval
-
-  #parse synch array since sample_interval_us is resolved
-  tu_per_tick <- ifelse(section$Protocol$fSynchTimeUnit == 1,
-                        yes = sample_interval_us,
-                        no = section$Protocol$fSynchTimeUnit)
-  lStart_tick <- section$SynchArray$lStart / tu_per_tick
-  section$SynchArray <- cbind(section$SynchArray, lStart_tick)
 
   #We've done all file reading
   close(fp)
 
   #Now compile everything we've got into result
   op_mode <- section$Protocol$nOperationMode
-
   if (op_mode == 1L) {
     #event-driven variable-length
     stop("Event-driven variable-length mode is not supported yet.")
@@ -174,44 +105,31 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   }
   else if (op_mode == 2L | op_mode == 4L | op_mode == 5L) {
     #event-driven fixed-length (2), high-speed oscilloscope (4), waveform fixed-length (5)
-
-    #resolve 3d array from rawdata
-    pts_per_chan <- section$Protocol$lNumSamplesPerEpisode / chan_num
+    pts_per_chan <- section$Protocol$lNumSamplesPerEpisode %/% chan_num
     epi_per_run <- section$Protocol$lEpisodesPerRun
     #check if data pts number match
     if (section_info$Data$llNumEntries != pts_per_chan * chan_num * epi_per_run) {
-      stop("Data section: recorded data points do not match protocol setting.")
+      err_abf_file("Recorded number of data points does not match protocol setting.")
     }
     dim(data) <- c(chan_num, pts_per_chan, epi_per_run)
-    data <- aperm(data, c(2, 3, 1))
-    if (data_int) {
-      dscale <- signal_resol * signal_scale
-      doffset <- signal_offset
-      for (i in seq_len(chan_num)) {
-        data[,,i] <- data[,,i] * dscale[i] + doffset[i]
-      }
-    }
   }
   else if (op_mode == 3L) {
     #Gap-free
-
-    #resolve 2d array from rawdata
     #Can't resolve values from protocol any more
-    pts_per_chan <- section_info$Data$llNumEntries %/% 2L
-    chan_per_run <- chan_num
-    #Added 3rd dim so that we can treat a Gap-free like an episodic abf (with only
-    dim(data) <- c(chan_per_run, pts_per_chan, 1L)
-    data <- aperm(data, c(2, 3, 1))
-    if (data_int) {
-      dscale <- signal_resol * signal_scale
-      doffset <- signal_offset
-      for (i in seq_len(chan_num)) {
-        data[,,i] <- data[,,i] * dscale[i] + doffset[i]
-      }
-    }
+    pts_per_chan <- section_info$Data$llNumEntries %/% chan_num
+    dim(data) <- c(chan_num, pts_per_chan, 1L)
   }
   else {
-    stop(paste0("Protocol section: Unrecognised operation mode ", op_mode, "."))
+    err_abf_file(sprintf("Unrecognised op mode %d", op_mode))
+  }
+
+  data <- aperm(data, c(2, 3, 1))
+  if (data_int) {
+    dscale <- signal_resol * signal_scale
+    doffset <- signal_offset
+    for (i in seq_len(chan_num)) {
+      data[,,i] <- data[,,i] * dscale[i] + doffset[i]
+    }
   }
 
   attr(data, "class") <- "abf"
@@ -294,3 +212,64 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist 
 }
 
 AddSurfix <- function(x, sur) ifelse(endsWith(x, sur), x, paste0(x, sur))
+
+abf2_head <- function(fp) {
+
+  header <- read_struct_n(fp, ABF2.Header.def)
+  if (header$fFileSignature != "ABF2") {
+    close(fp)
+    err_abf_file("Only ABF2 file format is supported.")
+  }
+
+  header
+}
+
+abf2_section_info <- function(fp) {
+
+  section_info <- list()
+  for (i in seq_along(ABF2.SectionInfoList)) {
+    section_name <- ABF2.SectionInfoList[i]
+    section_info[[section_name]] <- read_struct_n(fp, ABF2.SectionInfo.def)
+  }
+
+  section_info
+}
+
+abf2_section <- function(fp, section_info) {
+
+  #Read all supported sections
+  section <- list()
+  #These sections are quite important, if not presented throw a warning.
+  if (section_info$Protocol$llNumEntries > 0) {
+    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def, df = FALSE)
+  } else {
+    close(fp)
+    err_abf_file("No protocol entries recorded.")
+  }
+  if (section_info$ADC$llNumEntries > 0) {
+    section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def)
+  } else {
+    close(fp)
+    err_abf_file("No ADC entries recorded.")
+  }
+  if (section_info$DAC$llNumEntries > 0) {
+    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def, df = FALSE)
+  }
+  if (section_info$Epoch$llNumEntries > 0) {
+    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def, df = FALSE)
+  }
+  if (section_info$EpochPerDAC$llNumEntries > 0) {
+    epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
+    section$EpochPerDAC <- epdac[order(epdac$nDACNum, epdac$nEpochNum), ]
+  }
+  if (section_info$SynchArray$llNumEntries > 0) {
+    section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
+  }
+  if (section_info$Strings$llNumEntries > 0) {
+    section$Strings <- read_str_section(fp, section_info$Strings)
+  } else {
+    warning("No strings entries recorded.")
+  }
+
+  section
+}

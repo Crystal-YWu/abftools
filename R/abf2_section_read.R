@@ -152,14 +152,12 @@ read_str_section <- function(fp, section.info) {
 #String sectio is basically a set of \0 seperated strings.
 parse_str_section <- function(rawdata) {
 
-  result <- list()
-  idx <- 0
+  result <- c()
   ptr <- ABF2.StringOffset
   if (ptr >= length(rawdata)) return(result)
   for (i in seq(from = ABF2.StringOffset, to = length(rawdata))) {
     if (rawdata[i] == 0) {
-      idx <- idx + 1
-      result[[idx]] <- rawToChar(rawdata[ptr:(i - 1)])
+      result <- c(result, rawToChar(rawdata[ptr:(i - 1)]))
       ptr <- i + 1
     }
   }

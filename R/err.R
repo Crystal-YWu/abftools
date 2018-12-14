@@ -6,6 +6,12 @@ err <- function(msg) {
   stop(err_msg)
 }
 
+err_abf_file <- function(elaborate) {
+
+  msg <- sprintf("Error reading abf file: %s", elaborate)
+  err(msg)
+}
+
 err_abf_not_episodic <- function() {
 
   msg <- "The abf object is not episodic."

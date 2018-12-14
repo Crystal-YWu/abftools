@@ -275,7 +275,7 @@ CheckSamplingInterval <- function(abf, intv, channel, epoch = "B") {
   wf <- GetWaveform(abf, episodes)
   wf_chan <- FirstElement(GetWaveformEnabledDAC(abf))
   meta <- get_meta(abf)
-  wf_unit <- meta$Strings[[meta$DAC$lDACChannelUnitsIndex[wf_chan]]]
+  wf_unit <- meta$Strings[meta$DAC$lDACChannelUnitsIndex[wf_chan]]
   settings <- meta$EpochPerDAC$fEpochInitLevel[epoch] +
     (seq_len(nEpi(abf)) - 1) * meta$EpochPerDAC$fEpochLevelInc[epoch]
 
