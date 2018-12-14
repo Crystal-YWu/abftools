@@ -14,8 +14,10 @@ abf2_load_protocol <- function(filename) {
 
   fp <- file(filename, "rb")
 
+  fp <- file(filename, "rb")
+
   #Read header
-  header <- read_struct(fp, ABF2.Header.def)
+  header <- read_struct_n(fp, ABF2.Header.def)
   if (header$fFileSignature != "ABF2") {
     close(fp)
     stop("Only ABF2 file format is supported.")
@@ -23,43 +25,42 @@ abf2_load_protocol <- function(filename) {
 
   #Read all sections info
   section_info <- list()
-  fptr <- header$byte.total
   for (i in seq_along(ABF2.SectionInfoList)) {
     section_name <- ABF2.SectionInfoList[i]
-    section_info[[section_name]] <- read_struct(fp, ABF2.SectionInfo.def, fptr)
-    fptr <- fptr + section_info[[section_name]]$byte.total
+    section_info[[section_name]] <- read_struct_n(fp, ABF2.SectionInfo.def)
   }
 
   #Read all supported sections
   section <- list()
-  if (section_info$Protocol$llNumEntries > 0)
-    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def)
-  else {
-    close(fp)
-    stop("Protocol section: no entries recorded.")
+  #These sections are quite important, if not presented throw a warning.
+  if (section_info$Protocol$llNumEntries > 0) {
+    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def, df = FALSE)
+  } else {
+    warning("Protocol section: no entries recorded.")
   }
-  if (section_info$ADC$llNumEntries > 0)
+  if (section_info$ADC$llNumEntries > 0) {
     section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def)
-  else {
-    close(fp)
-    stop("ADC section: no entries recorded.")
+  } else {
+    warning("ADC section: no entries recorded.")
   }
-  if (section_info$DAC$llNumEntries > 0)
+  if (section_info$DAC$llNumEntries > 0) {
     section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def)
-  else
-    warning("DAC section: no entries recorded.")
-  if (section_info$Epoch$llNumEntries > 0)
+  }
+  if (section_info$Epoch$llNumEntries > 0) {
     section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def)
-  else
-    warning("Epoch section: no entries recorded.")
-  if (section_info$EpochPerDAC$llNumEntries > 0)
-    section$EpochPerDAC <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
-  else
-    warning("EpochPerDAC section: no entries recorded.")
-  if (section_info$Strings$llNumEntries > 0)
+  }
+  if (section_info$EpochPerDAC$llNumEntries > 0) {
+    epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
+    section$EpochPerDAC <- epdac[order(epdac$nDACNum, epdac$nEpochNum), ]
+  }
+  if (section_info$SynchArray$llNumEntries > 0) {
+    section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
+  }
+  if (section_info$Strings$llNumEntries > 0) {
     section$Strings <- read_str_section(fp, section_info$Strings)
-  else
+  } else {
     warning("Strings section: no entries recorded.")
+  }
 
   attr(section, "class") <- "abf_protocol"
 

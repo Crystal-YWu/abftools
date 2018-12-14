@@ -24,7 +24,7 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   fp <- file(filename, "rb")
 
   #Read header
-  header <- read_struct(fp, ABF2.Header.def)
+  header <- read_struct_n(fp, ABF2.Header.def)
   if (header$fFileSignature != "ABF2") {
     close(fp)
     stop("Only ABF2 file format is supported.")
@@ -32,18 +32,16 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
   #Read all sections info
   section_info <- list()
-  fptr <- header$byte.total
   for (i in seq_along(ABF2.SectionInfoList)) {
     section_name <- ABF2.SectionInfoList[i]
-    section_info[[section_name]] <- read_struct(fp, ABF2.SectionInfo.def, fptr)
-    fptr <- fptr + section_info[[section_name]]$byte.total
+    section_info[[section_name]] <- read_struct_n(fp, ABF2.SectionInfo.def)
   }
 
   #Read all supported sections
   section <- list()
   #These sections are quite important, if not presented throw a warning.
   if (section_info$Protocol$llNumEntries > 0) {
-    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def)
+    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def, df = FALSE)
   } else {
     close(fp)
     stop("Protocol section: no entries recorded.")
@@ -54,18 +52,22 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
     close(fp)
     stop("ADC section: no entries recorded.")
   }
-  if (section_info$DAC$llNumEntries > 0)
-    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def)
-  if (section_info$Epoch$llNumEntries > 0)
-    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def)
+  if (section_info$DAC$llNumEntries > 0) {
+    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def, df = FALSE)
+  }
+  if (section_info$Epoch$llNumEntries > 0) {
+    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def, df = FALSE)
+  }
   if (section_info$EpochPerDAC$llNumEntries > 0) {
     epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
     #sort EpochPerDAC prior to saving to meta, so we don't need to re-sort this
     #everytime calling epoch.R functions.
     section$EpochPerDAC <- epdac[order(epdac$nDACNum, epdac$nEpochNum), ]
   }
-  if (section_info$SynchArray$llNumEntries > 0)
+  if (section_info$SynchArray$llNumEntries > 0) {
     section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
+  }
+
 
   #We do not need these miscellaneous sections
   #if (section_info$Math$llNumEntries > 0)
@@ -76,23 +78,21 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   #  section$UserList <- read_section(fp, section_info$UserList, ABF2.UserList.def)
 
   #Read strings section
-  if (section_info$Strings$llNumEntries > 0)
+  if (section_info$Strings$llNumEntries > 0) {
     section$Strings <- read_str_section(fp, section_info$Strings)
-  else
+  } else {
     warning("Strings section: no entries recorded.")
+  }
   #Throw warning if read strings do not match llNumEntries.
-  if (length(section$Strings) != section_info$String$llNumEntries)
+  if (length(section$Strings) != section_info$String$llNumEntries) {
     warning("Strings section: llNumEntries and actual entries read do not match.")
+  }
 
   chan_num <- nrow(section$ADC)
-  if (section_info$Strings$llNumEntries == 0) {
-    chan_name <- rep("", chan_num)
-    chan_unit <- rep("", chan_num)
-    chan_desc <- rep("", chan_num)
-  } else {
-    chan_name <- c()
-    chan_unit <- c()
-    chan_desc <- c()
+  chan_name <- rep("", chan_num)
+  chan_unit <- rep("", chan_num)
+  chan_desc <- rep("", chan_num)
+  if (section_info$Strings$llNumEntries != 0) {
     for (i in seq_len(chan_num)) {
       idx <- section$ADC$lADCChannelNameIndex[i]
       chan_name[i] <- section$Strings[[idx]]
@@ -119,18 +119,18 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
   #Read data section
   #Basic sanity check
-  rawdata_int <- section_info$Data$uBytes == 2
-  if (section_info$Data$uBytes == 2 || section_info$Data$uByte == 4)
-    rawdata <- read_data_section(fp, section_info$Data)
-  else {
+  data_int <- section_info$Data$uBytes == 2
+  if (section_info$Data$uBytes == 2 || section_info$Data$uByte == 4) {
+    data <- read_data_section(fp, section_info$Data)
+  } else {
     close(fp)
     stop("Data section: unknown data record type.")
   }
   #Scaling and offset of rawdata
-  if (rawdata_int) {
-    signal_resol <- section$Protocol$fADCRange[1] / section$Protocol$lADCResolution[1]
-    signal_scale <- rep(1, chan_num)
-    signal_offset <- rep(0, chan_num)
+  if (data_int) {
+    signal_resol <- section$Protocol$fADCRange / section$Protocol$lADCResolution
+    signal_scale <- rep(1.0, chan_num)
+    signal_offset <- rep(0.0, chan_num)
     for (i in seq_len(chan_num)) {
       #instrument scale factor
       signal_scale[i] <- section$ADC$fInstrumentScaleFactor[i]
@@ -148,7 +148,7 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   }
 
   #sampling interval
-  sample_interval_us <- section$Protocol$fADCSequenceInterval[1]
+  sample_interval_us <- section$Protocol$fADCSequenceInterval
 
   #parse synch array since sample_interval_us is resolved
   tu_per_tick <- ifelse(section$Protocol$fSynchTimeUnit == 1,
@@ -161,7 +161,7 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   close(fp)
 
   #Now compile everything we've got into result
-  op_mode <- section$Protocol$nOperationMode[1]
+  op_mode <- section$Protocol$nOperationMode
 
   if (op_mode == 1L) {
     #event-driven variable-length
@@ -176,22 +176,21 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
     #event-driven fixed-length (2), high-speed oscilloscope (4), waveform fixed-length (5)
 
     #resolve 3d array from rawdata
-    pts_per_chan <- section$Protocol$lNumSamplesPerEpisode[1] / chan_num
-    chan_per_epi <- chan_num
-    epi_per_run <- section$Protocol$lEpisodesPerRun[1]
+    pts_per_chan <- section$Protocol$lNumSamplesPerEpisode / chan_num
+    epi_per_run <- section$Protocol$lEpisodesPerRun
     #check if data pts number match
-    if (section_info$Data$llNumEntries != pts_per_chan * chan_per_epi * epi_per_run) {
+    if (section_info$Data$llNumEntries != pts_per_chan * chan_num * epi_per_run) {
       stop("Data section: recorded data points do not match protocol setting.")
     }
-    data <- array(data = rawdata, dim = c(chan_per_epi, pts_per_chan, epi_per_run))
-    #scale data if needed
-    if (rawdata_int)
-      for (i in seq_len(chan_per_epi))
-        data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
-
-    #data in memory is ordered in (chan, pts, epi) since we usually access
-    #episodic data by channel, a more efficient order should be (pts, epi, chan)
+    dim(data) <- c(chan_num, pts_per_chan, epi_per_run)
     data <- aperm(data, c(2, 3, 1))
+    if (data_int) {
+      dscale <- signal_resol * signal_scale
+      doffset <- signal_offset
+      for (i in seq_len(chan_num)) {
+        data[,,i] <- data[,,i] * dscale[i] + doffset[i]
+      }
+    }
   }
   else if (op_mode == 3L) {
     #Gap-free
@@ -201,14 +200,15 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
     pts_per_chan <- section_info$Data$llNumEntries %/% 2L
     chan_per_run <- chan_num
     #Added 3rd dim so that we can treat a Gap-free like an episodic abf (with only
-    #one episode).
-    data <- array(data = rawdata, dim = c(chan_per_run, pts_per_chan, 1))
-    #scale data if needed
-    if (rawdata_int)
-      for (i in seq_len(chan_per_run))
-        data[i,,] <- data[i,,] * signal_resol * signal_scale[i] + signal_offset[i]
-
+    dim(data) <- c(chan_per_run, pts_per_chan, 1L)
     data <- aperm(data, c(2, 3, 1))
+    if (data_int) {
+      dscale <- signal_resol * signal_scale
+      doffset <- signal_offset
+      for (i in seq_len(chan_num)) {
+        data[,,i] <- data[,,i] * dscale[i] + doffset[i]
+      }
+    }
   }
   else {
     stop(paste0("Protocol section: Unrecognised operation mode ", op_mode, "."))
