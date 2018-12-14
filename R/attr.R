@@ -179,7 +179,7 @@ GetEpisodesPerChannel <- function(abf) {
   }
 
   meta <- get_meta(abf)
-  ret <- meta$Protocol$lEpisodesPerRun
+  ret <- nrow(meta$SynchArray)
 
   return(ret)
 }
@@ -199,7 +199,11 @@ GetPointsPerEpisode <- function(abf) {
   }
 
   meta <- get_meta(abf)
-  ret <- meta$Protocol$lNumSamplesPerEpisode %/% GetNumOfChannel(abf)
+  if (mode == 1L) {
+    ret <- meta$SynchArray$lLength %/% GetNumOfChannel(abf)
+  } else {
+    ret <- meta$SynchArray$lLength[1] %/% GetNumOfChannel(abf)
+  }
 
   return(ret)
 }

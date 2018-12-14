@@ -29,11 +29,11 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 
   #sampling interval
   sample_interval_us <- section$Protocol$fADCSequenceInterval
-  tu_per_tick <- ifelse(section$Protocol$fSynchTimeUnit == 1,
-                        yes = sample_interval_us,
-                        no = section$Protocol$fSynchTimeUnit)
-  lStart_tick <- section$SynchArray$lStart / tu_per_tick
-  section$SynchArray <- cbind(section$SynchArray, lStart_tick)
+  #tu_per_tick <- ifelse(section$Protocol$fSynchTimeUnit == 1,
+  #                      yes = sample_interval_us,
+  #                      no = section$Protocol$fSynchTimeUnit)
+  #lStart_tick <- section$SynchArray$lStart %/% tu_per_tick + 1L
+  #section$SynchArray$lStart <- lStart_tick
 
   chan_num <- nrow(section$ADC)
   chan_name <- rep("", chan_num)
@@ -96,12 +96,23 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   op_mode <- section$Protocol$nOperationMode
   if (op_mode == 1L) {
     #event-driven variable-length
-    stop("Event-driven variable-length mode is not supported yet.")
+    warning("Event-driven variable-length mode is not tested.")
 
-    #For variable-length sweeps, we can't simply extract data into a 3d array
-    #since sweep lengths (pts_per_chan) are different
+    #NA padded 3d array
+    max_length <- max(section$SynchArray$lLength)
+    nevent <- nrow(section$SynchArray)
+    npts <- max_length %/% chan_num
+    tmp <- array(data = NA, dim = c(chan_num, npts, nevent))
 
-    #TODO: a proper data representation of variable-length mode
+    idx_end <- cumsum(section$SynchArray$lLength)
+    idx_start <- c(1L, idx_end + 1L)
+
+    for (i in seq_len(nevent)) {
+      idx <- seq.int(from = idx_start[i], to = idx_end[i])
+      tmp[,,i] <- data[idx]
+    }
+    data <- tmp
+
   }
   else if (op_mode == 2L | op_mode == 4L | op_mode == 5L) {
     #event-driven fixed-length (2), high-speed oscilloscope (4), waveform fixed-length (5)
@@ -112,6 +123,7 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
       err_abf_file("Recorded number of data points does not match protocol setting.")
     }
     dim(data) <- c(chan_num, pts_per_chan, epi_per_run)
+
   }
   else if (op_mode == 3L) {
     #Gap-free
