@@ -2,9 +2,12 @@
 % Please edit documentation in R/attr.R
 \name{GetNumOfChannel}
 \alias{GetNumOfChannel}
+\alias{nChan}
 \title{Get number of channels.}
 \usage{
 GetNumOfChannel(abf)
+
+nChan(abf)
 }
 \arguments{
 \item{abf}{an abf object.}

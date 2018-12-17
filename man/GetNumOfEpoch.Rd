@@ -2,9 +2,12 @@
 % Please edit documentation in R/attr.R
 \name{GetNumOfEpoch}
 \alias{GetNumOfEpoch}
+\alias{nEpoch}
 \title{Get number of epochs.}
 \usage{
 GetNumOfEpoch(abf)
+
+nEpoch(abf)
 }
 \arguments{
 \item{abf}{an abf object}

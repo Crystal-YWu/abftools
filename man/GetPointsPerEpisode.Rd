@@ -2,9 +2,12 @@
 % Please edit documentation in R/attr.R
 \name{GetPointsPerEpisode}
 \alias{GetPointsPerEpisode}
+\alias{nPts}
 \title{Get number of recorded points per episode/sweep.}
 \usage{
-GetPointsPerEpisode(abf)
+GetPointsPerEpisode(abf, event = NULL)
+
+nPts(abf)
 }
 \arguments{
 \item{abf}{an abf object.}

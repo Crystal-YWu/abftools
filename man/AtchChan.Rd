@@ -4,7 +4,8 @@
 \alias{AtchChan}
 \title{Attach a new channel to an abf object.}
 \usage{
-AtchChan(abf, new_channel, channel_name, channel_unit, channel_desc)
+AtchChan(abf, new_channel, channel_name, channel_unit,
+  channel_desc = channel_name)
 }
 \arguments{
 \item{abf}{an abf object.}
