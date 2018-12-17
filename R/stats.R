@@ -73,42 +73,38 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   nepi <- nEpi(abf)
   npts_abf <- nPts(abf)
 
-  #indices of the sampled points
   idx_smpl <- seq(from = 1L, to = npts_abf, by = sampling_ratio)
-  #npts for sampled abf
   npts <- length(idx_smpl)
-  #copy sampled points to data
   data <- array(abf[idx_smpl, , ], dim = c(npts, nepi, nch))
-  #TODO: this is super SLOW, optimisation needed.
-  #Solution 1. restrict sampling_func to a function that applies data by column,
-  #and provide high performance colXX functions to users. Should consider
-  #consistency with sampling_func of melt.abf
-  #Solution 2. convert this part to Rcpp.
+
   if (!is.null(sampling_func)) {
-    for (chan in seq_len(nch)) {
-      #for (epi in seq.int(nepi)) {
-      #  for (i in seq.int(npts - 1L)) {
-      #    mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
-      #    data[i, epi, chan] <- sampling_func(abf[mask, epi, chan])
-      #  }
-      #  mask <- seq.int(idx_smpl[npts], npts_abf)
-      #  data[npts, epi, chan] <- sampling_func(abf[mask, epi, chan])
-      #}
-      #sapply sees speed degrade. use loop instead.
-      #for (i in seq.int(npts - 1L)) {
-      #  mask <- seq.int(idx_smpl[i], idx_smpl[i + 1] - 1L)
-      #  tmp_values <- sapply(seq.int(nepi), function(x) sampling_func(abf[mask, x, chan]))
-      #  data[i, , chan] <- tmp_values
-      #}
-      #mask <- seq.int(idx_smpl[npts], npts_abf)
-      #tmp_values <- sapply(seq.int(nepi), function(x) sampling_func(abf[mask, x, chan]))
-      #data[npts, , chan] <- tmp_values
-      for (i in seq_len(npts - 1L)) {
-        mask <- seq(idx_smpl[i], idx_smpl[i + 1] - 1L)
-        data[i, , chan] <- sampling_func(abf[mask, , chan])
+    idx_end <- c(idx_smpl[2:npts] - 1L, npts_abf)
+    if (GetMode(abf) == 1L) {
+      warned <- FALSE
+      for (ch in seq_len(nch)) {
+        for (i in seq_len(npts)) {
+          mask <- seq.int(idx_smpl[i], idx_end[i])
+          tmp <- abf[mask, , ch]
+          if (all(is.na(tmp))) {
+            break
+          }
+          val <- sampling_func(tmp)
+          nan <- which(is.nan(val))
+          if (length(nan) && !warned) {
+            val[nan] <- NA
+            warning("NaN values are replaced by NAs.")
+            warned <- TRUE
+          }
+          data[i, , ch] <- val
+        }
       }
-      mask <- seq(idx_smpl[npts], npts_abf)
-      data[npts, , chan] <- sampling_func(abf[mask, , chan])
+    } else {
+      for (ch in seq_len(nch)) {
+        for (i in seq_len(npts)) {
+          mask <- seq.int(idx_smpl[i], idx_end[i])
+          data[i, , ch] <- sampling_func(abf[mask, , ch])
+        }
+      }
     }
   }
 
@@ -128,7 +124,12 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   #alter meta
   meta <- get_meta(abf)
   meta$Protocol$fADCSequenceInterval <- new_samp_intv
-  meta$Protocol$lNumSamplesPerEpisode <- npts * nch
+  if (GetMode(abf) != 3L) {
+    nepi <- nEpi(abf)
+    for (i in seq_len(nepi)) {
+      meta$SynchArray$lLength[i] <- sum(!is.na(data[, i, 1L])) * nch
+    }
+  }
   attr(data, "meta") <- meta
 
   return(data)
