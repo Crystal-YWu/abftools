@@ -98,6 +98,11 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
     #event-driven variable-length
     warning("Event-driven variable-length mode is not tested.")
 
+    #check data pts
+    if (section_info$Data$llNumEntries != sum(section$SynchArray$lLength)) {
+      err_abf_file("Recorded number of data points does not match protocol setting.")
+    }
+
     #NA padded 3d array
     max_length <- max(section$SynchArray$lLength)
     nevent <- nrow(section$SynchArray)
@@ -118,19 +123,20 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
   }
   else if (op_mode == 2L | op_mode == 4L | op_mode == 5L) {
     #event-driven fixed-length (2), high-speed oscilloscope (4), waveform fixed-length (5)
-    pts_per_chan <- section$Protocol$lNumSamplesPerEpisode %/% chan_num
-    epi_per_run <- section$Protocol$lEpisodesPerRun
+
     #check if data pts number match
-    if (section_info$Data$llNumEntries != pts_per_chan * chan_num * epi_per_run) {
+    if (section_info$Data$llNumEntries != sum(section$SynchArray$lLength)) {
       err_abf_file("Recorded number of data points does not match protocol setting.")
     }
+
+    pts_per_chan <- section$SynchArray$lLength[1] %/% chan_num
+    epi_per_run <- nrow(section$SynchArray)
     dim(data) <- c(chan_num, pts_per_chan, epi_per_run)
 
   }
   else if (op_mode == 3L) {
     #Gap-free
-    #Can't resolve values from protocol any more
-    pts_per_chan <- section_info$Data$llNumEntries %/% chan_num
+    pts_per_chan <- length(data) %/% chan_num
     dim(data) <- c(chan_num, pts_per_chan, 1L)
   }
   else {
