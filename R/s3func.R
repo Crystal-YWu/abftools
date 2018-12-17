@@ -9,14 +9,22 @@
 #'
 print.abf <- function(x, ...) {
 
+  mode <- GetMode(x)
+  if (mode == 1L) {
+    fmt_str <- paste0("Mode %d abf object %s.\n",
+                      "Recorded %d ADC channels and %d events. ",
+                      "Sampling interval: %.2f us.")
+    s <- sprintf(fmt_str, mode, GetTitle(x), nChan(x), nEpi(x), GetSamplingIntv(x))
+  } else {
     fmt_str <- paste0("Mode %d abf object %s.\n",
                       "Recorded %d ADC channels of %d episodes with %d points per episode. ",
                       "Sampling interval: %.2f us.")
-    s <- sprintf(fmt_str, GetMode(x), GetTitle(x), nChan(x), nEpi(x), nPts(x),
+    s <- sprintf(fmt_str, mode, GetTitle(x), nChan(x), nEpi(x), nPts(x),
                  GetSamplingIntv(x))
-    cat(s, "\n")
+  }
+  print(s)
 
-    invisible(x)
+  invisible(x)
 }
 
 #' Extract channel data from an abf object.
