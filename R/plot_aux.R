@@ -41,11 +41,11 @@ TickToTime <- function(abf, time_unit, ctick) {
 
   ctime <- switch(time_unit,
                   tick = ctick,
-                  us = ctick * GetSamplingIntv(abf),
-                  ms = ctick * GetSamplingIntv(abf) / 1000,
-                  s  = ctick * GetSamplingIntv(abf) / 1000 / 1000,
-                  min = ctick * GetSamplingIntv(abf) / 1000 / 1000 / 60,
-                  hr = ctick * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60,
+                  us =  (ctick - 1L) * GetSamplingIntv(abf),
+                  ms =  (ctick - 1L) * GetSamplingIntv(abf) / 1000,
+                  s  =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000,
+                  min = (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60,
+                  hr =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60,
                   err_time_unit())
 
   return(ctime)
