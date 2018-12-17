@@ -117,7 +117,8 @@ CheckChannelDim <- function(abf, channel_data) {
 #' @return an abf object with the attached channel.
 #' @export
 #'
-AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc) {
+AtchChan <- function(abf, new_channel,
+                     channel_name, channel_unit, channel_desc = channel_name) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -140,25 +141,6 @@ AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc)
   #copy meta information
   meta <- get_meta(abf)
 
-  #craft an ADC record that make sense
-  same_unit <- match(channel_unit, GetChannelUnit(abf))
-  if (!is.na(same_unit)) {
-    #we've found an ADC channel that has same unit, so we can pretend that the new
-    #channel has same settings
-    meta$ADC <- rbind(meta$ADC, meta$ADC[same_unit, ])
-  } else {
-    #new channel has a new unit, so we need to craft arbitrary ADC settings for it
-    meta$ADC <- rbind(meta$ADC, meta$ADC[nchan_old, ])
-    #new channel does not offset, and only scales to fADCRange/lADCResolution
-    meta$ADC$fSignalGain[nchan_new] <- 1.0
-    meta$ADC$fADCProgrammableGain[nchan_new] <- 1.0
-    meta$ADC$fTelegraphAdditGain <- 1.0
-    meta$ADC$fInstrumentOffset <- 0.0
-    meta$ADC$fSignalOffset <- 0.0
-  }
-  #set correct ADC num
-  meta$ADC$nADCNum <- nchan_new - 1L
-
   #set strings and corresponding ADC channel settings
   str <- meta$Strings
   str <- c(str, channel_name)
@@ -166,12 +148,15 @@ AtchChan <- function(abf, new_channel, channel_name, channel_unit, channel_desc)
   str <- c(str, channel_unit)
   channel_unit_idx <- length(str)
   meta$Strings <- str
-  meta$ADC$lADCChannelNameIndex[nchan_new] <- channel_name_idx
-  meta$ADC$lADCUnitsIndex[nchan_new] <- channel_unit_idx
+  newadc <- dummy_adc_entry(nADCNum = nchan_new - 1L,
+                            lADCChannelNameIndex = channel_name_idx,
+                            lADCUnitsIndex = channel_unit_idx)
+  meta$ADC <- rbind(meta$ADC, newadc)
 
-  #set lNumSamplesPerEpisode
-  npts <- nPts(abf)
-  meta$Protocol$lNumSamplesPerEpisode <- npts * nchan_new
+  if (GetMode(abf) != 3L) {
+    unit_lLength <- meta$SynchArray$lLength %/% nchan_old
+    meta$SynchArray$lLength <- unit_lLength * nchan_new
+  }
 
   #we should be good to go
   attr(new_abf, "class") <- "abf"

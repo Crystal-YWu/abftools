@@ -76,7 +76,7 @@ GetChannelName <- function(abf) {
     err_class_abf()
   }
 
-  return(attr(abf, "ChannelName"))
+  attr(abf, "ChannelName")
 }
 
 #' Get units of channels.
@@ -92,7 +92,7 @@ GetChannelUnit <- function(abf) {
     err_class_abf()
   }
 
-  return(attr(abf, "ChannelUnit"))
+  attr(abf, "ChannelUnit")
 }
 
 #' Get descriptions of channels.
@@ -108,7 +108,7 @@ GetChannelDesc <- function(abf) {
     err_class_abf()
   }
 
-  return(attr(abf, "ChannelDesc"))
+  attr(abf, "ChannelDesc")
 }
 
 #' Get sampling interval in us.
@@ -124,7 +124,7 @@ GetSamplingIntv <- function(abf) {
     err_class_abf()
   }
 
-  return(attr(abf, "SamplingInterval"))
+  attr(abf, "SamplingInterval")
 }
 
 #' Get mode of the abf object.
@@ -140,7 +140,7 @@ GetMode <- function(abf) {
     err_class_abf()
   }
 
-  return(attr(abf, "mode"))
+  attr(abf, "mode")
 }
 
 #' Get number of channels.
@@ -152,11 +152,7 @@ GetMode <- function(abf) {
 #'
 GetNumOfChannel <- function(abf) {
 
-  meta <- get_meta(abf)
-  #Every observation of table ADC is a channel
-  ret <- nrow(meta$ADC)
-
-  return(ret)
+  dim(abf)[3]
 }
 
 #' Get number of episodes/sweeps per channel.
@@ -173,15 +169,7 @@ GetNumOfChannel <- function(abf) {
 #'
 GetEpisodesPerChannel <- function(abf) {
 
-  mode <- GetMode(abf)
-  if (mode == 3L) {
-    return(1L)
-  }
-
-  meta <- get_meta(abf)
-  ret <- nrow(meta$SynchArray)
-
-  return(ret)
+  dim(abf)[2]
 }
 
 #' Get number of recorded points per episode/sweep.
@@ -191,21 +179,30 @@ GetEpisodesPerChannel <- function(abf) {
 #' @return number of recorded points per episode/sweep.
 #' @export
 #'
-GetPointsPerEpisode <- function(abf) {
+GetPointsPerEpisode <- function(abf, event = NULL) {
+
+  dim(abf)[1]
+}
+
+#' Get number of recorded points for corresponding event.
+#'
+#' @param abf an abf object.
+#' @param event id of event.
+#'
+#' @return number of recorded points.
+#' @export
+#'
+GetPointsPerEvent <- function(abf, event = 1L) {
 
   mode <- GetMode(abf)
-  if (mode == 3L) {
-    return(dim(abf)[1])
-  }
-
-  meta <- get_meta(abf)
-  if (mode == 1L) {
-    ret <- meta$SynchArray$lLength %/% GetNumOfChannel(abf)
+  if (mode != 1L) {
+    ans <- GetPointsPerEpisode(abf)
   } else {
-    ret <- meta$SynchArray$lLength[1] %/% GetNumOfChannel(abf)
+    meta <- get_meta(abf)
+    ans <- meta$SynchArray$lLength[event] %/% nChan(abf)
   }
 
-  return(ret)
+  ans
 }
 
 #' Get number of epochs.
@@ -223,58 +220,45 @@ GetNumOfEpoch <- function(abf) {
     return(0L)
   }
 
-  return(nrow(epdac))
+  nrow(epdac)
 }
 
-#' Get number of channels.
-#'
-#' @param abf an abf object.
-#'
-#' @return number of channels.
+#' @rdname GetNumOfChannel
 #' @export
 #'
 nChan <- function(abf) {
 
-  return(GetNumOfChannel(abf))
+  GetNumOfChannel(abf)
 }
 
-#' Get number of recorded points per episode/sweep.
-#'
-#' @param abf an abf object.
-#'
-#' @return number of recorded points per episode/sweep.
+#' @rdname GetPointsPerEpisode
 #' @export
 #'
 nPts <- function(abf) {
 
-  return(GetPointsPerEpisode(abf))
+  GetPointsPerEpisode(abf)
 }
 
-#' Get number of episodes/sweeps per channel.
+#' @rdname GetPointsPerEvent
+#' @export
 #'
-#' The returned number may be different to the result of dim(abf[[chan_id]]) if
-#' you have removed episodes from the abf object. GetEpisodesPerChannel / nEpi
-#' always return the original number of episodes per channel setting in the
-#' abf2 protocol.
-#'
-#' @param abf an abf object.
-#'
-#' @return number of episodes/sweeps per channel.
+nPtsEvent <- function(abf, event = 1L) {
+
+  GetPointsPerEvent(abf, event)
+}
+
+#' @rdname GetEpisodesPerChannel
 #' @export
 #'
 nEpi <- function(abf) {
 
-  return(GetEpisodesPerChannel(abf))
+  GetEpisodesPerChannel(abf)
 }
 
-#' Get number of epochs.
-#'
-#' @param abf an abf object
-#'
-#' @return number of epochs.
+#' @rdname GetNumOfEpoch
 #' @export
 #'
 nEpoch <- function(abf) {
 
-  return(GetNumOfEpoch(abf))
+  GetNumOfEpoch(abf)
 }
