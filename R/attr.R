@@ -120,22 +120,78 @@ GetChannelDesc <- function(abf) {
 #' @return a abf object with new unit set.
 #' @export
 #'
-SetChannelUnit <- function(abf, unit, channel = 1L) {
+SetChanUnit <- function(abf, unit, channel = 1L) {
 
   if (IsAbf(abf)) {
-    units <- GetChannelDesc(abf)
+
+    units <- GetChannelUnit(abf)
     units[channel] <- as.character(unit)
-    eval.parent(substitute({
-      attr(abf, "ChannelUnit") <- units
-      invisible(abf)
-    }))
+    attr(abf, "ChannelUnit") <- units
+
   } else {
+
     err_class_abf()
   }
 
+  abf
 }
 
-#' Set channel description
+#' Set channel description.
+#'
+#' @param abf an abf object.
+#' @param desc a new description for the channel.
+#' @param channel channel id.
+#'
+#' @return a abf object with new ChannelDesc set.
+#' @export
+#'
+SetChanDesc <- function(abf, desc, channel = 1L) {
+
+  if (IsAbf(abf)) {
+
+    descs <- GetChannelDesc(abf)
+    descs[channel] <- as.character(desc)
+    attr(abf, "ChannelDesc") <- descs
+
+  } else {
+
+    err_class_abf()
+  }
+
+  abf
+}
+
+#' Set channel unit, by-ref behaviour.
+#'
+#' @param abf an abf object.
+#' @param unit a new unit
+#' @param channel channel id.
+#'
+#' @return a abf object with new unit set.
+#' @export
+#'
+SetChannelUnit <- function(abf, unit, channel = 1L) {
+
+  if (IsAbf(abf)) {
+
+    eval.parent(substitute({
+      abf <- SetChanUnit(abf, unit, channel)
+      invisible(abf)
+    }))
+
+  } else if (IsAbfList(abf)) {
+
+    eval.parent(substitute({
+      abf <- lapply(abf, function(x) SetChanUnit(x, unit, channel))
+      invisible(abf)
+    }))
+
+  } else {
+    err_class_abf_list()
+  }
+}
+
+#' Set channel description, by-ref behaviour.
 #'
 #' @param abf an abf object.
 #' @param description a new description for the channel.
@@ -147,16 +203,22 @@ SetChannelUnit <- function(abf, unit, channel = 1L) {
 SetChannelDesc <- function(abf, description, channel = 1L) {
 
   if (IsAbf(abf)) {
-    desc <- GetChannelDesc(abf)
-    desc[channel] <- as.character(description)
+
     eval.parent(substitute({
-      attr(abf, "ChannelDesc") <- desc
+      abf <- SetChanDesc(abf, description, channel)
       invisible(abf)
     }))
-  } else {
-    err_class_abf()
-  }
 
+  } else if (IsAbfList(abf)) {
+
+    eval.parent(substitute({
+      abf <- lapply(abf, function(x) SetChanDesc(x, description, channel))
+      invisible(abf)
+    }))
+
+  } else {
+    err_class_abf_list()
+  }
 }
 
 #' Get sampling interval in us.

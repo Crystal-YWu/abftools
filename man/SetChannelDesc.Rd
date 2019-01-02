@@ -2,7 +2,7 @@
 % Please edit documentation in R/attr.R
 \name{SetChannelDesc}
 \alias{SetChannelDesc}
-\title{Set channel description}
+\title{Set channel description, by-ref behaviour.}
 \usage{
 SetChannelDesc(abf, description, channel = 1L)
 }
@@ -17,5 +17,5 @@ SetChannelDesc(abf, description, channel = 1L)
 a abf object with new ChannelDesc set.
 }
 \description{
-Set channel description
+Set channel description, by-ref behaviour.
 }
