@@ -292,14 +292,14 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       dim_name[[2L + extra_dim]] <- dim_info$chan_id
       dimnames(data) <- dim_name
       #permutate dimensions
-      data <- aperm(data, c(1L + extra_dim, seq_len(extra_dim), 2 + extra_dim))
+      data <- aperm(data, c(1L + extra_dim, seq_len(extra_dim), 2L + extra_dim))
     } else {
       #..., time, episode
       dim_name[[1L + extra_dim]] <- dim_info$time_id
       dim_name[[2L + extra_dim]] <- dim_info$epi_id
       dimnames(data) <- dim_name
       #permutate dimensions
-      data <- aperm(data, c(1L + extra_dim, 2 + extra_dim, seq_len(extra_dim)))
+      data <- aperm(data, c(1L + extra_dim, 2L + extra_dim, seq_len(extra_dim)))
     }
 
     data

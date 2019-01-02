@@ -111,6 +111,54 @@ GetChannelDesc <- function(abf) {
   attr(abf, "ChannelDesc")
 }
 
+#' Set channel unit.
+#'
+#' @param abf an abf object.
+#' @param unit a new unit
+#' @param channel channel id.
+#'
+#' @return a abf object with new unit set.
+#' @export
+#'
+SetChannelUnit <- function(abf, unit, channel = 1L) {
+
+  if (IsAbf(abf)) {
+    units <- GetChannelDesc(abf)
+    units[channel] <- as.character(unit)
+    eval.parent(substitute({
+      attr(abf, "ChannelUnit") <- units
+      invisible(abf)
+    }))
+  } else {
+    err_class_abf()
+  }
+
+}
+
+#' Set channel description
+#'
+#' @param abf an abf object.
+#' @param description a new description for the channel.
+#' @param channel channel id.
+#'
+#' @return a abf object with new ChannelDesc set.
+#' @export
+#'
+SetChannelDesc <- function(abf, description, channel = 1L) {
+
+  if (IsAbf(abf)) {
+    desc <- GetChannelDesc(abf)
+    desc[channel] <- as.character(description)
+    eval.parent(substitute({
+      attr(abf, "ChannelDesc") <- desc
+      invisible(abf)
+    }))
+  } else {
+    err_class_abf()
+  }
+
+}
+
 #' Get sampling interval in us.
 #'
 #' @param abf an abf object.
