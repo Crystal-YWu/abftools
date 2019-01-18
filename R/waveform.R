@@ -7,7 +7,7 @@
 #' @return channel data of the simulated waveform.
 #' @export
 #'
-GetWaveform <- function(abf, episodes, wf_dac_id) {
+GetWaveform <- function(abf, episodes = NULL, wf_dac_id = NULL) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -15,7 +15,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
     err_wf_mode()
   }
   #Check DAC channel and DAC source
-  if (missing(wf_dac_id) || is.null(wf_dac_id)) {
+  if (is.null(wf_dac_id)) {
     wf_dac_id <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac_id) == 0L) {
@@ -24,7 +24,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
   wf_dac_id <- FirstElement(wf_dac_id)
   #Parse episodes
   nepi <- nEpi(abf)
-  if (missing(episodes) || is.null(episodes)) {
+  if (is.null(episodes)) {
     episodes = seq_len(nepi)
   } else if (!AssertEpisode(abf, episodes)) {
     err_epi()
@@ -116,7 +116,7 @@ GetWaveform <- function(abf, episodes, wf_dac_id) {
   return(mx)
 }
 
-#' Attach a waveform channel to an abf object, by-ref behaviour.
+#' Attach a waveform channel to an abf object.
 #'
 #' @param abf an abf object.
 #'
@@ -146,7 +146,7 @@ AttachWaveform <- function(abf) {
 
   new_abf <- AtchChan(abf, wf, dac_name, dac_unit, dac_desc)
 
-  return(new_abf)
+  new_abf
 }
 
 wf_step <- function(len, Vhi) {

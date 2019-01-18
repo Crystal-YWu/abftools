@@ -4,16 +4,16 @@
 \alias{MaskEpisodes}
 \title{Mask episodes with a value, by-ref behaviour.}
 \usage{
-MaskEpisodes(abf, channel, episodes, value)
+MaskEpisodes(abf, episodes, value, channel = 1L)
 }
 \arguments{
 \item{abf}{an abf or a list of abf object.}
 
-\item{channel}{channel id, 1-based.}
-
 \item{episodes}{the episodes to mask.}
 
 \item{value}{the value assigned to the episodes.}
+
+\item{channel}{channel id, 1-based.}
 }
 \value{
 an abf object with desired episodes masked with value.

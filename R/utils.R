@@ -66,37 +66,6 @@ SetIntv <- function(intv, startPos, endPos) {
   }))
 }
 
-push <- function(x, items) {
-
-  if (is.vector(x) || is.list(x)) {
-    eval.parent(substitute({
-      x <- append(x, items)
-    }))
-  } else {
-    err_class_vec_list()
-  }
-}
-
-pop <- function(x) {
-
-  #this contaminates parent's env, need better solution
-  if (is.vector(x)) {
-    eval.parent(substitute({
-      item <- x[length(x)]
-      x <- x[-length(x)]
-      item
-    }))
-  } else if (is.list(x)) {
-    eval.parent(substitute({
-      item <- x[[length(x)]]
-      x <- x[[-length(x)]]
-      item
-    }))
-  } else {
-    err_class_vec_list()
-  }
-}
-
 #' Apply a function over a list of abf objects.
 #'
 #' @param abf_list a list of abf objects.

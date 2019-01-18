@@ -1,14 +1,14 @@
 #' Mask episodes with a value.
 #'
 #' @param abf an abf object.
-#' @param channel channel id, 1-based.
 #' @param episodes the episodes to mask.
 #' @param value the value assigned to the episodes.
+#' @param channel channel id, 1-based.
 #'
 #' @return an abf object with desired episodes masked with value.
 #' @export
 #'
-MskEpi <- function(abf, channel, episodes, value) {
+MskEpi <- function(abf, episodes, value, channel = 1L) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -36,14 +36,14 @@ MskEpi <- function(abf, channel, episodes, value) {
 #' Mask episodes with a value, by-ref behaviour.
 #'
 #' @param abf an abf or a list of abf object.
-#' @param channel channel id, 1-based.
 #' @param episodes the episodes to mask.
 #' @param value the value assigned to the episodes.
+#' @param channel channel id, 1-based.
 #'
 #' @return an abf object with desired episodes masked with value.
 #' @export
 #'
-MaskEpisodes <- function(abf, channel, episodes, value) {
+MaskEpisodes <- function(abf, episodes, value, channel = 1L) {
 
   if (IsAbf(abf)) {
     return(

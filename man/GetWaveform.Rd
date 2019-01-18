@@ -4,7 +4,7 @@
 \alias{GetWaveform}
 \title{Simulate waveform.}
 \usage{
-GetWaveform(abf, episodes, wf_dac_id)
+GetWaveform(abf, episodes = NULL, wf_dac_id = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}

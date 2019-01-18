@@ -37,20 +37,20 @@ AssertLength <- function(x, ..., explicit = NULL) {
     }
   }
 
-  return(FALSE)
+  FALSE
 }
 
 AssertEpisode <- function(abf, episode) {
 
-  return(all(nEpi(abf) >= episode & episode > 0L))
+  all(nEpi(abf) >= episode & episode > 0L)
 }
 
 AssertChannel <- function(abf, channel) {
 
-  return(all(nChan(abf) >= channel & channel > 0L))
+  all(nChan(abf) >= channel & channel > 0L)
 }
 
 AssertEpoch <- function(abf, epoch) {
 
-  return(all(nEpoch(abf) >= epoch & epoch > 0L))
+  all(nEpoch(abf) >= epoch & epoch > 0L)
 }

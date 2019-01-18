@@ -60,9 +60,9 @@ ApplyBlank <- function(abf, chan, epi_val) {
 #' @return an abf object or a list of abf objects
 #' @export
 #'
-BlankAbf <- function(abf, ref_data, ref_intv = NULL, current_channel) {
+BlankAbf <- function(abf, ref_data, ref_intv = NULL, current_channel = NULL) {
 
-  if (missing(current_channel) || is.null(current_channel)) {
+  if (is.null(current_channel)) {
     current_channel <- GetFirstCurrentChan(abf)
   }
 

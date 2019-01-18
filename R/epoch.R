@@ -15,7 +15,7 @@ GetEpochId <- function(epoch_name) {
     err_epoch_name()
   }
 
-  return(epoch)
+  epoch
 }
 
 #' Get DAC id of which waveform is enabled.
@@ -31,6 +31,16 @@ GetWaveformEnabledDAC <- function(abf) {
     err_class_abf()
   }
 
+  #We can't rely solely on DAC$nWaveformEnable because even if user selected other
+  #modes which waveforms are not enabled and corresponding settings are grayed
+  #out in Clampex software, somehow the program will write all previous Waveform
+  #settings.
+  #
+  #Check if EpochPerDAC is present
+  if (nEpoch(abf) == 0L) {
+    return(integer())
+  }
+
   meta <- get_meta(abf)
 
   idx <- as.logical(meta$DAC$nWaveformEnable)
@@ -43,17 +53,7 @@ GetWaveformEnabledDAC <- function(abf) {
   #force DACid <-> nDACNum conversion
   DACid <- nDACNum + 1L
 
-  #We can't rely solely on DAC$nWaveformEnable because even if user selected other
-  #modes which waveforms are not enabled and corresponding settings are grayed
-  #out in Clampex software, somehow the program will write all previous Waveform
-  #settings.
-  #
-  #Check if EpochPerDAC is present
-  if (nEpoch(abf) == 0L) {
-    return(integer())
-  }
-
-  return(DACid)
+  DACid
 }
 
 #I don't think we need to export this
@@ -74,7 +74,7 @@ GetWaveformEpdac <- function(abf, DACid) {
   #EpochPerDAC is already sorted in abf2_load.
   #ret <- ret[order(ret$nEpochNum), ]
 
-  return(ret)
+  ret
 }
 
 #' Get intervals of all epochs.
@@ -88,12 +88,12 @@ GetWaveformEpdac <- function(abf, DACid) {
 #' @return a 3-d array, see details.
 #' @export
 #'
-GetEpochIntervals <- function(abf, wf_dac_ch) {
+GetEpochIntervals <- function(abf, wf_dac_ch = NULL) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
   }
-  if (missing(wf_dac_ch) || is.null(wf_dac_ch)) {
+  if (is.null(wf_dac_ch)) {
     wf_dac_ch <- GetWaveformEnabledDAC(abf)
   }
   if (length(wf_dac_ch) == 0L) {
@@ -132,5 +132,5 @@ GetEpochIntervals <- function(abf, wf_dac_ch) {
 
   dimnames(win) <- list(c("startPos", "endPos", "length"), NULL, NULL)
 
-  return(win)
+  win
 }

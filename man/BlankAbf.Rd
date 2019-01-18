@@ -4,7 +4,7 @@
 \alias{BlankAbf}
 \title{Blank current channel of abf objects.}
 \usage{
-BlankAbf(abf, ref_data, ref_intv = NULL, current_channel)
+BlankAbf(abf, ref_data, ref_intv = NULL, current_channel = NULL)
 }
 \arguments{
 \item{abf}{an abf object or a list of abf objects.}

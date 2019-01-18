@@ -2,7 +2,7 @@
 % Please edit documentation in R/waveform.R
 \name{AttachWaveform}
 \alias{AttachWaveform}
-\title{Attach a waveform channel to an abf object, by-ref behaviour.}
+\title{Attach a waveform channel to an abf object.}
 \usage{
 AttachWaveform(abf)
 }
@@ -13,5 +13,5 @@ AttachWaveform(abf)
 an abf object with a new waveform channel attached.
 }
 \description{
-Attach a waveform channel to an abf object, by-ref behaviour.
+Attach a waveform channel to an abf object.
 }

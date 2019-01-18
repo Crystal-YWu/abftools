@@ -4,12 +4,12 @@
 \alias{AttachChannel}
 \title{Attach a new channel to an abf object, by-ref like behaviour.}
 \usage{
-AttachChannel(abf, new_channel, channel_name, channel_unit, channel_desc)
+AttachChannel(abf, channel_data, channel_name, channel_unit, channel_desc)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{new_channel}{data of the new channel.}
+\item{channel_data}{data of the new channel.}
 
 \item{channel_name}{name of the new channel.}
 

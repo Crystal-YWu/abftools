@@ -104,12 +104,12 @@ CheckChannelDim <- function(abf, channel_data) {
 
 #' Attach a new channel to an abf object.
 #'
-#' The attached new_channel's dimensions must match original dimensions,
+#' The attached channel_data's dimensions must match original dimensions,
 #' regardless of removed episodes due to the mechanism of RemoveEpisodes (they
 #' are only marked removed and excluded when extracting using [[).
 #'
 #' @param abf an abf object.
-#' @param new_channel data of the new channel.
+#' @param channel_data data of the new channel.
 #' @param channel_name name of the new channel.
 #' @param channel_unit unit of the new channel.
 #' @param channel_desc description of the new channel.
@@ -117,13 +117,13 @@ CheckChannelDim <- function(abf, channel_data) {
 #' @return an abf object with the attached channel.
 #' @export
 #'
-AtchChan <- function(abf, new_channel,
+AtchChan <- function(abf, channel_data,
                      channel_name, channel_unit, channel_desc = channel_name) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
   }
-  if (!CheckChannelDim(abf, new_channel)) {
+  if (!CheckChannelDim(abf, channel_data)) {
     err_wrong_dim()
   }
 
@@ -136,7 +136,7 @@ AtchChan <- function(abf, new_channel,
   nchan_old <- nChan(abf)
   nchan_new <- nchan_old + 1L
   new_abf[, , 1:nchan_old] <- abf
-  new_abf[, , nchan_new] <- new_channel
+  new_abf[, , nchan_new] <- channel_data
 
   #copy meta information
   meta <- get_meta(abf)
@@ -177,7 +177,7 @@ AtchChan <- function(abf, new_channel,
 #' Attach a new channel to an abf object, by-ref like behaviour.
 #'
 #' @param abf an abf object.
-#' @param new_channel data of the new channel.
+#' @param channel_data data of the new channel.
 #' @param channel_name name of the new channel.
 #' @param channel_unit unit of the new channel.
 #' @param channel_desc description of the new channel.
@@ -185,11 +185,12 @@ AtchChan <- function(abf, new_channel,
 #' @return an abf object with the attached channel.
 #' @export
 #'
-AttachChannel <- function(abf, new_channel, channel_name, channel_unit, channel_desc) {
+AttachChannel <- function(abf, channel_data, channel_name, channel_unit, channel_desc) {
 
   return(
     eval.parent(substitute({
-      abf <- AtchChan(abf, new_channel, channel_name, channel_unit, channel_desc)
+      abf <- AtchChan(abf, channel_data, channel_name, channel_unit, channel_desc)
+      invisible(abf)
     }))
   )
 }
@@ -234,6 +235,7 @@ ReplaceChannel <- function(abf, channel, channel_data) {
   return(
     eval.parent(substitute({
       abf <- RplcChan(abf, channel, channel_data)
+      invisible(abf)
     }))
   )
 }

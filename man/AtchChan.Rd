@@ -4,13 +4,13 @@
 \alias{AtchChan}
 \title{Attach a new channel to an abf object.}
 \usage{
-AtchChan(abf, new_channel, channel_name, channel_unit,
+AtchChan(abf, channel_data, channel_name, channel_unit,
   channel_desc = channel_name)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{new_channel}{data of the new channel.}
+\item{channel_data}{data of the new channel.}
 
 \item{channel_name}{name of the new channel.}
 
@@ -22,7 +22,7 @@ AtchChan(abf, new_channel, channel_name, channel_unit,
 an abf object with the attached channel.
 }
 \description{
-The attached new_channel's dimensions must match original dimensions,
+The attached channel_data's dimensions must match original dimensions,
 regardless of removed episodes due to the mechanism of RemoveEpisodes (they
 are only marked removed and excluded when extracting using [[).
 }
