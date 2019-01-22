@@ -47,15 +47,23 @@ QuickPlot.default <- function(data, ...) {
 #' @rdname QuickPlot
 #' @export
 #'
+QuickPlot.matrix <- function(data, ...) {
+
+  QuickPlot(as.data.frame(data), ...)
+}
+
+#' @rdname QuickPlot
+#' @export
+#'
 #' @method QuickPlot abf
 #'
-QuickPlot.abf <- function(abf, pos, intv = NULL, cursor = NULL, time_unit,
+QuickPlot.abf <- function(abf, pos = NULL, intv = NULL, cursor = NULL, time_unit = NULL,
                           colour = FALSE, title = NULL, legend_title = NULL,
                           zero_intercept = TRUE, zero_axes = TRUE,
                           line_size = 0.5) {
 
 
-  if (missing(time_unit)) {
+  if (is.null(time_unit)) {
 
     if (nChan(abf) == 1L || nEpi(abf) == 1L) {
       #time_unit is not defined, but only one channel/episode,
@@ -67,9 +75,6 @@ QuickPlot.abf <- function(abf, pos, intv = NULL, cursor = NULL, time_unit,
 
       #parse pos
       #TODO: potential performance implication
-      if (missing(pos)) {
-        pos <- NULL
-      }
       if (!is.null(pos)) {
         pos <- MaskIntv(pos)
       }
@@ -89,7 +94,7 @@ QuickPlot.abf <- function(abf, pos, intv = NULL, cursor = NULL, time_unit,
 
   } else {
 
-    if (!missing(pos) && !is.null(pos)) {
+    if (!is.null(pos)) {
       warning("Argument pos is ignored. Please use intv or cursor for time series plots.")
     }
 
@@ -110,8 +115,8 @@ QuickPlot.data.frame <- function(df, colour = FALSE,
                                  title = NULL, legend_title = NULL,
                                  zero_intercept = TRUE, zero_axes = TRUE,
                                  line_size = 0.5, marker_size = line_size * 4,
-                                 err_bar_size = line_size / 1.5,
-                                 err_bar_width = marker_size * 1.5) {
+                                 err_bar_size = line_size / 1.75,
+                                 err_bar_width = marker_size * 1.25) {
 
   df <- list(df)
 
@@ -131,8 +136,8 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
                            title = NULL, legend_title = NULL,
                            zero_intercept = TRUE, zero_axes = TRUE,
                            line_size = 0.5, marker_size = line_size * 4,
-                           err_bar_size = line_size / 1.5,
-                           err_bar_width = marker_size * 1.5) {
+                           err_bar_size = line_size / 1.75,
+                           err_bar_width = marker_size * 1.25) {
 
   #whether column id is present in data
   id_present <- FALSE
@@ -177,8 +182,8 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
     }
 
     #We do not have unit information in this case
-    x_label <- "Voltage"
-    y_label <- "Current"
+    x_label <- "V"
+    y_label <- "I"
 
   } else {
 
