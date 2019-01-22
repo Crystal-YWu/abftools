@@ -4,7 +4,8 @@
 \alias{abf2_load}
 \title{abf2_load}
 \usage{
-abf2_load(filename, folder = NULL, abf_title = NULL)
+abf2_load(filename, folder = NULL, abf_title = NULL,
+  short_desc = TRUE)
 }
 \arguments{
 \item{filename}{file path to the abf2 file.}
@@ -12,6 +13,8 @@ abf2_load(filename, folder = NULL, abf_title = NULL)
 \item{folder}{OPTIONAL, path to folder containing the abf2 file.}
 
 \item{abf_title}{OPTIONAL, a title assigned to the loaded file, default is filename.}
+
+\item{short_desc}{whether to use short channel descriptions (I/V instead of Current/Voltage).}
 }
 \value{
 an abf object.

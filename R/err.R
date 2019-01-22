@@ -215,7 +215,7 @@ err_channel_data <- function(chan) {
 err_channel_config <- function(x) {
 
   xname <- as.character(substitute(x))
-  msg <- sprintf("Elements of %s have different channel configuration.", xname)
+  msg <- sprintf("Elements of %s have different channel configurations.", xname)
 
   err(msg)
 }

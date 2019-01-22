@@ -5,7 +5,7 @@
 \title{abf2_loadlist}
 \usage{
 abf2_loadlist(filelist, folder = NULL, attach_ext = TRUE,
-  titlelist = NULL)
+  titlelist = NULL, short_desc = TRUE)
 }
 \arguments{
 \item{filelist}{a list of file name or a data.frame like object with a column named FileName/filename.}
@@ -15,6 +15,8 @@ abf2_loadlist(filelist, folder = NULL, attach_ext = TRUE,
 \item{attach_ext}{automatically add ".abf" extension to filelist if not present.}
 
 \item{titlelist}{OPTIONAL, a list of titles, a single title to be assigned to all loaded files.}
+
+\item{short_desc}{whether to use short channel description.}
 }
 \value{
 a list of abf objects.

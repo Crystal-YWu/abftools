@@ -3,11 +3,13 @@
 #' @param filename file path to the abf2 file.
 #' @param folder OPTIONAL, path to folder containing the abf2 file.
 #' @param abf_title OPTIONAL, a title assigned to the loaded file, default is filename.
+#' @param short_desc whether to use short channel descriptions (I/V instead of Current/Voltage).
 #'
 #' @return an abf object.
 #' @export
 #'
-abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
+abf2_load <- function(filename, folder = NULL,
+                      abf_title = NULL, short_desc = TRUE) {
 
   if (is.null(abf_title)) {
     #strip all leading path for abf_title
@@ -52,12 +54,10 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
       if (idx != 0) {
         chan_unit[i] <- section$Strings[[idx]]
       }
-      if (endsWith(toupper(chan_unit[i]), "V") ||
-          grepl("VO", toupper(chan_unit[i]), fixed = TRUE)) {
-        chan_desc[i] <- "Voltage"
-      } else if (endsWith(toupper(chan_unit[i]), "A") ||
-                 grepl("AM", toupper(chan_unit[i]), fixed = TRUE)) {
-        chan_desc[i] <- "Current"
+      if (IsVoltageUnit(chan_unit[i])) {
+        chan_desc[i] <- ifelse(short_desc, "V", "Voltage")
+      } else if (IsCurrentUnit(chan_unit[i])) {
+        chan_desc[i] <- ifelse(short_desc, "I", "Current")
       } else {
         chan_desc[i] <- gsub("\\s", "_", chan_name[i])
       }
@@ -178,11 +178,13 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL) {
 #' @param folder OPTIONAL, the path to the folder of the files, if filelist contains full path, leave this to empty.
 #' @param attach_ext automatically add ".abf" extension to filelist if not present.
 #' @param titlelist OPTIONAL, a list of titles, a single title to be assigned to all loaded files.
+#' @param short_desc whether to use short channel description.
 #'
 #' @return a list of abf objects.
 #' @export
 #'
-abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist = NULL) {
+abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
+                          titlelist = NULL, short_desc = TRUE) {
 
   names(filelist) <- tolower(names(filelist))
 
@@ -220,7 +222,10 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE, titlelist 
   }
 
   #load abf
-  abf_list <- lapply(filelist, function(x) abf2_load(x, folder, NULL))
+  abf_list <- lapply(filelist, function(x) abf2_load(x,
+                                                     folder = folder,
+                                                     abf_title = NULL,
+                                                     short_desc = short_desc))
 
   #set titles
   if (!is.null(titlelist)) {

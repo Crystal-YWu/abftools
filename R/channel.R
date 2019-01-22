@@ -1,3 +1,6 @@
+IsVoltageUnit <- function(x) endsWith(toupper(x), "V") | grepl("VO", toupper(x), fixed = TRUE)
+IsCurrentUnit <- function(x) endsWith(toupper(x), "A") | grepl("AM", toupper(x), fixed = TRUE)
+
 #' Get voltage channel id.
 #'
 #' @param abf an abf object or a list of abf objects.
@@ -8,7 +11,7 @@
 GetVoltageChan <- function(abf) {
 
   if (IsAbf(abf)) {
-    ans <- which(GetChannelDesc(abf) == "Voltage")
+    ans <- which(IsVoltageUnit(GetChannelUnit(abf)))
     if (!length(ans)) {
       err_id_voltage_chan()
     }
@@ -36,9 +39,9 @@ GetVoltageChan <- function(abf) {
 GetCurrentChan <- function(abf) {
 
   if (IsAbf(abf)) {
-    ans <- which(GetChannelDesc(abf) == "Current")
+    ans <- which(IsCurrentUnit(GetChannelUnit(abf)))
     if (!length(ans)) {
-      err_id_voltage_chan()
+      err_id_current_chan()
     }
   } else if (IsAbfList(abf)) {
     ans <- unique(lapply(abf, GetCurrentChan))

@@ -131,10 +131,7 @@ FindSamplingInterval <- function(abf, current_channel, voltage_channel,
 
     v_settings <- meta$EpochPerDAC$fEpochInitLevel[epoch] +
       (seq_len(nEpi(abf)) - 1L) * meta$EpochPerDAC$fEpochLevelInc[epoch]
-    v_settings <- v_settings * 0.05
-    #workaround for zero v settings: set delta to mean.
-    idx_zero <- which(v_settings == 0)
-    v_settings[idx_zero] = mean(v_settings)
+    v_settings <- max(abs(v_settings)) * 0.10
 
     allowed_voltage_delta <- v_settings
   }
