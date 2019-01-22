@@ -221,6 +221,41 @@ SetChannelDesc <- function(abf, description, channel = 1L) {
   }
 }
 
+CpChannelAttr <- function(x, abf, channel = NULL) {
+
+  if (is.null(channel)) {
+    name <- GetChannelName(abf)
+    unit <- GetChannelUnit(abf)
+    desc <- GetChannelDesc(abf)
+  } else {
+    name <- GetChannelName(abf)[channel]
+    unit <- GetChannelUnit(abf)[channel]
+    desc <- GetChannelDesc(abf)[channel]
+  }
+
+  attr(x, "ChannelName") <- name
+  attr(x, "ChannelUnit") <- unit
+  attr(x, "ChannelDesc") <- desc
+
+  x
+}
+
+CpAbfAttr <- function(x, abf, cp_class = TRUE) {
+
+  attr(x, "title") <- GetTitle(abf)
+  attr(x, "mode") <- GetMode(abf)
+
+  x <- CpChannelAttr(x, abf)
+
+  attr(x, "SamplingInterval") <- GetSamplingIntv(abf)
+  attr(x, "EpiAvail") <- attr(abf, "EpiAvail")
+  if (cp_class) {
+    attr(x, "class") <- "abf"
+  }
+
+  x
+}
+
 #' Get sampling interval in us.
 #'
 #' @param abf an abf object.
@@ -235,6 +270,14 @@ GetSamplingIntv <- function(abf) {
   }
 
   attr(abf, "SamplingInterval")
+}
+
+#' @rdname GetSamplingIntv
+#' @export
+#'
+GetSamplingRate <- function(abf) {
+
+  GetSamplingIntv(abf)
 }
 
 #' Get mode of the abf object.

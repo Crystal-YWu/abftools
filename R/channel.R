@@ -162,17 +162,12 @@ AtchChan <- function(abf, channel_data,
   }
 
   #we should be good to go
-  attr(new_abf, "class") <- "abf"
-  attr(new_abf, "title") <- GetTitle(abf)
-  attr(new_abf, "mode") <- GetMode(abf)
+  new_abf <- CpAbfAttr(new_abf, abf)
+  attr(new_abf, "meta") <- meta
 
   attr(new_abf, "ChannelName") <- c(GetChannelName(abf), channel_name)
   attr(new_abf, "ChannelUnit") <- c(GetChannelUnit(abf), channel_unit)
   attr(new_abf, "ChannelDesc") <- c(GetChannelDesc(abf), channel_desc)
-  attr(new_abf, "SamplingInterval") <- GetSamplingIntv(abf)
-  attr(new_abf, "EpiAvail") <- attr(abf, "EpiAvail")
-
-  attr(new_abf, "meta") <- meta
 
   return(new_abf)
 }

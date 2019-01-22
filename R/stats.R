@@ -112,14 +112,8 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   new_samp_intv <- old_samp_intv * sampling_ratio
 
   #copy meta
-  attr(data, "class") <- "abf"
-  attr(data, "title") <- GetTitle(abf)
-  attr(data, "mode") <- GetMode(abf)
-  attr(data, "ChannelName") <- GetChannelName(abf)
-  attr(data, "ChannelUnit") <- GetChannelUnit(abf)
-  attr(data, "ChannelDesc") <- GetChannelDesc(abf)
+  data <- CpAbfAttr(data, abf)
   attr(data, "SamplingInterval") <- new_samp_intv
-  attr(data, "EpiAvail") <- attr(abf, "EpiAvail")
 
   #alter meta
   meta <- get_meta(abf)

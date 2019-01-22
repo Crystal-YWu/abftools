@@ -2,9 +2,12 @@
 % Please edit documentation in R/attr.R
 \name{GetSamplingIntv}
 \alias{GetSamplingIntv}
+\alias{GetSamplingRate}
 \title{Get sampling interval in us.}
 \usage{
 GetSamplingIntv(abf)
+
+GetSamplingRate(abf)
 }
 \arguments{
 \item{abf}{an abf object.}

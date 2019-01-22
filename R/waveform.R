@@ -11,7 +11,7 @@ GetWaveform <- function(abf, episodes = NULL, wf_dac_id = NULL) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
-  } else if (attr(abf, "mode") != 5L) {
+  } else if (GetMode(abf) != 5L) {
     err_wf_mode()
   }
   #Check DAC channel and DAC source
