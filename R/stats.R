@@ -51,7 +51,9 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
   df <- data.frame(mean_voltage_means, sem_voltage_means, mean_current_means,
                    sem_current_means, nsamples)
   colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current", "Num Samples")
-  return(df)
+  df <- CpChannelAttr(df, abf_list[[1]])
+
+  df
 }
 
 #' Sample abf object to reduce data points.
@@ -195,7 +197,8 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
   if (ret.df) {
     ret <- as.data.frame(ret)
   }
-  return(ret)
+
+  ret
 }
 
 #' Calculate mean currents of multiple abf objects

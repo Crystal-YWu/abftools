@@ -181,9 +181,22 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
       plt_data <- EnforceListNames(plt_data)
     }
 
-    #We do not have unit information in this case
-    x_label <- "V"
-    y_label <- "I"
+    chan_desc <- attr(data[[1]], "ChannelDesc")
+    chan_unit <- attr(data[[1]], "ChannelUnit")
+    if (is.null(chan_desc) || is.null(chan_unit)) {
+      #We do not have unit information in this case
+      x_label <- "V"
+      y_label <- "I"
+    } else {
+      vol_id <- FirstElement(which(IsVoltageUnit(chan_unit)))
+      cur_id <- FirstElement(which(IsCurrentUnit(chan_unit)))
+      vol_desc <- chan_desc[vol_id]
+      vol_unit <- chan_unit[vol_id]
+      cur_desc <- chan_desc[cur_id]
+      cur_unit <- chan_unit[cur_id]
+      x_label <- GetAxisLabel(vol_desc, vol_unit)
+      y_label <- GetAxisLabel(cur_desc, cur_unit)
+    }
 
   } else {
 

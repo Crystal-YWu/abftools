@@ -314,7 +314,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     data
   }
 
-  f <- function(abf, intv = NULL, episode, channel) {
+  f <- function(abf, intv = NULL, episode = NULL, channel = NULL) {
 
     if (!IsAbf(abf)) {
       err_class_abf()
@@ -327,7 +327,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       mask_time <- MaskIntv(intv)
     }
     mask_epi = integer()
-    if (missing(episode) || is.null(episode)) {
+    if (is.null(episode)) {
       mask_epi <- GetAvailEpisodes(abf)
     } else {
       mask_epi <- as.integer(unlist(episode))
@@ -336,7 +336,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       }
     }
     mask_chan = integer()
-    if (missing(channel) || is.null(channel)) {
+    if (is.null(channel)) {
       mask_chan <- GetAllChannels(abf)
     } else {
       mask_chan <- as.integer(unlist(channel))
@@ -362,6 +362,8 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       }
       ret <- fix_col(ret, col_info)
     }
+
+    ret <- CpChannelAttr(ret, abf, channel)
 
     ret
   }
