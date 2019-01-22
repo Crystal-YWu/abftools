@@ -148,12 +148,15 @@ DefaultEpiLabel <- function(abf) {
 #' @param xticks number of ticks of x axis
 #' @param yticks number of ticks of y axis
 #' @param textsize size of axis label size
+#' @param ticksize size of tick labels
 #'
 #' @return a list of ggplot object
 #' @export
 #'
-ZeroAxes <- function(xlimit, ylimit, xlabel, ylabel, xticks = 5, yticks = 5,
-                     textsize = 5) {
+ZeroAxes <- function(xlimit, ylimit,
+                     xlabel = NULL, ylabel = NULL,
+                     xticks = 5, yticks = 5,
+                     textsize = NULL, ticksize = NULL) {
 
   #remove xy axes
   theme_axis <- theme(axis.title.x = element_blank(),
@@ -181,15 +184,31 @@ ZeroAxes <- function(xlimit, ylimit, xlabel, ylabel, xticks = 5, yticks = 5,
 
   xlabel_posx <- min(xlimit)# + x_incr
   xlabel_posy <- 0
-  x_label <- annotate("text", x = xlabel_posx, y = xlabel_posy, label = xlabel, size = textsize,
-                      hjust = 0, vjust = -1.5)
+
+  if (!is.null(xlabel)) {
+    if (is.null(textsize)) {
+      x_label <- annotate("text", x = xlabel_posx, y = xlabel_posy, label = xlabel,
+                          hjust = 0, vjust = -1.5)
+    } else {
+      x_label <- annotate("text", x = xlabel_posx, y = xlabel_posy, label = xlabel,
+                          size = textsize, hjust = 0, vjust = -1.5)
+    }
+  }
   #shape 3 hack
   x_pts <- annotate("point", x = x_tick, y = rep(0, length(x_tick)), shape = 3)
 
   ylabel_posx <- 0
   ylabel_posy <- min(ylimit)# + y_incr
-  y_label <- annotate("text", x = ylabel_posx, y = ylabel_posy, label = ylabel, size = textsize,
-                      angle = 90, hjust = 0, vjust = -1.5)
+  if (!is.null(ylabel)) {
+    if (is.null(textsize)) {
+      y_label <- annotate("text", x = ylabel_posx, y = ylabel_posy, label = ylabel,
+                          angle = 90, hjust = 0, vjust = -1.5)
+    } else {
+      y_label <- annotate("text", x = ylabel_posx, y = ylabel_posy, label = ylabel,
+                          size = textsize, angle = 90, hjust = 0, vjust = -1.5)
+    }
+  }
+
   #shape 3 hack
   y_pts <- annotate("point", x = rep(0, length(y_tick)), y = y_tick, shape = 3)
 
@@ -198,8 +217,14 @@ ZeroAxes <- function(xlimit, ylimit, xlabel, ylabel, xticks = 5, yticks = 5,
     if (x == 0) {
       next
     }
-    tmp <- annotate("text", x = x, y = 0, label = as.character(x),
-                    hjust = 0.5, vjust = 1.5)
+    if (is.null(ticksize)) {
+      tmp <- annotate("text", x = x, y = 0, label = as.character(x),
+                      hjust = 0.5, vjust = 1.5)
+    } else {
+      tmp <- annotate("text", x = x, y = 0, label = as.character(x),
+                      size = ticksize, hjust = 0.5, vjust = 1.5)
+    }
+
     x_tick_lab <- c(x_tick_lab, tmp)
   }
   y_tick_lab <- NULL

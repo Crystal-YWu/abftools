@@ -4,8 +4,8 @@
 \alias{ZeroAxes}
 \title{Shift the axes of a ggplot object to 0}
 \usage{
-ZeroAxes(xlimit, ylimit, xlabel, ylabel, xticks = 5, yticks = 5,
-  textsize = 5)
+ZeroAxes(xlimit, ylimit, xlabel = NULL, ylabel = NULL, xticks = 5,
+  yticks = 5, textsize = NULL, ticksize = NULL)
 }
 \arguments{
 \item{xlimit}{limit of x values}
@@ -21,6 +21,8 @@ ZeroAxes(xlimit, ylimit, xlabel, ylabel, xticks = 5, yticks = 5,
 \item{yticks}{number of ticks of y axis}
 
 \item{textsize}{size of axis label size}
+
+\item{ticksize}{size of tick labels}
 }
 \value{
 a list of ggplot object
