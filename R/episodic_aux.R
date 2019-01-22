@@ -22,7 +22,7 @@ EpisodicInterval_f <- function(abf_list, intv_list, channel, f) {
       next
     } else {
       if (is.null(intv_list[[i]])) {
-        mask <- seq_len(nEpi(abf_list[[i]]))
+        mask <- seq_len(nPts(abf_list[[i]]))
       } else {
         mask <- MaskIntv(intv_list[[i]])
       }
