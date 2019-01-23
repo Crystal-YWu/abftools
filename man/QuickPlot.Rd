@@ -3,8 +3,8 @@
 \name{QuickPlot}
 \alias{QuickPlot}
 \alias{QuickPlot.default}
-\alias{QuickPlot.matrix}
 \alias{QuickPlot.abf}
+\alias{QuickPlot.matrix}
 \alias{QuickPlot.data.frame}
 \alias{QuickPlot.list}
 \title{Quick plot various type of data.}
@@ -13,22 +13,20 @@ QuickPlot(data, ...)
 
 \method{QuickPlot}{default}(data, ...)
 
-\method{QuickPlot}{matrix}(data, ...)
-
 \method{QuickPlot}{abf}(abf, pos = NULL, intv = NULL, cursor = NULL,
   time_unit = NULL, colour = FALSE, title = NULL,
   legend_title = NULL, zero_intercept = TRUE, zero_axes = TRUE,
   line_size = 0.5)
 
-\method{QuickPlot}{data.frame}(df, colour = FALSE, title = NULL,
-  legend_title = NULL, zero_intercept = TRUE, zero_axes = TRUE,
-  line_size = 0.5, marker_size = line_size * 4,
-  err_bar_size = line_size/1.75, err_bar_width = marker_size * 1.25)
+\method{QuickPlot}{matrix}(data, ...)
+
+\method{QuickPlot}{data.frame}(df, colour = FALSE, ...)
 
 \method{QuickPlot}{list}(data, pos = NULL, colour = TRUE,
   title = NULL, legend_title = NULL, zero_intercept = TRUE,
   zero_axes = TRUE, line_size = 0.5, marker_size = line_size * 4,
-  err_bar_size = line_size/1.75, err_bar_width = marker_size * 1.25)
+  err_bar_size = line_size/1.75, err_bar_width = marker_size * 1.25,
+  smooth = FALSE)
 }
 \arguments{
 \item{data}{data to plot, QuickPlot will try its best to figure out how to plot.}

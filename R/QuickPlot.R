@@ -47,14 +47,6 @@ QuickPlot.default <- function(data, ...) {
 #' @rdname QuickPlot
 #' @export
 #'
-QuickPlot.matrix <- function(data, ...) {
-
-  QuickPlot(as.data.frame(data), ...)
-}
-
-#' @rdname QuickPlot
-#' @export
-#'
 #' @method QuickPlot abf
 #'
 QuickPlot.abf <- function(abf, pos = NULL, intv = NULL, cursor = NULL, time_unit = NULL,
@@ -106,25 +98,25 @@ QuickPlot.abf <- function(abf, pos = NULL, intv = NULL, cursor = NULL, time_unit
   p
 }
 
+
+#' @rdname QuickPlot
+#' @export
+#'
+QuickPlot.matrix <- function(data, ...) {
+
+  QuickPlot(as.data.frame(data), ...)
+}
+
 #' @rdname QuickPlot
 #' @export
 #'
 #' @method QuickPlot data.frame
 #'
-QuickPlot.data.frame <- function(df, colour = FALSE,
-                                 title = NULL, legend_title = NULL,
-                                 zero_intercept = TRUE, zero_axes = TRUE,
-                                 line_size = 0.5, marker_size = line_size * 4,
-                                 err_bar_size = line_size / 1.75,
-                                 err_bar_width = marker_size * 1.25) {
+QuickPlot.data.frame <- function(df, colour = FALSE, ...) {
 
   df <- list(df)
 
-  QuickPlot.list(df, colour = colour,
-                 title = title, legend_title = legend_title,
-                 zero_intercept = zero_intercept, zero_axes = zero_axes,
-                 line_size = line_size, marker_size = marker_size,
-                 err_bar_size = err_bar_size, err_bar_width = err_bar_width)
+  QuickPlot.list(df, colour = colour, ...)
 }
 
 #' @rdname QuickPlot
@@ -137,7 +129,8 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
                            zero_intercept = TRUE, zero_axes = TRUE,
                            line_size = 0.5, marker_size = line_size * 4,
                            err_bar_size = line_size / 1.75,
-                           err_bar_width = marker_size * 1.25) {
+                           err_bar_width = marker_size * 1.25,
+                           smooth = FALSE) {
 
   #whether column id is present in data
   id_present <- FALSE
@@ -229,7 +222,26 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
   #Plotting
 
   #plot lines
-  p <- p + geom_line(size = line_size)
+  if (smooth) {
+    nsp <- Inf
+    for (elem in plt_data) {
+      tmp <- nrow(elem)
+      nsp <- min(tmp, nsp)
+    }
+    nsp <- nsp - 2L
+    #workaround for single smoothline coloured blue
+    n <- length(plt_data)
+    if (n == 1L) {
+      p <- p + geom_smooth(size = line_size, se = FALSE, colour = "Black",
+                           method = "lm", formula = y ~ splines::bs(x, nsp))
+    } else {
+      p <- p + geom_smooth(size = line_size, se = FALSE,
+                           method = "lm", formula = y ~ splines::bs(x, nsp))
+    }
+
+  } else {
+    p <- p + geom_line(size = line_size)
+  }
 
   #plot error bars
   if (err_bar) {
