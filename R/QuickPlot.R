@@ -228,7 +228,7 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
       tmp <- nrow(elem)
       nsp <- min(tmp, nsp)
     }
-    nsp <- nsp - 2L
+    nsp <- nsp - 1L
     #workaround for single smoothline coloured blue
     n <- length(plt_data)
     if (n == 1L) {
