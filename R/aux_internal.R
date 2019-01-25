@@ -8,7 +8,7 @@ MaskIntv <- function(intv) {
     return(intv[1]:intv[2])
   }
 
-  return(intv)
+  intv
 }
 
 OvlpIntv <- function(intv1, intv2) {
@@ -18,9 +18,9 @@ OvlpIntv <- function(intv1, intv2) {
   len <- idx2 - idx1 + 1L
 
   if (len <= 0) {
-    return(NA)
+    NA
   } else {
-    return(c(idx1, idx2, len))
+    Intv(idx1, idx2, len)
   }
 }
 
@@ -29,7 +29,7 @@ ShftIntv <- function(intv, pts) {
   intv[1] <- intv[1] + pts
   intv[2] <- intv[2] + pts
 
-  return(intv)
+  intv
 }
 
 LogiToIntv <- function(logi) {
@@ -43,7 +43,7 @@ LogiToIntv <- function(logi) {
   length <- r$lengths[r$values]
 
   win <- rbind(startPos, endPos, length)
-  return(win)
+  win
 }
 
 IntvToLogi <- function(intv, full_length) {
@@ -54,35 +54,35 @@ IntvToLogi <- function(intv, full_length) {
     ret[mask] <- TRUE
   }
 
-  return(ret)
+  ret
 }
 
 FilterMinIntervalSize <- function(interval, min_intv_size) {
 
   mask <- min_intv_size <= interval[3, ]
 
-  return(interval[ , mask, drop = FALSE])
+  interval[ , mask, drop = FALSE]
 }
 
 FilterMaxIntervalSize <- function(interval, max_intv_size) {
 
   mask <- interval[3, ] <= max_intv_size
 
-  return(interval[ , mask, drop = FALSE])
+  interval[ , mask, drop = FALSE]
 }
 
 FilterMinIntervalPos <- function(interval, min_intv_pos) {
 
   mask <- min_intv_pos <= interval[1, ]
 
-  return(interval[ , mask, drop = FALSE])
+  interval[ , mask, drop = FALSE]
 }
 
 FilterMaxIntervalPos <- function(interval, max_intv_pos) {
 
   mask <- interval[2, ] <= max_intv_pos
 
-  return(interval[ , mask, drop = FALSE])
+  interval[ , mask, drop = FALSE]
 }
 
 FirstElement <- function(x, elaborate = NULL) {
@@ -97,7 +97,7 @@ FirstElement <- function(x, elaborate = NULL) {
     warning(msg)
   }
 
-  return(x[[1]])
+  x[[1]]
 }
 
 ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
@@ -113,9 +113,8 @@ ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
     err_internal_bug(add_msg)
   }
   mask <- MaskIntv(intv)
-  y <- abf[mask, episode, channel]
 
-  return(y)
+  abf[mask, episode, channel]
 }
 
 ExpandList <- function(x, ref) {
@@ -128,7 +127,7 @@ ExpandList <- function(x, ref) {
     x <- rep(list(x), length(ref))
   }
 
-  return(x)
+  x
 }
 
 abf_list_copy_paste_place_holder <- function(abf) {

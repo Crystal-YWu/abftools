@@ -139,7 +139,7 @@ err_assert_len <- function(var, to_match) {
 
 err_epoch_dac <- function() {
 
-  msg <- "Waveform epoch is not recorded in the ABF object."
+  msg <- "Epoch setting is not enabled."
 
   err(msg)
 }

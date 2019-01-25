@@ -40,19 +40,15 @@ CpChannelAttr <- function(x, abf, channel = NULL) {
   x
 }
 
-CpAbfAttr <- function(x, abf, cp_class = TRUE) {
+CpAbfAttr <- function(x, abf) {
 
-  if (cp_class) {
-    attr(x, "class") <- "abf"
-  }
-  attr(x, "title") <- GetTitle(abf)
-  attr(x, "mode") <- GetMode(abf)
-
-  x <- CpChannelAttr(x, abf)
-
-  attr(x, "SamplingInterval") <- GetSamplingIntv(abf)
-  attr(x, "EpiAvail") <- attr(abf, "EpiAvail")
-  attr(x, "SyncArray") <- attr(abf, "SyncArray")
+  x <- ApplyAbfAttr(x, title = GetTitle(abf), mode = GetMode(abf),
+                    ChannelName = GetChannelName(abf),
+                    ChannelUnit = GetChannelUnit(abf),
+                    ChannelDesc = GetChannelDesc(abf),
+                    SamplingInterval = GetSamplingIntv(abf),
+                    EpiAvail = GetEpiAvail(abf), SyncArray = GetSyncArray(abf),
+                    meta = get_meta(abf))
 
   x
 }
@@ -315,6 +311,8 @@ GetSamplingRate <- function(abf) {
 
   GetSamplingIntv(abf)
 }
+
+GetEpiAvail <- function(abf) attr(abf, "EpiAvail")
 
 #' Return sync array of an abf object.
 #'

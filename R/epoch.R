@@ -11,7 +11,7 @@ GetEpochId <- function(epoch_name) {
   epoch_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
   epoch <- match(epoch_name, epoch_names)
 
-  if (is.null(epoch)) {
+  if (any(is.na(epoch))) {
     err_epoch_name()
   }
 
@@ -56,7 +56,6 @@ GetWaveformEnabledDAC <- function(abf) {
   DACid
 }
 
-#I don't think we need to export this
 GetWaveformEpdac <- function(abf, DACid) {
 
   if (!IsAbf(abf)) {
@@ -67,14 +66,8 @@ GetWaveformEpdac <- function(abf, DACid) {
   epdac <- meta$EpochPerDAC
   nDACNum <- DACid - 1L
 
-  #nDACNum is 0-based
   mask <- epdac$nDACNum == nDACNum
-  #sort epdac by nEpochNum just in case
-  ret <- epdac[mask, ]
-  #EpochPerDAC is already sorted in abf2_load.
-  #ret <- ret[order(ret$nEpochNum), ]
-
-  ret
+  epdac[mask, ]
 }
 
 #' Get intervals of all epochs.

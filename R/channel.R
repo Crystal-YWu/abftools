@@ -94,7 +94,7 @@ GetAllChannels <- function(abf) {
     err_class_abf()
   }
 
-  return(seq_len(nChan(abf)))
+  seq_len(nChan(abf))
 }
 
 CheckChannelDim <- function(abf, channel_data) {
@@ -102,7 +102,7 @@ CheckChannelDim <- function(abf, channel_data) {
   d1 <- dim(abf)
   d2 <- dim(channel_data)
 
-  return(all(d1[1:2] == d2))
+  all(d1[1:2] == d2)
 }
 
 #' Attach a new channel to an abf object.
@@ -156,20 +156,21 @@ AtchChan <- function(abf, channel_data,
                             lADCUnitsIndex = channel_unit_idx)
   meta$ADC <- rbind(meta$ADC, newadc)
 
-  if (GetMode(abf) != 3L) {
+  if (!is.null(meta$SynchArray)) {
     unit_lLength <- meta$SynchArray$lLength %/% nchan_old
     meta$SynchArray$lLength <- unit_lLength * nchan_new
   }
 
   #we should be good to go
-  new_abf <- CpAbfAttr(new_abf, abf)
-  attr(new_abf, "meta") <- meta
+  new_abf <- ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
+                          ChannelName = c(GetChannelName(abf), channel_name),
+                          ChannelUnit = c(GetChannelUnit(abf), channel_unit),
+                          ChannelDesc = c(GetChannelDesc(abf), channel_desc),
+                          SamplingInterval = GetSamplingIntv(abf),
+                          EpiAvail = GetEpiAvail(abf),
+                          SyncArray = meta$SynchArray, meta = meta)
 
-  attr(new_abf, "ChannelName") <- c(GetChannelName(abf), channel_name)
-  attr(new_abf, "ChannelUnit") <- c(GetChannelUnit(abf), channel_unit)
-  attr(new_abf, "ChannelDesc") <- c(GetChannelDesc(abf), channel_desc)
-
-  return(new_abf)
+  new_abf
 }
 
 #' Attach a new channel to an abf object, by-ref like behaviour.
