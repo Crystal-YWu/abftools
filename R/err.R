@@ -30,12 +30,6 @@ err_class_abf_list <- function() {
   err(msg)
 }
 
-err_class_abf_protocol <- function() {
-
-  msg <- "Only abf or abf protocol object are supported."
-  err(msg)
-}
-
 err_class_vec_list <- function() {
 
   msg <- "Only vector or list are supported."

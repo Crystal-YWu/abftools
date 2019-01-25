@@ -101,24 +101,6 @@ read_struct_n <- function(fp, struct.def, fptr = NULL, n = 1L) {
   result
 }
 
-#Calculate total size of a struct for verification purpose if needed.
-#This function is unsafe since there could be string of undefined length and we
-#would never know the correct size of the string before reading. Currently
-#this function always yield correct results because the only string field is
-#fFileSignature of a well-defined size of 4. However, features could be broken
-#if we introduce parsing of Tag sections etc. in the future.
-sizeof_struct <- function(struct.def) {
-
-  size <- 0
-  for (i in seq_along(struct.def$field)) {
-    tp <- struct.def$ctype[i]
-    ss <- struct.def$ssize[i]
-    size <- size + sizeof[tp] + ss
-  }
-
-  return(size)
-}
-
 #Calculate actual file pointer from section info
 get_fptr <- function(section.info) section.info$uBlockIndex * ABF2.BlockSize
 
@@ -145,7 +127,7 @@ read_str_section <- function(fp, section.info) {
   rawdata <- readBin(fp, what = "raw", n = section.info$uBytes)
   parsed <- parse_str_section(rawdata)
 
-  return(parsed)
+  parsed
 }
 
 #Parse the string section from rawdata
@@ -162,10 +144,9 @@ parse_str_section <- function(rawdata) {
     }
   }
 
-  return(result)
+  result
 }
 
-#But what's the point of sync array section?
 read_synch_arr_section <- function(fp, section.info) {
 
   n_entries <- section.info$llNumEntries
@@ -173,12 +154,12 @@ read_synch_arr_section <- function(fp, section.info) {
 
   fptr <- get_fptr(section.info)
   seek(fp, where = fptr, origin = "start")
-  data <- array(data = readBin(fp, "integer", n = n_element, size = sizeof["int32"]),
+  data <- array(data = readBin(fp, what = "integer", size = sizeof["int32"], n = n_element),
                 dim = c(2, n_entries))
-  synch_arr <- data.frame(t(data))
+  synch_arr <- t(data)
   colnames(synch_arr) <- c("lStart", "lLength")
 
-  return(synch_arr)
+  data.frame(synch_arr)
 }
 
 #Read raw data section
@@ -192,5 +173,5 @@ read_data_section <- function(fp, section.info) {
   seek(fp, where = fptr, origin = "start")
   rawdata <- readBin(fp, what = datatype, size = datasize, n = datalen, signed = TRUE)
 
-  return(rawdata)
+  rawdata
 }
