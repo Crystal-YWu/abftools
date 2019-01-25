@@ -278,6 +278,14 @@ abf2_section <- function(fp, section_info) {
   }
   if (section_info$SynchArray$llNumEntries > 0) {
     section$SynchArray <- read_synch_arr_section(fp, section_info$SynchArray)
+    #convert to lStart to tick so that SyncArray is compatible with TickToTime()
+    if (section$Protocol$fSynchTimeUnit == 1) {
+      section$SynchArray$lStart <- 1 +
+        section$SynchArray$lStart / section$Protocol$fADCSequenceInterval
+    } else {
+      section$SynchArray$lStart <- 1 +
+        section$SynchArray$lStart / section$Protocol$fSynchTimeUnit
+    }
   }
   if (section_info$Strings$llNumEntries > 0) {
     section$Strings <- read_str_section(fp, section_info$Strings)
