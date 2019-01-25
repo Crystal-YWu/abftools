@@ -30,7 +30,7 @@ MskEpi <- function(abf, episodes, value, channel = 1L) {
 
   abf[, episodes, channel] <- value
 
-  return(abf)
+  abf
 }
 
 #' Mask episodes with a value, by-ref behaviour.
@@ -90,11 +90,9 @@ RmEpi <- function(abf, episodes) {
     err_abf_not_episodic()
   }
 
-  epi_avail <- attr(abf, "EpiAvail")
-  epi_avail[episodes] <- FALSE
-  attr(abf, "EpiAvail") <- epi_avail
+  attr(abf, "EpiAvail")[episodes] <- FALSE
 
-  return(abf)
+  abf
 }
 
 #' Remove episodes from an abf object, by-ref behaviour.
@@ -151,11 +149,9 @@ ResEpi <- function(abf, episodes) {
   if (d[3] == 1L)
     err_abf_not_episodic()
 
-  epi_avail <- attr(abf, "EpiAvail")
-  epi_avail[episodes] <- TRUE
-  attr(abf, "EpiAvail") <- epi_avail
+  attr(abf, "EpiAvail")[episodes] <- TRUE
 
-  return(abf)
+  abf
 }
 
 #' Restore previous removed episodes, by-ref behaviour.
@@ -199,15 +195,14 @@ GetAvailEpisodes <- function(abf) {
     all_epi <- seq_len(nEpi(x))
     avail_epi <- attr(x, "EpiAvail")
 
-    return(all_epi[avail_epi])
+    all_epi[avail_epi]
   }
 
   if (IsAbf(abf)) {
-    return(f(abf))
+    f(abf)
   } else if (IsAbfList(abf)) {
-    return(lapply(abf, f))
+    lapply(abf, f)
   } else {
     err_class_abf_list()
   }
-
 }
