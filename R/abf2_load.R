@@ -25,30 +25,23 @@ abf2_load <- function(filename, folder = NULL,
 
   fp <- file(filename, "rb")
 
-  header <- abf2_head(fp)
+  header <- abf2_header(fp)
   section_info <- abf2_section_info(fp)
   section <- abf2_section(fp, section_info)
 
   #sampling interval
   sample_interval_us <- section$Protocol$fADCSequenceInterval
-  #tu_per_tick <- ifelse(section$Protocol$fSynchTimeUnit == 1,
-  #                      yes = sample_interval_us,
-  #                      no = section$Protocol$fSynchTimeUnit)
-  #lStart_tick <- section$SynchArray$lStart %/% tu_per_tick + 1L
-  #section$SynchArray$lStart <- lStart_tick
 
+  #parse channels
   chan_num <- nrow(section$ADC)
-  chan_name <- rep("", chan_num)
-  chan_unit <- rep("", chan_num)
-  chan_desc <- rep("", chan_num)
+  chan_name <- paste0("ch", seq_len(chan_num))
+  chan_unit <- paste0("ch", seq_len(chan_num), "_unit")
+  chan_desc <- paste0("ch", seq_len(chan_num))
   if (!is.null(section$Strings)) {
     for (i in seq_len(chan_num)) {
       idx <- section$ADC$lADCChannelNameIndex[i]
       if (idx != 0) {
         chan_name[i] <- section$Strings[idx]
-      } else {
-        #skip if the channel is unnamed.
-        next
       }
       idx <- section$ADC$lADCUnitsIndex[i]
       if (idx != 0) {
@@ -152,24 +145,20 @@ abf2_load <- function(filename, folder = NULL,
     }
   }
 
-  attr(data, "class") <- "abf"
-  attr(data, "title") <- abf_title
-  attr(data, "mode") <- op_mode
-
-  #attr(data, "ChannelNum") <- chan_num
-  attr(data, "ChannelName") <- chan_name
-  attr(data, "ChannelUnit") <- chan_unit
-  attr(data, "ChannelDesc") <- chan_desc
-  attr(data, "SamplingInterval") <- sample_interval_us
 
   nepi <- dim(data)[2]
-  attr(data, "EpiAvail") <- rep(TRUE, nepi)
-
   meta <- section
   meta$Header <- header
-  attr(data, "meta") <- meta
+  abf <- ApplyAbfAttr(data, title = abf_title, mode = op_mode,
+                      ChannelName = chan_name,
+                      ChannelUnit = chan_unit,
+                      ChannelDesc = chan_desc,
+                      SamplingInterval = sample_interval_us,
+                      EpiAvail = rep(TRUE, nepi),
+                      SyncArray = section$SynchArray,
+                      meta = meta)
 
-  return(data)
+  abf
 }
 
 #' abf2_loadlist
@@ -233,12 +222,12 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
     SetTitle(abf_list, titlelist)
   }
 
-  return(abf_list)
+  abf_list
 }
 
 AddSurfix <- function(x, sur) ifelse(endsWith(x, sur), x, paste0(x, sur))
 
-abf2_head <- function(fp) {
+abf2_header <- function(fp) {
 
   header <- read_struct_n(fp, ABF2.Header.def)
   if (header$fFileSignature != "ABF2") {
