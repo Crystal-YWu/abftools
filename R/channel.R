@@ -90,11 +90,13 @@ GetFirstCurrentChan <- function(abf) {
 #'
 GetAllChannels <- function(abf) {
 
-  if (!IsAbf(abf)) {
+  if (IsAbf(abf)) {
+    seq_len(nChan(abf))
+  } else if (IsAbfList(abf)) {
+    lapply(abf, function(x) seq_len(nChan(x)))
+  } else {
     err_class_abf()
   }
-
-  seq_len(nChan(abf))
 }
 
 CheckChannelDim <- function(abf, channel_data) {
@@ -102,7 +104,7 @@ CheckChannelDim <- function(abf, channel_data) {
   d1 <- dim(abf)
   d2 <- dim(channel_data)
 
-  all(d1[1:2] == d2)
+  length(d2) == 2L && all(d1[1:2] == d2)
 }
 
 #' Attach a new channel to an abf object.
@@ -127,7 +129,7 @@ AtchChan <- function(abf, channel_data,
     err_class_abf()
   }
   if (!CheckChannelDim(abf, channel_data)) {
-    err_wrong_dim()
+    eval(substitute(err_wrong_dim(abf, channel_data)))
   }
 
   #new dimension
@@ -162,15 +164,12 @@ AtchChan <- function(abf, channel_data,
   }
 
   #we should be good to go
-  new_abf <- ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
-                          ChannelName = c(GetChannelName(abf), channel_name),
-                          ChannelUnit = c(GetChannelUnit(abf), channel_unit),
-                          ChannelDesc = c(GetChannelDesc(abf), channel_desc),
-                          SamplingInterval = GetSamplingIntv(abf),
-                          EpiAvail = GetEpiAvail(abf),
-                          SyncArray = meta$SynchArray, meta = meta)
-
-  new_abf
+  ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
+               ChannelName = c(GetChannelName(abf), channel_name),
+               ChannelUnit = c(GetChannelUnit(abf), channel_unit),
+               ChannelDesc = c(GetChannelDesc(abf), channel_desc),
+               SamplingInterval = GetSamplingIntv(abf),
+               EpiAvail = GetEpiAvail(abf), meta = meta)
 }
 
 #' Attach a new channel to an abf object, by-ref like behaviour.
@@ -197,13 +196,13 @@ AttachChannel <- function(abf, channel_data, channel_name, channel_unit, channel
 #' Replacing channel data.
 #'
 #' @param abf an abf object.
-#' @param channel ADC channel id, 1-based.
 #' @param channel_data channel data to replace the original.
+#' @param channel ADC channel id, 1-based.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-RplcChan <- function(abf, channel, channel_data) {
+RplcChan <- function(abf, channel_data, channel = 1L) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -212,28 +211,27 @@ RplcChan <- function(abf, channel, channel_data) {
     err_channel()
   }
   if (!CheckChannelDim(abf, channel_data)) {
-    err_wrong_dim()
+    eval(substitute(err_wrong_dim(abf, channel_data)))
   }
-
   abf[, , channel] <- channel_data
 
-  return(abf)
+  abf
 }
 
 #' Replacing channel data, by-ref like behaviour.
 #'
 #' @param abf an abf object.
-#' @param channel ADC channel id, 1-based.
 #' @param channel_data channel data to replace the original.
+#' @param channel ADC channel id, 1-based.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-ReplaceChannel <- function(abf, channel, channel_data) {
+ReplaceChannel <- function(abf, channel_data, channel = 1L) {
 
   return(
     eval.parent(substitute({
-      abf <- RplcChan(abf, channel, channel_data)
+      abf <- RplcChan(abf, channel_data, channel)
       invisible(abf)
     }))
   )

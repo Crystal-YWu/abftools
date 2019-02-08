@@ -1,9 +1,19 @@
-err <- function(msg) {
+err <- function(msg, esc_eval = FALSE) {
 
-  func <- as.character(sys.call(-2L))[1]
+  if (esc_eval) {
+    func <- as.character(sys.call(-4L))[1]
+  } else {
+    func <- as.character(sys.call(-2L))[1]
+  }
 
   err_msg <- paste0(func, ": ", msg)
   stop(err_msg)
+}
+
+err_ctype <- function(type) {
+
+  msg <- sprintf("Unknown ctype: %s.", type)
+  err(msg)
 }
 
 err_abf_file <- function(elaborate) {
@@ -44,13 +54,13 @@ err_intv_pos <- function() {
 
 err_id_current_chan <- function() {
 
-  msg <- "Failed to identify current channel id. Please provide manually."
+  msg <- "Failed to identify current channel id."
   err(msg)
 }
 
 err_id_voltage_chan <- function() {
 
-  msg <- "Failed to identify voltage channel id. Please provide manually."
+  msg <- "Failed to identify voltage channel id."
   err(msg)
 }
 
@@ -109,10 +119,12 @@ err_time_unit <- function() {
   err(msg)
 }
 
-err_wrong_dim <- function() {
+err_wrong_dim <- function(x, y) {
 
-  msg <- "Dimensions do not match."
-  err(msg)
+  xname <- as.character(substitute(x))
+  yname <- as.character(substitute(y))
+  msg <- sprintf("Dimensions of %s and %s do not match.", xname, yname)
+  err(msg, TRUE)
 }
 
 err_mask_na <- function() {
