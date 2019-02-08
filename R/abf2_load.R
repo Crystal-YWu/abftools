@@ -8,8 +8,7 @@
 #' @return an abf object.
 #' @export
 #'
-abf2_load <- function(filename, folder = NULL,
-                      abf_title = NULL, short_desc = TRUE) {
+abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TRUE) {
 
   if (is.null(abf_title)) {
     #strip all leading path for abf_title
@@ -19,15 +18,20 @@ abf2_load <- function(filename, folder = NULL,
     abf_title <- as.character(abf_title)
   }
   if (!is.null(folder)) {
-    folder <- AddSurfix(folder, "/")
+    folder <- AddSurfix(as.character(folder), "/")
     filename <- paste0(folder, filename)
   }
 
   fp <- file(filename, "rb")
-
+  #header
   header <- abf2_header(fp)
+  #section info
   section_info <- abf2_section_info(fp)
+  #meta
   section <- abf2_section(fp, section_info)
+  #data
+  data <- read_data_section(fp, section_info$Data)
+  close(fp)
 
   #sampling interval
   sample_interval_us <- section$Protocol$fADCSequenceInterval
@@ -57,11 +61,8 @@ abf2_load <- function(filename, folder = NULL,
     }
   }
 
-  #Read data section
-  data_int <- section_info$Data$uBytes == 2
-  data <- read_data_section(fp, section_info$Data)
-
   #Scaling and offset of rawdata
+  data_int <- section_info$Data$uBytes == 2
   if (data_int) {
     signal_resol <- section$Protocol$fADCRange / section$Protocol$lADCResolution
     signal_scale <- rep(1.0, chan_num)
@@ -81,9 +82,6 @@ abf2_load <- function(filename, folder = NULL,
       signal_offset[i] <- section$ADC$fInstrumentOffset[i] - section$ADC$fSignalOffset[i]
     }
   }
-
-  #We've done all file reading
-  close(fp)
 
   #Now compile everything we've got into result
   op_mode <- section$Protocol$nOperationMode
@@ -145,20 +143,16 @@ abf2_load <- function(filename, folder = NULL,
     }
   }
 
-
   nepi <- dim(data)[2]
   meta <- section
   meta$Header <- header
-  abf <- ApplyAbfAttr(data, title = abf_title, mode = op_mode,
-                      ChannelName = chan_name,
-                      ChannelUnit = chan_unit,
-                      ChannelDesc = chan_desc,
-                      SamplingInterval = sample_interval_us,
-                      EpiAvail = rep(TRUE, nepi),
-                      SyncArray = section$SynchArray,
-                      meta = meta)
-
-  abf
+  ApplyAbfAttr(data, title = abf_title, mode = op_mode,
+               ChannelName = chan_name,
+               ChannelUnit = chan_unit,
+               ChannelDesc = chan_desc,
+               SamplingInterval = sample_interval_us,
+               EpiAvail = rep(TRUE, nepi),
+               meta = meta)
 }
 
 #' abf2_loadlist
@@ -200,12 +194,7 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
   } else {
     extracted <- filelist
   }
-
   filelist <- as.character(unlist(extracted))
-
-  if (!is.null(folder)) {
-    folder <- AddSurfix(as.character(folder), "/")
-  }
   if (attach_ext) {
     filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
   }
@@ -255,25 +244,26 @@ abf2_section <- function(fp, section_info) {
   section <- list()
   #These sections are quite important, if not presented throw a warning.
   if (section_info$Protocol$llNumEntries > 0) {
-    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def, df = FALSE)
+    section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def,
+                                     ret.df = FALSE)
   } else {
     close(fp)
     err_abf_file("No protocol entries recorded.")
   }
   if (section_info$ADC$llNumEntries > 0) {
-    section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def)
+    section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def, ret.df = TRUE)
   } else {
     close(fp)
     err_abf_file("No ADC entries recorded.")
   }
   if (section_info$DAC$llNumEntries > 0) {
-    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def, df = FALSE)
+    section$DAC <- read_section(fp, section_info$DAC, ABF2.DAC.def, ret.df = FALSE)
   }
   if (section_info$Epoch$llNumEntries > 0) {
-    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def, df = FALSE)
+    section$Epoch <- read_section(fp, section_info$Epoch, ABF2.Epoch.def, ret.df = FALSE)
   }
   if (section_info$EpochPerDAC$llNumEntries > 0) {
-    epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def)
+    epdac <- read_section(fp, section_info$EpochPerDAC, ABF2.EpochPerDAC.def, ret.df = TRUE)
     section$EpochPerDAC <- epdac[order(epdac$nDACNum, epdac$nEpochNum), ]
   }
   if (section_info$SynchArray$llNumEntries > 0) {

@@ -1,56 +1,57 @@
 #define attr of an abf object
 ApplyAbfAttr <- function(x, class = "abf", title, mode,
                          ChannelName, ChannelUnit, ChannelDesc,
-                         SamplingInterval, EpiAvail, SyncArray, meta) {
+                         SamplingInterval, EpiAvail, meta = NULL) {
 
-  attr(x, "class") <- class
-  attr(x, "title") <- title
-  attr(x, "mode") <- mode
+  eval.parent(substitute({
+    attr(x, "class") <- class
+    attr(x, "title") <- title
+    attr(x, "mode") <- mode
 
-  attr(x, "ChannelName") <- ChannelName
-  attr(x, "ChannelUnit") <- ChannelUnit
-  attr(x, "ChannelDesc") <- ChannelDesc
+    attr(x, "ChannelName") <- ChannelName
+    attr(x, "ChannelUnit") <- ChannelUnit
+    attr(x, "ChannelDesc") <- ChannelDesc
 
-  attr(x, "SamplingInterval") <- SamplingInterval
-  attr(x, "EpiAvail") <- EpiAvail
-  attr(x, "SyncArray") <- SyncArray
+    attr(x, "SamplingInterval") <- SamplingInterval
+    attr(x, "EpiAvail") <- EpiAvail
 
-  attr(x, "meta") <- meta
+    if (!is.null(meta)) {
+      attr(x, "meta") <- meta
+    }
 
-  x
+    invisible(x)
+  }))
 }
 
 #copy channel related attr
 CpChannelAttr <- function(x, abf, channel = NULL) {
 
-  if (is.null(channel)) {
-    name <- GetChannelName(abf)
-    unit <- GetChannelUnit(abf)
-    desc <- GetChannelDesc(abf)
-  } else {
-    name <- GetChannelName(abf)[channel]
-    unit <- GetChannelUnit(abf)[channel]
-    desc <- GetChannelDesc(abf)[channel]
-  }
-
-  attr(x, "ChannelName") <- name
-  attr(x, "ChannelUnit") <- unit
-  attr(x, "ChannelDesc") <- desc
-
-  x
+  eval.parent(substitute({
+    if (is.null(channel)) {
+      attr(x, "ChannelName") <- GetChannelName(abf)
+      attr(x, "ChannelUnit") <- GetChannelUnit(abf)
+      attr(x, "ChannelDesc") <- GetChannelDesc(abf)
+    } else {
+      attr(x, "ChannelName") <- GetChannelName(abf)[channel]
+      attr(x, "ChannelUnit") <- GetChannelUnit(abf)[channel]
+      attr(x, "ChannelDesc") <- GetChannelDesc(abf)[channel]
+    }
+    invisible(x)
+  }))
 }
 
 CpAbfAttr <- function(x, abf) {
 
-  x <- ApplyAbfAttr(x, title = GetTitle(abf), mode = GetMode(abf),
-                    ChannelName = GetChannelName(abf),
-                    ChannelUnit = GetChannelUnit(abf),
-                    ChannelDesc = GetChannelDesc(abf),
-                    SamplingInterval = GetSamplingIntv(abf),
-                    EpiAvail = GetEpiAvail(abf), SyncArray = GetSyncArray(abf),
-                    meta = get_meta(abf))
-
-  x
+  eval.parent(substitute({
+    ApplyAbfAttr(x, title = GetTitle(abf), mode = GetMode(abf),
+                 ChannelName = GetChannelName(abf),
+                 ChannelUnit = GetChannelUnit(abf),
+                 ChannelDesc = GetChannelDesc(abf),
+                 SamplingInterval = GetSamplingIntv(abf),
+                 EpiAvail = GetEpiAvail(abf),
+                 meta = get_meta(abf))
+    invisible(x)
+  }))
 }
 
 #' Get title of an abf object.
@@ -112,12 +113,26 @@ GetMode <- function(abf) {
   if (IsAbf(abf)) {
     attr(abf, "mode")
   } else if (IsAbfList(abf)) {
-    lapply(abf, GetMode)
+    lapply(abf, function(x) attr(x, "mode"))
   } else {
     err_class_abf()
   }
 }
 
+validate_channel <- function(abf, channel) {
+
+  if (is.null(channel)) {
+    return(TRUE)
+  }
+
+  if (IsAbf(abf)) {
+    AssertChannel(abf, channel)
+  } else if (IsAbfList(abf)) {
+    all(sapply(abf, function(x) AssertChannel(x, channel)))
+  } else {
+    err_class_abf()
+  }
+}
 
 #' Get names of channels.
 #'
@@ -129,61 +144,18 @@ GetMode <- function(abf) {
 #'
 GetChannelName <- function(abf, channel = NULL) {
 
+  if (!validate_channel(abf, channel)) {
+    err_channel()
+  }
+
   if (IsAbf(abf)) {
     if (is.null(channel)) {
       attr(abf, "ChannelName")
     } else {
       attr(abf, "ChannelName")[channel]
     }
-  } else if (IsAbfList(abf)) {
+  } else {
     lapply(abf, GetChannelName, channel = channel)
-  } else {
-    err_class_abf()
-  }
-}
-
-#' Get units of channels.
-#'
-#' @param abf an abf object.
-#' @param channel channel id.
-#'
-#' @return a character vector of channel units.
-#' @export
-#'
-GetChannelUnit <- function(abf, channel = NULL) {
-
-  if (IsAbf(abf)) {
-    if (is.null(channel)) {
-      attr(abf, "ChannelUnit")
-    } else {
-      attr(abf, "ChannelUnit")[channel]
-    }
-  } else if (IsAbfList(abf)) {
-    lapply(abf, GetChannelUnit, channel = channel)
-  } else {
-    err_class_abf()
-  }
-}
-
-#' Get descriptions of channels.
-#'
-#' @param abf an abf object.
-#'
-#' @return a character vector of channel descriptions.
-#' @export
-#'
-GetChannelDesc <- function(abf, channel = NULL) {
-
-  if (IsAbf(abf)) {
-    if (is.null(channel)) {
-      attr(abf, "ChannelDesc")
-    } else {
-      attr(abf, "ChannelDesc")[channel]
-    }
-  } else if (IsAbfList(abf)) {
-    lapply(abf, GetChannelDesc, channel = channel)
-  } else {
-    err_class_abf()
   }
 }
 
@@ -198,15 +170,16 @@ GetChannelDesc <- function(abf, channel = NULL) {
 #'
 SetChannelName <- function(abf, name, channel = 1L) {
 
-  if (IsAbf(abf)) {
+  if (!validate_channel(abf, channel)) {
+    err_channel()
+  }
 
+  if (IsAbf(abf)) {
     eval.parent(substitute({
       attr(abf, "ChannelName")[channel] <- name
       invisible(abf)
     }))
-
-  } else if (IsAbfList(abf)) {
-
+  } else {
     eval.parent(substitute({
       abf <- lapply(abf, function(x) {
         attr(x, "ChannelName")[channel] <- name
@@ -214,9 +187,31 @@ SetChannelName <- function(abf, name, channel = 1L) {
       })
       invisible(abf)
     }))
+  }
+}
 
+#' Get units of channels.
+#'
+#' @param abf an abf object.
+#' @param channel channel id.
+#'
+#' @return a character vector of channel units.
+#' @export
+#'
+GetChannelUnit <- function(abf, channel = NULL) {
+
+  if (!validate_channel(abf, channel)) {
+    err_channel()
+  }
+
+  if (IsAbf(abf)) {
+    if (is.null(channel)) {
+      attr(abf, "ChannelUnit")
+    } else {
+      attr(abf, "ChannelUnit")[channel]
+    }
   } else {
-    err_class_abf_list()
+    lapply(abf, GetChannelUnit, channel = channel)
   }
 }
 
@@ -231,15 +226,16 @@ SetChannelName <- function(abf, name, channel = 1L) {
 #'
 SetChannelUnit <- function(abf, unit, channel = 1L) {
 
-  if (IsAbf(abf)) {
+  if (!validate_channel(abf, channel)) {
+    err_channel()
+  }
 
+  if (IsAbf(abf)) {
     eval.parent(substitute({
       attr(abf, "ChannelUnit")[channel] <- unit
       invisible(abf)
     }))
-
-  } else if (IsAbfList(abf)) {
-
+  } else {
     eval.parent(substitute({
       abf <- lapply(abf, function(x) {
         attr(x, "ChannelUnit")[channel] <- unit
@@ -247,9 +243,30 @@ SetChannelUnit <- function(abf, unit, channel = 1L) {
       })
       invisible(abf)
     }))
+  }
+}
 
+#' Get descriptions of channels.
+#'
+#' @param abf an abf object.
+#'
+#' @return a character vector of channel descriptions.
+#' @export
+#'
+GetChannelDesc <- function(abf, channel = NULL) {
+
+  if (!validate_channel(abf, channel)) {
+    err_channel()
+  }
+
+  if (IsAbf(abf)) {
+    if (is.null(channel)) {
+      attr(abf, "ChannelDesc")
+    } else {
+      attr(abf, "ChannelDesc")[channel]
+    }
   } else {
-    err_class_abf_list()
+    lapply(abf, GetChannelDesc, channel = channel)
   }
 }
 
@@ -264,15 +281,16 @@ SetChannelUnit <- function(abf, unit, channel = 1L) {
 #'
 SetChannelDesc <- function(abf, description, channel = 1L) {
 
-  if (IsAbf(abf)) {
+  if (!validate_channel(abf, channel)) {
+    err_channel()
+  }
 
+  if (IsAbf(abf)) {
     eval.parent(substitute({
       attr(abf, "ChannelDesc")[channel] <- description
       invisible(abf)
     }))
-
-  } else if (IsAbfList(abf)) {
-
+  } else {
     eval.parent(substitute({
       abf <- lapply(abf, function(x) {
         attr(x, "ChannelDesc")[channel] <- description
@@ -280,9 +298,6 @@ SetChannelDesc <- function(abf, description, channel = 1L) {
       })
       invisible(abf)
     }))
-
-  } else {
-    err_class_abf_list()
   }
 }
 
@@ -321,10 +336,11 @@ GetEpiAvail <- function(abf) attr(abf, "EpiAvail")
 #' @return a sync array
 #' @export
 #'
-GetSyncArray <- function(abf) {
+GetSynchArray <- function(abf) {
 
   if (IsAbf(abf)) {
-    attr(abf, "SyncArray")
+    meta <- get_meta(abf)
+    meta$SynchArray
   } else if (IsAbfList(abf)) {
     lapply(abf, GetSamplingIntv)
   } else {
@@ -341,15 +357,16 @@ GetSyncArray <- function(abf) {
 #'
 GetNumOfChannel <- function(abf) {
 
-  dim(abf)[3]
+  if (IsAbf(abf)) {
+    dim(abf)[3]
+  } else if (IsAbfList(abf)) {
+    lapply(abf, GetNumOfChannel)
+  } else {
+    err_class_abf()
+  }
 }
 
 #' Get number of episodes/sweeps per channel.
-#'
-#' The returned number may be different to the result of dim(abf[[chan_id]]) if
-#' you have removed episodes from the abf object. GetEpisodesPerChannel / nEpi
-#' always return the original number of episodes per channel setting in the
-#' abf2 protocol.
 #'
 #' @param abf an abf object.
 #'
@@ -358,7 +375,13 @@ GetNumOfChannel <- function(abf) {
 #'
 GetEpisodesPerChannel <- function(abf) {
 
-  dim(abf)[2]
+  if (IsAbf(abf)) {
+    dim(abf)[2]
+  } else if (IsAbfList(abf)) {
+    lapply(abf, GetEpisodesPerChannel)
+  } else {
+    err_class_abf()
+  }
 }
 
 #' Get number of recorded points per episode/sweep.
@@ -370,7 +393,13 @@ GetEpisodesPerChannel <- function(abf) {
 #'
 GetPointsPerEpisode <- function(abf) {
 
-  dim(abf)[1]
+  if (IsAbf(abf)) {
+    dim(abf)[1]
+  } else if (IsAbfList(abf)) {
+    lapply(abf, GetPointsPerEpisode)
+  } else {
+    err_class_abf()
+  }
 }
 
 #' Get number of recorded points for corresponding event.
@@ -383,12 +412,18 @@ GetPointsPerEpisode <- function(abf) {
 #'
 GetPointsPerEvent <- function(abf, event = 1L) {
 
-  mode <- GetMode(abf)
-  if (mode != 1L) {
-    ans <- GetPointsPerEpisode(abf)
+  if (IsAbf(abf)) {
+    mode <- GetMode(abf)
+    if (mode != 1L) {
+      ans <- GetPointsPerEpisode(abf)
+    } else {
+      sync <- GetSynchArray(abf)
+      ans <- sync$lLength[event] %/% GetNumOfChannel(abf)
+    }
+  } else if (IsAbfList(abf)) {
+    ans <- lapply(abf, GetPointsPerEvent, event = event)
   } else {
-    sync <- GetSyncArray(abf)
-    ans <- sync$lLength[event] %/% GetNumOfChannel(abf)
+    err_class_abf()
   }
 
   ans
@@ -403,13 +438,21 @@ GetPointsPerEvent <- function(abf, event = 1L) {
 #'
 GetNumOfEpoch <- function(abf) {
 
-  meta <- get_meta(abf)
-  epdac <- meta$EpochPerDAC
-  if (is.null(epdac)) {
-    return(0L)
+  if (IsAbf(abf)) {
+    meta <- get_meta(abf)
+    epdac <- meta$EpochPerDAC
+    if (is.null(epdac)) {
+      ans <- 0L
+    } else {
+      ans <- nrow(epdac)
+    }
+  } else if (IsAbfList(abf)) {
+    ans <- lapply(abf, GetNumOfEpoch)
+  } else {
+    err_class_abf()
   }
 
-  nrow(epdac)
+  ans
 }
 
 #' @rdname GetNumOfChannel

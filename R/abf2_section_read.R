@@ -23,9 +23,41 @@ uint <- function(b1, b2) {
   else
     65536.0 * b1 + b2
 }
+assign_struct <- function(struct.def, n = 1L) {
+
+  ans <- list()
+  for (i in seq_along(struct.def$field)) {
+
+    fd <- struct.def$field[i]
+    tp <- struct.def$ctype[i]
+
+    if ((tp == "int16") || (tp == "int32") || (tp == "int8") ||
+        (tp == "int64") || (tp == "char") || (tp == "unused")) {
+      ans[[fd]] <- rep(0L, n)
+    }
+    else if ((tp == "float") || (tp == "double")) {
+      ans[[fd]] <- rep(0.0, n)
+    }
+    else if (startsWith(tp, "uint") || (tp == "uchar")) {
+      if (sizeof[tp] == 4) {
+        ans[[fd]] <- rep(0.0, n)
+      } else {
+        ans[[fd]] <- rep(0L, n)
+      }
+    }
+    else if (tp == "string") {
+      ans[[fd]] <- rep("", n)
+    }
+    else {
+      err_ctype(tp)
+    }
+  }
+
+  ans
+}
 read_struct_n <- function(fp, struct.def, fptr = NULL, n = 1L) {
 
-  result <- list()
+  result <- assign_struct(struct.def, n)
   if (!is.null(fptr)) {
     seek(fp, where = fptr, origin = "start")
   }
@@ -40,45 +72,30 @@ read_struct_n <- function(fp, struct.def, fptr = NULL, n = 1L) {
 
       if ((tp == "int16") || (tp == "int32") || (tp == "int8") ||
           (tp == "int64") || (tp == "char")) {
-        if (is.null(result[[fd]])) {
-          result[[fd]] <- rep(0L, n)
-        }
         #read a signed integer: char, int8, int16, int32, int64
         result[[fd]][idx] <- readBin(fp, what = "integer", size = sz, signed = TRUE)
       }
-      else if ( (tp == "float") || (tp == "double") ) {
-        if (is.null(result[[fd]])) {
-          result[[fd]] <- rep(0.0, n)
-        }
+      else if ((tp == "float") || (tp == "double")) {
         #read a floating point numbers: float, double
         result[[fd]][idx] <- readBin(fp, what = "numeric", size = sz)
       }
-      else if ( startsWith(tp, "uint") || (tp == "uchar") ) {
+      else if (startsWith(tp, "uint") || (tp == "uchar")) {
         #read an unsigned integer:
         #this gets a little bit tricky because R does not support unsigned long
-        if ( sz == 4 ) {
-          if (is.null(result[[fd]])) {
-            result[[fd]] <- rep(0.0, n)
-          }
+        if (sz == 4) {
           #uint32: use numeric to store an unsigned long
           b1 <- readBin(fp, what = "integer", size = 2, signed = FALSE)
           b2 <- readBin(fp, what = "integer", size = 2, signed = FALSE)
           result[[fd]][idx] <- uint(b1, b2)
         } else {
-          if (is.null(result[[fd]])) {
-            result[[fd]] <- rep(0L, n)
-          }
           #uchar, uint8, uint16
           result[[fd]][idx] <- readBin(fp, what = "integer", size = sz, signed = FALSE)
         }
       }
-      else if ( tp == "string" ) {
-        if (is.null(result[[fd]])) {
-          result[[fd]] <- rep("", n)
-        }
+      else if (tp == "string") {
         #Read strings: if size is given, readBin/rawToChar are called, otherwise
         #read until \0
-        if ( ss != 0L ) {
+        if (ss != 0L) {
           #In case of multi-byte characters, readBin instead of readChar
           rawstr <- readBin(fp, what = "raw", n = ss)
           result[[fd]][idx] <- rawToChar(rawstr)
@@ -87,13 +104,9 @@ read_struct_n <- function(fp, struct.def, fptr = NULL, n = 1L) {
           result[[fd]][idx] <- readBin(fp, what = "character")
         }
       }
-      else if ( tp == "unused" ) {
-        if (is.null(result[[fd]])) {
-          result[[fd]] <- rep(0L, n)
-        }
+      else if (tp == "unused") {
         # simply skip ss bytes of data
         seek(fp, where = ss, origin = "current")
-        result[[fd]][idx] <- 0L
       }
     }
   }
@@ -104,13 +117,13 @@ read_struct_n <- function(fp, struct.def, fptr = NULL, n = 1L) {
 #Calculate actual file pointer from section info
 get_fptr <- function(section.info) section.info$uBlockIndex * ABF2.BlockSize
 
-read_section <- function(fp, section.info, section.def, df = TRUE) {
+read_section <- function(fp, section.info, section.def, ret.df = TRUE) {
 
   fptr <- get_fptr(section.info)
   #pre-allocate result data.frame
   n <- section.info$llNumEntries
   ans <- read_struct_n(fp, section.def, fptr, n = n)
-  if (df) {
+  if (ret.df) {
     as.data.frame(do.call(cbind, ans))
   } else {
     ans
@@ -129,14 +142,15 @@ read_str_section <- function(fp, section.info) {
 
   parsed
 }
-
 #Parse the string section from rawdata
 #String sectio is basically a set of \0 seperated strings.
 parse_str_section <- function(rawdata) {
 
   result <- c()
   ptr <- ABF2.StringOffset
-  if (ptr >= length(rawdata)) return(result)
+  if (ptr >= length(rawdata)) {
+    return(result)
+  }
   for (i in seq(from = ABF2.StringOffset, to = length(rawdata))) {
     if (rawdata[i] == 0) {
       result <- c(result, rawToChar(rawdata[ptr:(i - 1)]))
