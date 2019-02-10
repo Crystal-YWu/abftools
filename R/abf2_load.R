@@ -43,20 +43,22 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TR
   chan_desc <- paste0("ch", seq_len(chan_num))
   if (!is.null(section$Strings)) {
     for (i in seq_len(chan_num)) {
-      idx <- section$ADC$lADCChannelNameIndex[i]
-      if (idx != 0) {
-        chan_name[i] <- section$Strings[idx]
+      #nADCNum -> channel id
+      ch <- section$ADC$nADCNum[i] + 1L
+      str_idx <- section$ADC$lADCChannelNameIndex[i]
+      if (str_idx != 0) {
+        chan_name[ch] <- section$Strings[str_idx]
       }
-      idx <- section$ADC$lADCUnitsIndex[i]
-      if (idx != 0) {
-        chan_unit[i] <- section$Strings[[idx]]
+      str_idx <- section$ADC$lADCUnitsIndex[i]
+      if (str_idx != 0) {
+        chan_unit[ch] <- section$Strings[[str_idx]]
       }
-      if (IsVoltageUnit(chan_unit[i])) {
-        chan_desc[i] <- ifelse(short_desc, "V", "Voltage")
-      } else if (IsCurrentUnit(chan_unit[i])) {
-        chan_desc[i] <- ifelse(short_desc, "I", "Current")
+      if (IsVoltageUnit(chan_unit[ch])) {
+        chan_desc[ch] <- ifelse(short_desc, "V", "Voltage")
+      } else if (IsCurrentUnit(chan_unit[ch])) {
+        chan_desc[ch] <- ifelse(short_desc, "I", "Current")
       } else {
-        chan_desc[i] <- gsub("\\s", "_", chan_name[i])
+        chan_desc[ch] <- gsub("\\s", "_", chan_name[ch])
       }
     }
   }
