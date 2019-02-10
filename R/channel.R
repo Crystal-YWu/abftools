@@ -12,9 +12,6 @@ GetVoltageChan <- function(abf) {
 
   if (IsAbf(abf)) {
     ans <- which(IsVoltageUnit(GetChannelUnit(abf)))
-    if (!length(ans)) {
-      err_id_voltage_chan()
-    }
   } else if (IsAbfList(abf)) {
     ans <- unique(lapply(abf, GetVoltageChan))
     if (length(ans) > 1L) {
@@ -40,9 +37,6 @@ GetCurrentChan <- function(abf) {
 
   if (IsAbf(abf)) {
     ans <- which(IsCurrentUnit(GetChannelUnit(abf)))
-    if (!length(ans)) {
-      err_id_current_chan()
-    }
   } else if (IsAbfList(abf)) {
     ans <- unique(lapply(abf, GetCurrentChan))
     if (length(ans) > 1L) {
@@ -66,7 +60,8 @@ GetCurrentChan <- function(abf) {
 #'
 GetFirstVoltageChan <- function(abf) {
 
-  FirstElement(GetVoltageChan(abf))
+  voltage_channel <- GetVoltageChan(abf)
+  FirstElement(voltage_channel)
 }
 
 #' Get first current channel id.
@@ -78,7 +73,8 @@ GetFirstVoltageChan <- function(abf) {
 #'
 GetFirstCurrentChan <- function(abf) {
 
-  FirstElement(GetCurrentChan(abf))
+  current_channel <- GetCurrentChan(abf)
+  FirstElement(current_channel)
 }
 
 #' Return all channels of an abf object.
@@ -129,7 +125,7 @@ AtchChan <- function(abf, channel_data,
     err_class_abf()
   }
   if (!CheckChannelDim(abf, channel_data)) {
-    eval(substitute(err_wrong_dim(abf, channel_data)))
+    eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
 
   #new dimension
@@ -211,7 +207,7 @@ RplcChan <- function(abf, channel_data, channel = 1L) {
     err_channel()
   }
   if (!CheckChannelDim(abf, channel_data)) {
-    eval(substitute(err_wrong_dim(abf, channel_data)))
+    eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
   abf[, , channel] <- channel_data
 

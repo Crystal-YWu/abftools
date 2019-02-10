@@ -40,6 +40,17 @@ err_class_abf_list <- function() {
   err(msg)
 }
 
+err_zero_length <- function(x, elaborate = NULL, ...) {
+
+  xname <- as.character(substitute(x))
+  msg <- sprintf("%s is of zero length.", xname)
+  if (!is.null(elaborate)) {
+    msg <- sprintf("%s %s", msg, elaborate)
+  }
+
+  err(msg, ...)
+}
+
 err_class_vec_list <- function() {
 
   msg <- "Only vector or list are supported."
@@ -119,12 +130,12 @@ err_time_unit <- function() {
   err(msg)
 }
 
-err_wrong_dim <- function(x, y) {
+err_wrong_dim <- function(x, y, ...) {
 
   xname <- as.character(substitute(x))
   yname <- as.character(substitute(y))
   msg <- sprintf("Dimensions of %s and %s do not match.", xname, yname)
-  err(msg, TRUE)
+  err(msg, ...)
 }
 
 err_mask_na <- function() {
