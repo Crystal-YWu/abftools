@@ -5,41 +5,24 @@
 #' @param current_channel current channel id, 1-based.
 #' @param voltage_channel voltage channel id, 1-based.
 #'
-#' @return a data frame containing calculated Voltage, SEM Voltage, Current, SEM Current columns.
+#' @return a data frame containing calculated Voltage, SEM Voltage, Current,
+#' SEM Current and number of samples.
 #' @export
 #'
-IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
+IVSummary <- function(abf_list, intv_list = NULL,
+                      current_channel = GetFirstCurrentChan(abf_list),
+                      voltage_channel = GetFirstVoltageChan(abf_list)) {
 
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
   }
-  if (missing(intv_list) || is.null(intv_list)) {
-    intv_list = list()
-    for (i in seq_along(abf_list)) {
-      intv_list[[i]] <- Intv(1L, nPts(abf_list[[i]]))
-    }
-  } else {
-    intv_list <- ExpandList(intv_list, abf_list)
-    if (is.null(intv_list)) {
-      err_assert_len(intv_list, abf_list)
-    }
-  }
-  #figure out current channel and voltage channel
-  if (missing(current_channel) || is.null(current_channel)) {
-    current_channel <- GetFirstCurrentChan(abf_list)
-  }
-  if (missing(voltage_channel) || is.null(voltage_channel)) {
-    voltage_channel <- GetFirstVoltageChan(abf_list)
-  }
-  if (is.na(current_channel)) {
-    err_id_current_chan()
-  }
-  if (is.na(voltage_channel)) {
-    err_id_voltage_chan()
-  }
+  CheckArgs(abf_list, chan = c(current_channel, voltage_channel), allow_list = TRUE)
+  intv_list <- CheckIntvList(abf_list, intv_list)
 
-  current_means <- MultiIntervalMeans(abf_list, intv_list, current_channel, na.rm = TRUE)
-  voltage_means <- MultiIntervalMeans(abf_list, intv_list, voltage_channel, na.rm = TRUE)
+  current_means <- Episodic_ColFunc(abf_list, intv_list, current_channel,
+                                    colMeans, na.rm = TRUE)
+  voltage_means <- Episodic_ColFunc(abf_list, intv_list, voltage_channel,
+                                    colMeans, na.rm = TRUE)
 
   mean_current_means <- colMeans(current_means, na.rm = TRUE)
   mean_voltage_means <- colMeans(voltage_means, na.rm = TRUE)
@@ -48,8 +31,8 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 
   nsamples <- rep(length(abf_list), length(mean_voltage_means))
 
-  df <- data.frame(mean_voltage_means, sem_voltage_means, mean_current_means,
-                   sem_current_means, nsamples)
+  df <- data.frame(mean_voltage_means, sem_voltage_means,
+                   mean_current_means, sem_current_means, nsamples)
   colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current", "Num Samples")
 
   CpChannelAttr(df, abf_list[[1]])
@@ -67,9 +50,7 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 #'
 SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
+  CheckArgs(abf)
 
   nch <- nChan(abf)
   nepi <- nEpi(abf)
@@ -128,7 +109,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
   }
   attr(data, "meta") <- meta
 
-  return(data)
+  data
 }
 
 #' Sample abf object to reduce data points, by-ref like behaviour.
@@ -176,26 +157,22 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
   }
-  intv_list <- ExpandList(intv_list, abf_list)
-  if (is.null(intv_list)) {
-    err_assert_len(intv_list, abf_list)
-  }
-  channel <- FirstElement(channel)
-  for (tmp in abf_list) {
-    if (!AssertChannel(tmp, channel)) {
-      err_channel()
+  CheckArgs(abf_list, chan = channel, allow_list = TRUE)
+  intv_list <- CheckIntvList(abf_list, intv_list)
+
+  if (length(channel) == 1L) {
+    ret <- t(Episodic_ColFunc(abf_list, intv_list, channel, colMeans, na.rm = na.rm))
+    if (ret.df) {
+      ret <- as.data.frame(ret)
     }
-  }
-
-  colname <- c()
-  for (i in seq_along(abf_list)) {
-    colname[i] <- GetTitle(abf_list[[i]])
-  }
-  ret <- t(MultiIntervalMeans(abf_list, intv_list, channel, na.rm))
-  colnames(ret) <- colname
-
-  if (ret.df) {
-    ret <- as.data.frame(ret)
+  } else {
+    ret <- lapply(channel, function(x) t(Episodic_ColFunc(abf_list, intv_list,
+                                                          channel = x, f = colMeans,
+                                                          na.rm = na.rm)))
+    if (ret.df) {
+      ret <- lapply(ret, as.data.frame)
+    }
+    names(ret) <- GetChannelDesc(abf_list[[1]])[channel]
   }
 
   ret
@@ -214,8 +191,7 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
 MultiMean_Current <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm = TRUE) {
 
   channel <- GetFirstCurrentChan(abf_list)
-
-  return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
+  MultiMean(abf_list, intv_list, channel, ret.df, na.rm)
 }
 
 #' Calculate mean voltages of multiple abf objects
@@ -231,8 +207,7 @@ MultiMean_Current <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm =
 MultiMean_Voltage <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm =TRUE) {
 
   channel <- GetFirstVoltageChan(abf_list)
-
-  return(MultiMean(abf_list, intv_list, channel, ret.df, na.rm))
+  MultiMean(abf_list, intv_list, channel, ret.df, na.rm)
 }
 
 
@@ -264,7 +239,7 @@ mean.abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na
   ret <- f(abf, intv)
   rownames(ret) <- DefaultEpiLabel(abf)
 
-  return(ret)
+  ret
 }
 
 #' Calculate standard deviation of an abf object.
@@ -293,7 +268,7 @@ sd_abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.r
   ret <- f(abf, intv)
   rownames(ret) <- DefaultEpiLabel(abf)
 
-  return(ret)
+  ret
 }
 
 sem_func <- function(x, na.rm) stats::sd(x, na.rm) / sqrt(length(x))
@@ -323,6 +298,5 @@ sem_abf <- function(abf, intv = NULL, ret.df = FALSE, use_chan_name = FALSE, na.
   ret <- f(abf, intv)
   rownames(ret) <- DefaultEpiLabel(abf)
 
-  return(ret)
+  ret
 }
-

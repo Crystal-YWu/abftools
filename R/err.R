@@ -171,13 +171,13 @@ err_internal_bug <- function(additional) {
   err(msg)
 }
 
-err_assert_len <- function(var, to_match) {
+err_assert_len <- function(var, to_match, ...) {
 
   var_name <- as.character(substitute(var))
   match_name <- as.character(substitute(to_match))
   msg <- sprintf("Length of %s does not match %s.", var_name, match_name)
 
-  err(msg)
+  err(msg, ...)
 }
 
 err_arrange <- function(arr) {

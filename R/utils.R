@@ -18,9 +18,9 @@ colSems <- function(df, na.rm = FALSE) {
 #'
 #' Only two or the arguments are needed. If all are given, len will be ignored.
 #'
-#' @param startPos start position.
-#' @param endPos end position.
-#' @param len length of the interval.
+#' @param startPos OPTIONAL, start position.
+#' @param endPos OPTIONAL, end position.
+#' @param len OPTIONAL, length of the interval.
 #'
 #' @return an interval.
 #' @export
