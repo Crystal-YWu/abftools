@@ -19,7 +19,7 @@ ApplyAbfAttr <- function(x, class = "abf", title, mode,
       attr(x, "meta") <- meta
     }
 
-    invisible(x)
+    x
   }))
 }
 
@@ -36,7 +36,8 @@ CpChannelAttr <- function(x, abf, channel = NULL) {
       attr(x, "ChannelUnit") <- GetChannelUnit(abf)[channel]
       attr(x, "ChannelDesc") <- GetChannelDesc(abf)[channel]
     }
-    invisible(x)
+
+    x
   }))
 }
 
@@ -50,7 +51,6 @@ CpAbfAttr <- function(x, abf) {
                  SamplingInterval = GetSamplingIntv(abf),
                  EpiAvail = GetEpiAvail(abf),
                  meta = get_meta(abf))
-    invisible(x)
   }))
 }
 
