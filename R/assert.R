@@ -117,3 +117,17 @@ CheckArgs <- function(abf, epi = NULL, chan = NULL, epo = NULL, dac = NULL,
 
   TRUE
 }
+
+CheckIntvList <- function(abf, intv) {
+
+  if (is.null(intv)) {
+    ans <- lapply(abf, function(x) Intv(1L, nPts(x)))
+  } else {
+    ans <- ExpandList(intv, abf)
+    if (is.null(ans)) {
+      eval(substitute(err_assert_len(abf, intv, esc_eval = TRUE)))
+    }
+  }
+
+  ans
+}
