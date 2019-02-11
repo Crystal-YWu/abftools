@@ -2,47 +2,30 @@
 #'
 #' @param abf an abf object.
 #' @param episodes the episodes to simulate.
-#' @param wf_dac_id waveform DAC channel, 1-based.
+#' @param dac waveform DAC channel, 1-based.
 #'
 #' @return channel data of the simulated waveform.
 #' @export
 #'
-GetWaveform <- function(abf, episodes = NULL, wf_dac_id = NULL) {
+GetWaveform <- function(abf,
+                        episodes = GetAllEpisodes(abf),
+                        dac = GetWaveformEnabledDAC(abf)) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  } else if (GetMode(abf) != 5L) {
+  dac <- FirstElement(dac)
+  CheckArgs(abf, epi = episodes, dac = dac)
+  if (GetMode(abf) != 5L) {
     err_wf_mode()
   }
-  #Check DAC channel and DAC source
-  if (is.null(wf_dac_id)) {
-    wf_dac_id <- GetWaveformEnabledDAC(abf)
-  }
-  if (length(wf_dac_id) == 0L) {
-    err_wf_dac()
-  }
-  wf_dac_id <- FirstElement(wf_dac_id)
-  #Parse episodes
-  nepi <- nEpi(abf)
-  if (is.null(episodes)) {
-    episodes = seq_len(nepi)
-  } else if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
-  #update nepi according to selected episodes
-  nepi <- length(episodes)
 
   meta <- get_meta(abf)
   #Stimulus file is not supported yet
-  wf_src <- meta$DAC$nWaveformSource[wf_dac_id]
-  if (wf_src != 1L) {
+  if (meta$DAC$nWaveformSource[dac] != 1L) {
     err_wf_support()
   }
 
-  #Assume instrument holding. Because I don't know where to extract exact holding
-  #values at the moment.
-  #throw a warning at this stage
-  wf_holding <- meta$DAC$fInstrumentHoldingLevel[wf_dac_id]
+  nepi <- length(episodes)
+
+  wf_holding <- meta$DAC$fInstrumentHoldingLevel[dac]
   npts <- nPts(abf)
   if (nepi == 1L) {
     mx <- rep(wf_holding, npts)
@@ -51,11 +34,8 @@ GetWaveform <- function(abf, episodes = NULL, wf_dac_id = NULL) {
   }
 
   #Extract epoch settings
-  epdac <- GetWaveformEpdac(abf, wf_dac_id)
+  epdac <- GetEpdac(abf, dac)
   nepoch <- nrow(epdac)
-  if (nepoch == 0L) {
-    err_wf_dac()
-  }
 
   #extract epoch settings
   init_level <- epdac$fEpochInitLevel
@@ -111,31 +91,27 @@ GetWaveform <- function(abf, episodes = NULL, wf_dac_id = NULL) {
 
   #set colnames
   if (nepi > 1L) {
-    colnames(mx) <- paste0("epi", episodes)
+    colnames(mx) <- DefaultEpiLabel(episodes)
   }
-  return(mx)
+
+  mx
 }
 
 #' Attach a waveform channel to an abf object.
 #'
 #' @param abf an abf object.
+#' @param dac waveform DAC channel, 1-based.
 #'
 #' @return an abf object with a new waveform channel attached.
 #' @export
 #'
-AttachWaveform <- function(abf) {
+AtchWaveform <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-
-  dac <- GetWaveformEnabledDAC(abf)
-  if (length(dac) == 0L) {
-    err_wf_dac()
-  }
   dac <- FirstElement(dac)
+  CheckArgs(abf, dac = dac)
+
   #get waveform channel
-  wf <- GetWaveform(abf, wf_dac_id = dac)
+  wf <- GetWaveform(abf, dac = dac)
   #figure out waveform unit
   meta <- get_meta(abf)
   idx_name <- meta$DAC$lDACChannelNameIndex[dac]
@@ -144,21 +120,35 @@ AttachWaveform <- function(abf) {
   dac_unit <- meta$Strings[idx_unit]
   dac_desc <- "Waveform"
 
-  new_abf <- AtchChan(abf, wf, dac_name, dac_unit, dac_desc)
+  AtchChan(abf, wf, dac_name, dac_unit, dac_desc)
+}
 
-  new_abf
+#' Attach a waveform channel to an abf object, by-ref like behaviour.
+#'
+#' @param abf an abf object.
+#' @param dac waveform DAC channel, 1-based.
+#'
+#' @return an abf object with a new waveform channel attached, invisibly.
+#' @export
+#'
+AttachWaveform <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
+
+  eval.parent(substitute({
+    abf <- AtchWaveform(abf, dac)
+    invisible(abf)
+  }))
 }
 
 wf_step <- function(len, Vhi) {
   #waveform 1
 
-  return(rep(Vhi, len))
+  rep(Vhi, len)
 }
 wf_ramp <- function(len, Vin, Vhi){
   #waveform 2
 
   k <- (Vhi - Vin) / len
-  return(seq_len(len) * k + Vin)
+  seq_len(len) * k + Vin
 }
 wf_pulse <- function(len, Vin, Vhi, period, width) {
   #waveform 3
@@ -166,22 +156,19 @@ wf_pulse <- function(len, Vin, Vhi, period, width) {
   win <- rep(Vin, period)
   win[seq_len(width)] <- Vhi
 
-  ret <- rep(win, length.out = len)
-  return(ret)
+  rep(win, length.out = len)
 }
 wf_trng <- function(len, Vin, Vhi, period, width) {
   #waveform 4
 
   win_l <- wf_ramp(width, Vhi, Vin)
   if (period == width) {
-    ret <- rep(win_l, length.out = len)
-    return(ret)
+    rep(win_l, length.out = len)
+  } else {
+    win_r <- wf_ramp(period - width, Vin, Vhi)
+    win <- c(win_l, win_r)
+    rep(win, length.out = len)
   }
-  win_r <- wf_ramp(period - width, Vin, Vhi)
-  win <- c(win_l, win_r)
-
-  ret <- rep(win, length.out = len)
-  return(ret)
 }
 wf_cos <- function(len, Vin, Vhi, period) {
   #waveform 5
@@ -190,8 +177,7 @@ wf_cos <- function(len, Vin, Vhi, period) {
   f <- 1 / period
   win <- amp * cos(2 * pi * f * seq_len(period)) - amp + Vin
 
-  ret <- rep(win, length.out = len)
-  return(ret)
+  rep(win, length.out = len)
 }
 wf_biphsc <- function(len, Vin, Vhi, period, width) {
   #waveform 7
@@ -203,7 +189,5 @@ wf_biphsc <- function(len, Vin, Vhi, period, width) {
   win[1:hwidth] <- Vhi
   win[(hwidth + 1L):width] <- Vlo
 
-  ret <- rep(win, length.out = len)
-
-  return(ret)
+  rep(win, length.out = len)
 }

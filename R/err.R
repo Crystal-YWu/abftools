@@ -22,12 +22,6 @@ err_abf_file <- function(elaborate) {
   err(msg)
 }
 
-err_abf_not_episodic <- function() {
-
-  msg <- "The abf object is not episodic."
-  err(msg)
-}
-
 err_class_abf <- function() {
 
   msg <- "Only abf object is supported."
@@ -40,6 +34,30 @@ err_class_abf_list <- function() {
   err(msg)
 }
 
+err_channel <- function() {
+
+  msg <- sprintf("Invalid channel id.")
+  err(msg)
+}
+
+err_episode <- function() {
+
+  msg <- sprintf("Invalid episode number.")
+  err(msg)
+}
+
+err_epoch <- function() {
+
+  msg <- "Invalid epoch number."
+  err(msg)
+}
+
+err_epoch_dac <- function() {
+
+  msg <- "Epoch setting is not enabled for DAC channel."
+  err(msg)
+}
+
 err_zero_length <- function(x, elaborate = NULL, ...) {
 
   xname <- as.character(substitute(x))
@@ -49,6 +67,12 @@ err_zero_length <- function(x, elaborate = NULL, ...) {
   }
 
   err(msg, ...)
+}
+
+err_abf_not_episodic <- function() {
+
+  msg <- "The abf object is not episodic."
+  err(msg)
 }
 
 err_class_vec_list <- function() {
@@ -81,11 +105,7 @@ err_epoch_name <- function() {
   err(msg)
 }
 
-err_epoch <- function() {
 
-  msg <- "Invalid epoch number."
-  err(msg)
-}
 
 err_wf_mode <- function() {
 
@@ -156,20 +176,6 @@ err_assert_len <- function(var, to_match) {
   var_name <- as.character(substitute(var))
   match_name <- as.character(substitute(to_match))
   msg <- sprintf("Length of %s does not match %s.", var_name, match_name)
-
-  err(msg)
-}
-
-err_epoch_dac <- function() {
-
-  msg <- "Epoch setting is not enabled."
-
-  err(msg)
-}
-
-err_channel <- function() {
-
-  msg <- "Invalid channel id."
 
   err(msg)
 }

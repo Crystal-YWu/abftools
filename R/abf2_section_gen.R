@@ -167,7 +167,7 @@ dummy_adc_entry <- function(nADCNum, lADCChannelNameIndex, lADCUnitsIndex) {
 }
 
 #assumes only one dac channel
-dummy_dac <- function(lDACChannelNameIndex, lDACChannelUnitsIndex, nWaveformEnable) {
+dummy_dac_entry <- function(lDACChannelNameIndex, lDACChannelUnitsIndex, nWaveformEnable) {
 
   DAC <- list()
 

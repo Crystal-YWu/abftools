@@ -121,9 +121,8 @@ CheckChannelDim <- function(abf, channel_data) {
 AtchChan <- function(abf, channel_data,
                      channel_name, channel_unit, channel_desc = channel_name) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
+  CheckArgs(abf)
+
   if (!CheckChannelDim(abf, channel_data)) {
     eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }

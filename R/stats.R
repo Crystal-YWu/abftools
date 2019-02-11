@@ -51,9 +51,8 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
   df <- data.frame(mean_voltage_means, sem_voltage_means, mean_current_means,
                    sem_current_means, nsamples)
   colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current", "Num Samples")
-  df <- CpChannelAttr(df, abf_list[[1]])
 
-  df
+  CpChannelAttr(df, abf_list[[1]])
 }
 
 #' Sample abf object to reduce data points.
@@ -61,11 +60,12 @@ IVSummary <- function(abf_list, intv_list, current_channel, voltage_channel) {
 #' @param abf an abf object.
 #' @param sampling_ratio the sampling ratio. See melt.abf for more details.
 #' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
+#' @param ... arguments passed to sampling_func
 #'
 #' @return a sampled abf object
 #' @export
 #'
-SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
+SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -114,7 +114,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
   new_samp_intv <- old_samp_intv * sampling_ratio
 
   #copy meta
-  data <- CpAbfAttr(data, abf)
+  CpAbfAttr(data, abf)
   attr(data, "SamplingInterval") <- new_samp_intv
 
   #alter meta

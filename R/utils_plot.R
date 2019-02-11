@@ -62,7 +62,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
   }
   #bind time column
   df <- cbind(time = ctime, df)
-  df <- melt(df, id.vars = "time", variable.name = "Episode", value.name = value.name, ...)
+  df <- melt(df, id.vars = "time", variable.name = "Episode", ..., value.name = value.name)
 
   return(df)
 }
@@ -133,9 +133,11 @@ DefaultEpiLabel <- function(abf) {
     err_class_abf()
   }
 
-  ret <- paste0("epi", seq_len(nep))
-
-  return(ret)
+  if (length(nep) == 1L) {
+    paste0("epi", seq_len(nep))
+  } else {
+    paste0("epi", nep)
+  }
 }
 
 

@@ -1,3 +1,21 @@
+#' Return all episodes of an abf object.
+#'
+#' @param abf an abf object.
+#'
+#' @return a vector of episode numbers.
+#' @export
+#'
+GetAllEpisodes <- function(abf) {
+
+  if (IsAbf(abf)) {
+    seq_len(nEpi(abf))
+  } else if (IsAbfList(abf)) {
+    lapply(abf, function(x) seq_len(nEpi(x)))
+  } else {
+    err_class_abf()
+  }
+}
+
 #' Mask episodes with a value.
 #'
 #' @param abf an abf object.
@@ -10,21 +28,13 @@
 #'
 MskEpi <- function(abf, episodes, value, channel = 1L) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
-  if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
+  CheckArgs(abf, chan = channel, epi = episodes)
+
   if (is.na(value)) {
     err_mask_na()
   }
 
-  d <- dim(abf)
-  if (d[3] == 1L) {
+  if (nEpi(abf) == 1L) {
     err_abf_not_episodic()
   }
 
@@ -59,7 +69,7 @@ MaskEpisodes <- function(abf, episodes, value, channel = 1L) {
       }))
     )
   } else {
-    err_class_abf_list()
+    err_class_abf()
   }
 
 }
@@ -78,15 +88,9 @@ MaskEpisodes <- function(abf, episodes, value, channel = 1L) {
 #'
 RmEpi <- function(abf, episodes) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
+  CheckArgs(abf, epi = episodes)
 
-  d <- dim(abf)
-  if (d[3] == 1L) {
+  if (nEpi(abf) == 1L) {
     err_abf_not_episodic()
   }
 
@@ -123,7 +127,7 @@ RemoveEpisodes <- function(abf, episodes) {
       }))
     )
   } else {
-    err_class_abf_list()
+    err_class_abf()
   }
 
 }
@@ -138,16 +142,11 @@ RemoveEpisodes <- function(abf, episodes) {
 #'
 ResEpi <- function(abf, episodes) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
+  CheckArgs(abf, epi = episodes)
 
-  d <- dim(abf)
-  if (d[3] == 1L)
+  if (nEpi(abf) == 1L) {
     err_abf_not_episodic()
+  }
 
   attr(abf, "EpiAvail")[episodes] <- TRUE
 
@@ -177,7 +176,7 @@ RestoreEpisodes <- function(abf, episodes) {
       }))
     )
   } else {
-    err_class_abf_list()
+    err_class_abf()
   }
 
 }
@@ -193,7 +192,7 @@ GetAvailEpisodes <- function(abf) {
 
   f <- function(x) {
     all_epi <- seq_len(nEpi(x))
-    avail_epi <- attr(x, "EpiAvail")
+    avail_epi <- GetEpiAvail(abf)
 
     all_epi[avail_epi]
   }
@@ -203,6 +202,6 @@ GetAvailEpisodes <- function(abf) {
   } else if (IsAbfList(abf)) {
     lapply(abf, f)
   } else {
-    err_class_abf_list()
+    err_class_abf()
   }
 }
