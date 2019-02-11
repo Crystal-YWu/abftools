@@ -440,12 +440,7 @@ GetNumOfEpoch <- function(abf) {
 
   if (IsAbf(abf)) {
     meta <- get_meta(abf)
-    epdac <- meta$EpochPerDAC
-    if (is.null(epdac)) {
-      ans <- 0L
-    } else {
-      ans <- nrow(epdac)
-    }
+    ans <- length(meta$Epoch$nEpochNum)
   } else if (IsAbfList(abf)) {
     ans <- lapply(abf, GetNumOfEpoch)
   } else {
