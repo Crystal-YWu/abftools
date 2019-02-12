@@ -319,6 +319,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     data
   }
 
+  dots <- list(...)
   f <- function(abf, intv = NULL,
                 episode = GetAvailEpisodes(abf),
                 channel = GetAllChannels(abf)) {
@@ -337,7 +338,13 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     #extract data
     xdata <- abf[mask_time, mask_epi, mask_chan, drop = FALSE]
     #apply to map_func
-    ret <- mapnd(x = xdata, f = map_func, along = along, pack_args = pack_args, ...)
+    args <- c(list(
+      x = xdata,
+      f = map_func,
+      along = along,
+      pack_args = pack_args
+      ), dots)
+    ret <- do.call(mapnd, args)
     #get dimension info
     dim_exp <- length(dim(ret)) > 2L
     dim_info <- parse_dim_info(abf, mask_time, mask_epi, mask_chan, dim_exp)
@@ -372,3 +379,4 @@ wrap_along <- function(...,
                        chan_id_func = chan_id_func, time_unit = time_unit,
                        ret.df = ret.df)
 }
+

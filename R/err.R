@@ -204,6 +204,9 @@ err_chan_id <- function() {
 
 err_invalid_axis <- function(axis) {
 
+  if (length(axis > 1L)) {
+    axis <- paste(axis, collapse = " ")
+  }
   msg <- sprintf("Invalid axis %s.", axis)
 
   err(msg)
