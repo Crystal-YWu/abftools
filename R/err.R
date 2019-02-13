@@ -60,7 +60,7 @@ err_epoch_dac <- function() {
 
 err_zero_length <- function(x, elaborate = NULL, ...) {
 
-  xname <- as.character(substitute(x))
+  xname <- as.character(deparse(substitute(x)))
   msg <- sprintf("%s is of zero length.", xname)
   if (!is.null(elaborate)) {
     msg <- sprintf("%s %s", msg, elaborate)
@@ -152,8 +152,8 @@ err_time_unit <- function() {
 
 err_wrong_dim <- function(x, y, ...) {
 
-  xname <- as.character(substitute(x))
-  yname <- as.character(substitute(y))
+  xname <- as.character(deparse(substitute(x)))
+  yname <- as.character(deparse(substitute(y)))
   msg <- sprintf("Dimensions of %s and %s do not match.", xname, yname)
   err(msg, ...)
 }
@@ -173,8 +173,8 @@ err_internal_bug <- function(additional) {
 
 err_assert_len <- function(var, to_match, ...) {
 
-  var_name <- as.character(substitute(var))
-  match_name <- as.character(substitute(to_match))
+  var_name <- as.character(deparse(substitute(var)))
+  match_name <- as.character(deparse(substitute(to_match)))
   msg <- sprintf("Length of %s does not match %s.", var_name, match_name)
 
   err(msg, ...)

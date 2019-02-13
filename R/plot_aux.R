@@ -48,7 +48,7 @@ TickToTime <- function(abf, time_unit, ctick) {
                   hr =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60,
                   err_time_unit())
 
-  return(ctime)
+  ctime
 }
 
 GetAxisLabel <- function(desc, unit, style = "slash") {
@@ -59,7 +59,6 @@ GetAxisLabel <- function(desc, unit, style = "slash") {
          #fall through, slash
          paste0(desc, " / ", unit)
   )
-
 }
 
 
