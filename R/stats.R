@@ -29,6 +29,11 @@ IVSummary <- function(abf_list, intv_list = NULL,
   sem_current_means <- colSems(current_means, na.rm = TRUE)
   sem_voltage_means <- colSems(voltage_means, na.rm = TRUE)
 
+  mean_current_means[which(is.nan(mean_current_means))] <- NA
+  mean_voltage_means[which(is.nan(mean_voltage_means))] <- NA
+  sem_current_means[which(is.nan(sem_current_means))] <- NA
+  sem_voltage_means[which(is.nan(sem_voltage_means))] <- NA
+
   nsamples <- rep(length(abf_list), length(mean_voltage_means))
 
   df <- data.frame(mean_voltage_means, sem_voltage_means,

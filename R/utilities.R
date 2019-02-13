@@ -12,7 +12,7 @@ AverageAbf <- function(abf_list, w = NULL) {
     err_class_abf_list()
   }
 
-  if (missing(w) || is.null(w)) {
+  if (is.null(w)) {
     n <- length(abf_list)
     ret <- abf_list[[1]]
     for (i in 2:n) {
@@ -20,7 +20,6 @@ AverageAbf <- function(abf_list, w = NULL) {
     }
     ret <- ret / n
   } else {
-
     if (!AssertLength(w, abf_list)) {
       err_assert_len(w, abf_list)
     }
@@ -34,16 +33,12 @@ AverageAbf <- function(abf_list, w = NULL) {
   }
 
 
-  return(ret)
+  ret
 }
 
 ApplyBlank <- function(abf, chan, epi_val) {
 
-  nepi <- nEpi(abf)
-  for (epi in seq_len(nepi)) {
-    abf[, epi, chan] <- abf[, epi, chan] - epi_val[epi]
-  }
-
+  abf[,, chan] <- sweep(abf[,, chan], 2L, epi_val)
   abf
 }
 
@@ -60,11 +55,8 @@ ApplyBlank <- function(abf, chan, epi_val) {
 #' @return an abf object or a list of abf objects
 #' @export
 #'
-BlankAbf <- function(abf, ref_data, ref_intv = NULL, current_channel = NULL) {
-
-  if (is.null(current_channel)) {
-    current_channel <- GetFirstCurrentChan(abf)
-  }
+BlankAbf <- function(abf, ref_data, ref_intv = NULL,
+                     current_channel = GetFirstCurrentChan(abf)) {
 
   #reference data
   if (IsAbf(ref_data)) {
@@ -73,8 +65,11 @@ BlankAbf <- function(abf, ref_data, ref_intv = NULL, current_channel = NULL) {
     ref_data <- IVSummary(ref_data, ref_intv, current_channel = current_channel)
   }
   current_data <- ParseDataFrameIV(ref_data)$Current
-  if (any(is.na(current_data))) {
+  idx_na <- is.na(current_data)
+  if (all(idx_na)) {
     err_channel_data("Current")
+  } else {
+    current_data[which(idx_na)] <- 0.0
   }
 
   if (IsAbf(abf)) {
