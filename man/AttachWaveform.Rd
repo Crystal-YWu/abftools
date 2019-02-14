@@ -2,16 +2,18 @@
 % Please edit documentation in R/waveform.R
 \name{AttachWaveform}
 \alias{AttachWaveform}
-\title{Attach a waveform channel to an abf object.}
+\title{Attach a waveform channel to an abf object, by-ref like behaviour.}
 \usage{
-AttachWaveform(abf)
+AttachWaveform(abf, dac = GetWaveformEnabledDAC(abf))
 }
 \arguments{
 \item{abf}{an abf object.}
+
+\item{dac}{waveform DAC channel, 1-based.}
 }
 \value{
-an abf object with a new waveform channel attached.
+an abf object with a new waveform channel attached, invisibly.
 }
 \description{
-Attach a waveform channel to an abf object.
+Attach a waveform channel to an abf object, by-ref like behaviour.
 }

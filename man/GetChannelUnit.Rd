@@ -4,10 +4,12 @@
 \alias{GetChannelUnit}
 \title{Get units of channels.}
 \usage{
-GetChannelUnit(abf)
+GetChannelUnit(abf, channel = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
+
+\item{channel}{channel id.}
 }
 \value{
 a character vector of channel units.

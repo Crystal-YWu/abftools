@@ -4,7 +4,7 @@
 \alias{MeltAbfChannel}
 \title{Melt channel data of abf objects.}
 \usage{
-MeltAbfChannel(abf, channel, intv = NULL, map_func = mean,
+MeltAbfChannel(abf, channel = NULL, intv = NULL, map_func = mean,
   abf_id_func = GetTitle, epi_id_func = DefaultEpiLabel,
   chan_id_func = DefaultChanLabel, na.intv.rm = TRUE, ...)
 }

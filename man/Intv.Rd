@@ -7,11 +7,11 @@
 Intv(startPos, endPos, len)
 }
 \arguments{
-\item{startPos}{start position.}
+\item{startPos}{OPTIONAL, start position.}
 
-\item{endPos}{end position.}
+\item{endPos}{OPTIONAL, end position.}
 
-\item{len}{length of the interval.}
+\item{len}{OPTIONAL, length of the interval.}
 }
 \value{
 an interval.

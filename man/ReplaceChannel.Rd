@@ -4,14 +4,14 @@
 \alias{ReplaceChannel}
 \title{Replacing channel data, by-ref like behaviour.}
 \usage{
-ReplaceChannel(abf, channel, channel_data)
+ReplaceChannel(abf, channel_data, channel = 1L)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{channel}{ADC channel id, 1-based.}
-
 \item{channel_data}{channel data to replace the original.}
+
+\item{channel}{ADC channel id, 1-based.}
 }
 \value{
 an abf object with the replaced channel.

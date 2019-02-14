@@ -4,12 +4,12 @@
 \alias{GetEpochIntervals}
 \title{Get intervals of all epochs.}
 \usage{
-GetEpochIntervals(abf, wf_dac_ch = NULL)
+GetEpochIntervals(abf, dac = GetWaveformEnabledDAC(abf))
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{wf_dac_ch}{OPTIONAL, waveform DAC channel, 1-based.}
+\item{dac}{OPTIONAL, DAC channel, 1-based.}
 }
 \value{
 a 3-d array, see details.

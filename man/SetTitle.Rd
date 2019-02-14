@@ -12,10 +12,8 @@ SetTitle(abf, title)
 \item{title}{the title to be set.}
 }
 \value{
-an abf object
+an abf object, invisibly
 }
 \description{
-In order to mimic the by-ref behaviour, when setting titles for a list of abf
-objects, a temp variable "i_____" in caller's scope is used and then removed.
-This may cause some trouble if you use i_____ in your code.
+Set title of an abf object, by-ref behaviour.
 }

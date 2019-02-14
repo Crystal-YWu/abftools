@@ -4,7 +4,7 @@
 \alias{GetChannelDesc}
 \title{Get descriptions of channels.}
 \usage{
-GetChannelDesc(abf)
+GetChannelDesc(abf, channel = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
