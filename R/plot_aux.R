@@ -16,13 +16,13 @@ GetYLimit <- function(abf, intv = NULL, curs = NULL, channel, blank = 0.0125) {
   for (i in seq_along(abf)) {
 
     #get pts of interest
-    poi <- c(intv[[i]][1:2], curs[[i]])
+    poi <- c(intv[[i]][1], intv[[i]][2], curs[[i]])
     if (is.null(poi)) {
       #no intv or curs is given, set mask to whole channel
       mask <- seq_len(nPts(abf[[i]]))
     } else {
-      xrange <- range(poi)
-      mask <- seq(xrange[1], xrange[2])
+      t_range <- range(poi)
+      mask <- seq(t_range[1], t_range[2])
     }
 
     lower <- min(abf[[i]][[channel]][mask, ])
@@ -34,7 +34,7 @@ GetYLimit <- function(abf, intv = NULL, curs = NULL, channel, blank = 0.0125) {
     ret <- range(ret, upper, lower)
   }
 
-  return(ret)
+  ret
 }
 
 TickToTime <- function(abf, time_unit, ctick) {

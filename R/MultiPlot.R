@@ -19,11 +19,7 @@ MultiPlotChannel_Pub <- function(abf_list, channel = 1L, time_unit = "s",
     err_class_abf_list()
   }
   channel <- FirstElement(channel)
-  for (tmp in abf_list) {
-    if (!AssertChannel(tmp, channel)) {
-      err_channel()
-    }
-  }
+  CheckArgs(abf_list, chan = channel, allow_list = TRUE)
 
   manual_title <- unlist(manual_title)
   if (!is.null(manual_title)) {
@@ -89,11 +85,7 @@ MultiPlotChannel <- function(abf_list, channel = 1L, intv = NULL, cursor = NULL,
   }
   #check selected channels are valid for all abf objects in abf_list
   channel <- unlist(channel)
-  for (abf in abf_list) {
-    if (!AssertChannel(abf, channel)) {
-      err_channel()
-    }
-  }
+  CheckArgs(abf_list, chan = channel, allow_list = TRUE)
 
   intv <- ExpandList(intv, abf_list)
   if (is.null(intv)) {

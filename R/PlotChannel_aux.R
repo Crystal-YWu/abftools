@@ -44,7 +44,7 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   p <- p + xlab(xlabel) + ylab(ylabel)
 
   #Good to go
-  return(p)
+  p
 }
 
 CollectAllCh <- function(abf, ...) {
@@ -56,7 +56,7 @@ CollectAllCh <- function(abf, ...) {
     plist[[i]] <- CollectCh(abf, channel = i, ...)
   }
 
-  return(plist)
+  plist
 }
 
 ArrangePlot <- function(p, arrange) {
@@ -67,5 +67,5 @@ ArrangePlot <- function(p, arrange) {
                A = cowplot::plot_grid(plotlist = p),
                err_arrange(arrange))
 
-  return(pg)
+  pg
 }

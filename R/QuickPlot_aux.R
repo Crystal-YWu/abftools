@@ -106,7 +106,7 @@ BindDataFrameList <- function(x) {
 #' @return a melted data frame
 #' @export
 #'
-MeltAbfChannel <- function(abf, channel, intv = NULL,
+MeltAbfChannel <- function(abf, channel = NULL, intv = NULL,
                            map_func = mean,
                            abf_id_func = GetTitle,
                            epi_id_func = DefaultEpiLabel,
@@ -117,19 +117,15 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
   if (IsAbf(abf)) {
     abf <- list(abf)
   } else if (!IsAbfList(abf)) {
-    err_class_abf_list()
+    err_class_abf()
   }
   #check channel
-  if (missing(channel) || is.null(channel)) {
+  if (is.null(channel)) {
     #abf is now a list of abf instead, so we use abf[[1]] instead
     channel <- GetAllChannels(abf[[1]])
   }
   channel <- unlist(channel)
-  for (tmp in abf) {
-    if (!AssertChannel(tmp, channel)) {
-      err_channel()
-    }
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   intv <- ExpandList(intv, abf)
   if (is.null(intv)) {
@@ -160,5 +156,5 @@ MeltAbfChannel <- function(abf, channel, intv = NULL,
     melted <- rbind(melted, tmp)
   }
 
-  return(melted)
+  melted
 }

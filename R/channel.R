@@ -180,12 +180,10 @@ AtchChan <- function(abf, channel_data,
 #'
 AttachChannel <- function(abf, channel_data, channel_name, channel_unit, channel_desc) {
 
-  return(
     eval.parent(substitute({
       abf <- AtchChan(abf, channel_data, channel_name, channel_unit, channel_desc)
       invisible(abf)
     }))
-  )
 }
 
 #' Replacing channel data.
@@ -199,12 +197,8 @@ AttachChannel <- function(abf, channel_data, channel_name, channel_unit, channel
 #'
 RplcChan <- function(abf, channel_data, channel = 1L) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel)
+
   if (!CheckChannelDim(abf, channel_data)) {
     eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
@@ -224,10 +218,8 @@ RplcChan <- function(abf, channel_data, channel = 1L) {
 #'
 ReplaceChannel <- function(abf, channel_data, channel = 1L) {
 
-  return(
     eval.parent(substitute({
       abf <- RplcChan(abf, channel_data, channel)
       invisible(abf)
     }))
-  )
 }
