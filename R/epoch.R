@@ -11,7 +11,7 @@ GetEpochId <- function(epoch_name) {
   epoch_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
   epoch <- match(epoch_name, epoch_names)
 
-  if (is.null(epoch)) {
+  if (any(is.na(epoch))) {
     err_epoch_name()
   }
 
@@ -27,54 +27,21 @@ GetEpochId <- function(epoch_name) {
 #'
 GetWaveformEnabledDAC <- function(abf) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-
-  #We can't rely solely on DAC$nWaveformEnable because even if user selected other
-  #modes which waveforms are not enabled and corresponding settings are grayed
-  #out in Clampex software, somehow the program will write all previous Waveform
-  #settings.
-  #
-  #Check if EpochPerDAC is present
-  if (nEpoch(abf) == 0L) {
-    return(integer())
-  }
+  CheckArgs(abf)
 
   meta <- get_meta(abf)
 
-  idx <- as.logical(meta$DAC$nWaveformEnable)
-  nDACNum <- meta$DAC$nDACNum[idx]
-  if (length(nDACNum) > 1L) {
-    #TODO: parse all enabled DAC channel.
-    warning("GetWaveformEnabledDAC: Multiple waveform DAC enabled.")
-  }
-
-  #force DACid <-> nDACNum conversion
-  DACid <- nDACNum + 1L
-
-  DACid
+  mask <- as.logical(meta$DAC$nWaveformEnable)
+  meta$DAC$nDACNum[mask] + 1L
 }
 
-#I don't think we need to export this
-GetWaveformEpdac <- function(abf, DACid) {
-
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
+GetEpdac <- function(abf, dac) {
 
   meta <- get_meta(abf)
   epdac <- meta$EpochPerDAC
-  nDACNum <- DACid - 1L
 
-  #nDACNum is 0-based
-  mask <- epdac$nDACNum == nDACNum
-  #sort epdac by nEpochNum just in case
-  ret <- epdac[mask, ]
-  #EpochPerDAC is already sorted in abf2_load.
-  #ret <- ret[order(ret$nEpochNum), ]
-
-  ret
+  mask <- epdac$nDACNum == (dac - 1L)
+  epdac[mask, ]
 }
 
 #' Get intervals of all epochs.
@@ -83,26 +50,16 @@ GetWaveformEpdac <- function(abf, DACid) {
 #' epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
 #'
 #' @param abf an abf object.
-#' @param wf_dac_ch OPTIONAL, waveform DAC channel, 1-based.
+#' @param dac OPTIONAL, DAC channel, 1-based.
 #'
 #' @return a 3-d array, see details.
 #' @export
 #'
-GetEpochIntervals <- function(abf, wf_dac_ch = NULL) {
+GetEpochIntervals <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (is.null(wf_dac_ch)) {
-    wf_dac_ch <- GetWaveformEnabledDAC(abf)
-  }
-  if (length(wf_dac_ch) == 0L) {
-    err_epoch_dac()
-  }
-  wf_dac_ch <- FirstElement(wf_dac_ch)
+  CheckArgs(abf, dac = dac)
 
-  #EpochPerDAC table
-  epdac <- GetWaveformEpdac(abf, wf_dac_ch)
+  epdac <- GetEpdac(abf, FirstElement(dac))
 
   #length of first holding
   npts <- nPts(abf)

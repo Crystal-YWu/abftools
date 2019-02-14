@@ -4,7 +4,9 @@
 \alias{IVSummary}
 \title{IVSummary calculates average current of a list of abf objects, within given intervals}
 \usage{
-IVSummary(abf_list, intv_list, current_channel, voltage_channel)
+IVSummary(abf_list, intv_list = NULL,
+  current_channel = GetFirstCurrentChan(abf_list),
+  voltage_channel = GetFirstVoltageChan(abf_list))
 }
 \arguments{
 \item{abf_list}{a list of abf objects.}
@@ -16,7 +18,8 @@ IVSummary(abf_list, intv_list, current_channel, voltage_channel)
 \item{voltage_channel}{voltage channel id, 1-based.}
 }
 \value{
-a data frame containing calculated Voltage, SEM Voltage, Current, SEM Current columns.
+a data frame containing calculated Voltage, SEM Voltage, Current,
+SEM Current and number of samples.
 }
 \description{
 IVSummary calculates average current of a list of abf objects, within given intervals

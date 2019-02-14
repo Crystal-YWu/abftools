@@ -1,7 +1,7 @@
 Package: abftools
 Type: Package
 Title: ABF Tools: Toolbox for Visualising and Analysing Electrophysiology ABF2 Data
-Version: 0.1.0
+Version: 0.9.9
 Author: Yue Wu <yue.wu@adelaide.edu.au>
 Maintainer: Jun <imlijunda@gmail.com>
 Description: A toolbox provide data structure and functions to manipulate and

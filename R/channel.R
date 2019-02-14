@@ -12,9 +12,6 @@ GetVoltageChan <- function(abf) {
 
   if (IsAbf(abf)) {
     ans <- which(IsVoltageUnit(GetChannelUnit(abf)))
-    if (!length(ans)) {
-      err_id_voltage_chan()
-    }
   } else if (IsAbfList(abf)) {
     ans <- unique(lapply(abf, GetVoltageChan))
     if (length(ans) > 1L) {
@@ -40,9 +37,6 @@ GetCurrentChan <- function(abf) {
 
   if (IsAbf(abf)) {
     ans <- which(IsCurrentUnit(GetChannelUnit(abf)))
-    if (!length(ans)) {
-      err_id_current_chan()
-    }
   } else if (IsAbfList(abf)) {
     ans <- unique(lapply(abf, GetCurrentChan))
     if (length(ans) > 1L) {
@@ -66,7 +60,8 @@ GetCurrentChan <- function(abf) {
 #'
 GetFirstVoltageChan <- function(abf) {
 
-  FirstElement(GetVoltageChan(abf))
+  voltage_channel <- GetVoltageChan(abf)
+  FirstElement(voltage_channel)
 }
 
 #' Get first current channel id.
@@ -78,7 +73,8 @@ GetFirstVoltageChan <- function(abf) {
 #'
 GetFirstCurrentChan <- function(abf) {
 
-  FirstElement(GetCurrentChan(abf))
+  current_channel <- GetCurrentChan(abf)
+  FirstElement(current_channel)
 }
 
 #' Return all channels of an abf object.
@@ -90,11 +86,13 @@ GetFirstCurrentChan <- function(abf) {
 #'
 GetAllChannels <- function(abf) {
 
-  if (!IsAbf(abf)) {
+  if (IsAbf(abf)) {
+    seq_len(nChan(abf))
+  } else if (IsAbfList(abf)) {
+    lapply(abf, function(x) seq_len(nChan(x)))
+  } else {
     err_class_abf()
   }
-
-  return(seq_len(nChan(abf)))
 }
 
 CheckChannelDim <- function(abf, channel_data) {
@@ -102,7 +100,7 @@ CheckChannelDim <- function(abf, channel_data) {
   d1 <- dim(abf)
   d2 <- dim(channel_data)
 
-  return(all(d1[1:2] == d2))
+  length(d2) == 2L && all(d1[1:2] == d2)
 }
 
 #' Attach a new channel to an abf object.
@@ -123,11 +121,10 @@ CheckChannelDim <- function(abf, channel_data) {
 AtchChan <- function(abf, channel_data,
                      channel_name, channel_unit, channel_desc = channel_name) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
+  CheckArgs(abf)
+
   if (!CheckChannelDim(abf, channel_data)) {
-    err_wrong_dim()
+    eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
 
   #new dimension
@@ -156,20 +153,18 @@ AtchChan <- function(abf, channel_data,
                             lADCUnitsIndex = channel_unit_idx)
   meta$ADC <- rbind(meta$ADC, newadc)
 
-  if (GetMode(abf) != 3L) {
+  if (!is.null(meta$SynchArray)) {
     unit_lLength <- meta$SynchArray$lLength %/% nchan_old
     meta$SynchArray$lLength <- unit_lLength * nchan_new
   }
 
   #we should be good to go
-  new_abf <- CpAbfAttr(new_abf, abf)
-  attr(new_abf, "meta") <- meta
-
-  attr(new_abf, "ChannelName") <- c(GetChannelName(abf), channel_name)
-  attr(new_abf, "ChannelUnit") <- c(GetChannelUnit(abf), channel_unit)
-  attr(new_abf, "ChannelDesc") <- c(GetChannelDesc(abf), channel_desc)
-
-  return(new_abf)
+  ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
+               ChannelName = c(GetChannelName(abf), channel_name),
+               ChannelUnit = c(GetChannelUnit(abf), channel_unit),
+               ChannelDesc = c(GetChannelDesc(abf), channel_desc),
+               SamplingInterval = GetSamplingIntv(abf),
+               EpiAvail = GetEpiAvail(abf), meta = meta)
 }
 
 #' Attach a new channel to an abf object, by-ref like behaviour.
@@ -185,55 +180,46 @@ AtchChan <- function(abf, channel_data,
 #'
 AttachChannel <- function(abf, channel_data, channel_name, channel_unit, channel_desc) {
 
-  return(
     eval.parent(substitute({
       abf <- AtchChan(abf, channel_data, channel_name, channel_unit, channel_desc)
       invisible(abf)
     }))
-  )
 }
 
 #' Replacing channel data.
 #'
 #' @param abf an abf object.
-#' @param channel ADC channel id, 1-based.
 #' @param channel_data channel data to replace the original.
+#' @param channel ADC channel id, 1-based.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-RplcChan <- function(abf, channel, channel_data) {
+RplcChan <- function(abf, channel_data, channel = 1L) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel)
+
   if (!CheckChannelDim(abf, channel_data)) {
-    err_wrong_dim()
+    eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
-
   abf[, , channel] <- channel_data
 
-  return(abf)
+  abf
 }
 
 #' Replacing channel data, by-ref like behaviour.
 #'
 #' @param abf an abf object.
-#' @param channel ADC channel id, 1-based.
 #' @param channel_data channel data to replace the original.
+#' @param channel ADC channel id, 1-based.
 #'
 #' @return an abf object with the replaced channel.
 #' @export
 #'
-ReplaceChannel <- function(abf, channel, channel_data) {
+ReplaceChannel <- function(abf, channel_data, channel = 1L) {
 
-  return(
     eval.parent(substitute({
-      abf <- RplcChan(abf, channel, channel_data)
+      abf <- RplcChan(abf, channel_data, channel)
       invisible(abf)
     }))
-  )
 }

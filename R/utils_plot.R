@@ -62,9 +62,9 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
   }
   #bind time column
   df <- cbind(time = ctime, df)
-  df <- melt(df, id.vars = "time", variable.name = "Episode", value.name = value.name, ...)
+  df <- melt(df, id.vars = "time", variable.name = "Episode", ..., value.name = value.name)
 
-  return(df)
+  df
 }
 
 #' Crop undesired values from an abf object
@@ -83,12 +83,7 @@ melt.abf <- function(abf, channel = 1L, sampling_ratio = 1L, sampling_func = NUL
 #'
 CropValue <- function(abf, channel, max_value, min_value) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel)
 
   if (!missing(max_value) && !is.null(max_value)) {
     abf[abf > max_value] = NA
@@ -97,7 +92,7 @@ CropValue <- function(abf, channel, max_value, min_value) {
     abf[abf < min_value] = NA
   }
 
-  return(abf)
+  abf
 }
 
 #' Get default channel label for every channel of an abf object.
@@ -113,7 +108,7 @@ DefaultChanLabel <- function(abf) {
     err_class_abf()
   }
 
-  return(GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf)))
+  GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf))
 }
 
 #' Get default label for every episode of an abf object
@@ -133,9 +128,11 @@ DefaultEpiLabel <- function(abf) {
     err_class_abf()
   }
 
-  ret <- paste0("epi", seq_len(nep))
-
-  return(ret)
+  if (length(nep) == 1L) {
+    paste0("epi", seq_len(nep))
+  } else {
+    paste0("epi", nep)
+  }
 }
 
 
@@ -167,8 +164,6 @@ ZeroAxes <- function(xlimit, ylimit,
                       axis.text.y = element_blank(),
                       axis.line.y = element_blank(),
                       axis.ticks.y = element_blank())
-
-
 
   x_axis <- geom_hline(yintercept = 0)
 

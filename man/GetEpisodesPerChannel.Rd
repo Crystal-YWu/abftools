@@ -16,8 +16,5 @@ nEpi(abf)
 number of episodes/sweeps per channel.
 }
 \description{
-The returned number may be different to the result of dim(abf[[chan_id]]) if
-you have removed episodes from the abf object. GetEpisodesPerChannel / nEpi
-always return the original number of episodes per channel setting in the
-abf2 protocol.
+Get number of episodes/sweeps per channel.
 }

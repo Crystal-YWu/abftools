@@ -11,16 +11,16 @@ colSems <- function(df, na.rm = FALSE) {
   sds <- matrixStats::colSds(df, na.rm = na.rm)
   sqn <- sqrt(length(sds))
 
-  return(sds / sqn)
+  sds / sqn
 }
 
 #' Generate an interval.
 #'
 #' Only two or the arguments are needed. If all are given, len will be ignored.
 #'
-#' @param startPos start position.
-#' @param endPos end position.
-#' @param len length of the interval.
+#' @param startPos OPTIONAL, start position.
+#' @param endPos OPTIONAL, end position.
+#' @param len OPTIONAL, length of the interval.
 #'
 #' @return an interval.
 #' @export
@@ -40,7 +40,8 @@ Intv <- function(startPos, endPos, len) {
 
   intv <- c(startPos, endPos, len)
   names(intv) <- c("startPos", "endPos", "length")
-  return(intv)
+
+  intv
 }
 
 #' Set intervals, by-ref behaviour
@@ -107,5 +108,5 @@ abfapply <- function(abf_list, FUN, ..., channel = 1L, intv = NULL, gen_names = 
     rownames(ret) <- DefaultEpiLabel(abf_list[[1]])
   }
 
-  return(ret)
+  ret
 }

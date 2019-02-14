@@ -14,7 +14,7 @@ SetChannelDesc(abf, description, channel = 1L)
 \item{channel}{channel id.}
 }
 \value{
-a abf object with new ChannelDesc set.
+a abf object with new description set, invisibly.
 }
 \description{
 Set channel description, by-ref behaviour.

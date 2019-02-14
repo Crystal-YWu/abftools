@@ -5,7 +5,7 @@
 \alias{nPts}
 \title{Get number of recorded points per episode/sweep.}
 \usage{
-GetPointsPerEpisode(abf, event = NULL)
+GetPointsPerEpisode(abf)
 
 nPts(abf)
 }

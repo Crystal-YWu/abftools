@@ -11,12 +11,12 @@ print.abf <- function(x, ...) {
 
   mode <- GetMode(x)
   if (mode == 1L) {
-    fmt_str <- paste0("Mode %d abf object %s.\n",
+    fmt_str <- paste0("Mode %d abf object %s. ",
                       "Recorded %d ADC channels and %d events. ",
                       "Sampling interval: %.2f us.")
     s <- sprintf(fmt_str, mode, GetTitle(x), nChan(x), nEpi(x), GetSamplingIntv(x))
   } else {
-    fmt_str <- paste0("Mode %d abf object %s.\n",
+    fmt_str <- paste0("Mode %d abf object %s. ",
                       "Recorded %d ADC channels of %d episodes with %d points per episode. ",
                       "Sampling interval: %.2f us.")
     s <- sprintf(fmt_str, mode, GetTitle(x), nChan(x), nEpi(x), nPts(x),
@@ -60,9 +60,8 @@ print.abf <- function(x, ...) {
   dim(mx) <- c(npts, nepi)
   colnames(mx) <- epi_names[epi]
 
-  return(mx)
+  mx
 }
-AllEpisodesAvail <- function(abf) all(attr(abf, "EpiAvail"))
 
 #' Convert a channel of an abf object to data.frame
 #'
@@ -79,7 +78,7 @@ as.data.frame.abf <- function(x, row.names = NULL, optional = FALSE, channel = 1
 
   mx <- x[[channel]]
 
-  return(as.data.frame(mx, row.names, optional, ...))
+  as.data.frame(mx, row.names, optional, ...)
 }
 
 #' Replacing channel data.
@@ -93,5 +92,5 @@ as.data.frame.abf <- function(x, row.names = NULL, optional = FALSE, channel = 1
 #'
 `[[<-.abf` <- function(x, channel, value) {
 
-  return(RplcChan(x, channel, value))
+  RplcChan(x, channel, value)
 }

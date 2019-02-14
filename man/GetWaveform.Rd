@@ -4,14 +4,15 @@
 \alias{GetWaveform}
 \title{Simulate waveform.}
 \usage{
-GetWaveform(abf, episodes = NULL, wf_dac_id = NULL)
+GetWaveform(abf, episodes = GetAllEpisodes(abf),
+  dac = GetWaveformEnabledDAC(abf))
 }
 \arguments{
 \item{abf}{an abf object.}
 
 \item{episodes}{the episodes to simulate.}
 
-\item{wf_dac_id}{waveform DAC channel, 1-based.}
+\item{dac}{waveform DAC channel, 1-based.}
 }
 \value{
 channel data of the simulated waveform.

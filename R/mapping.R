@@ -78,19 +78,25 @@ mapnd <- function(x, f, along = 1L, MARGIN = NULL, pack_args = FALSE, ...) {
 #' @return a function of f(abf, intv).
 #' @export
 #'
-WrapMappingFunc <- function(map_func, channel, abf_id_func = NULL, epi_id_func = NULL,
+WrapMappingFunc <- function(map_func, channel,
+                            abf_id_func = NULL,
+                            epi_id_func = NULL,
                             chan_id_func = DefaultChanLabel, ret.df = TRUE, ...) {
 
-  if (missing(channel)) {
-    channel <- NULL
-  }
-  f_along <- WrapMappingFuncAlong(map_func = map_func, abf_id_func = abf_id_func,
-                                  epi_id_func = epi_id_func, chan_id_func = chan_id_func,
+  f_along <- WrapMappingFuncAlong(map_func = map_func,
+                                  abf_id_func = abf_id_func,
+                                  epi_id_func = epi_id_func,
+                                  chan_id_func = chan_id_func,
                                   along = 1L, ret.df = ret.df, ...)
 
+  ch_missing <- missing(channel)
   f <- function(abf, intv = NULL) {
 
-    f_along(abf, intv = intv, episode = NULL, channel = channel)
+    if (ch_missing) {
+      f_along(abf, intv = intv)
+    } else {
+      f_along(abf, intv = intv, channel = channel)
+    }
   }
 
   f
@@ -162,7 +168,7 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
 
   warned_once <- !dim_warn
 
-  parse_dim_info <- function(abf, mask_time, mask_epi, mask_chan, dim_exp) {
+  get_dim_ids <- function(abf, mask_time, mask_epi, mask_chan, dim_exp) {
 
     #unique id
     abf_id <- NULL
@@ -176,11 +182,10 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
 
     #dim 1
     time_id <- TickToTime(abf, time_unit, mask_time)
-    if (dim_exp && time_unit != "tick" && !warned_once) {
+    if (dim_exp && along != 1L && time_unit != "tick" && !warned_once) {
       msg <- sprintf("Time dim unit is converted to %s.", time_unit)
       warning(msg)
     }
-
 
     #dim 2
     epi_id <- NULL
@@ -202,65 +207,58 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
       }
     }
 
-    dim_info <- list()
-    dim_info$abf_id <- abf_id
-    dim_info$time_id <- time_id
-    dim_info$epi_id <- epi_id
-    dim_info$chan_id <- chan_id
-
-    dim_info
+    list(
+      abf_id = abf_id,
+      time_id = time_id,
+      epi_id = epi_id,
+      chan_id = chan_id
+    )
   }
-  parse_col_info <- function(dim_info, mask_epi, mask_chan) {
-
-    col_names <- NULL
-    col_extra <- NULL
+  get_col_info <- function(dim_ids, mask_epi, mask_chan) {
 
     #add an extra column of id
-    if (!is.null(dim_info$abf_id)) {
-      col_names <- "id"
-      col_extra <- dim_info$abf_id
+    if (is.null(dim_ids$abf_id)) {
+      col_extra <- list()
+    } else {
+      col_extra <- list(id = dim_ids$abf_id)
     }
 
     if (along == 1L) {
       #along time, columns -> channels, rows -> episodes
-      if (!is.null(dim_info$epi_id)) {
+      if (!is.null(dim_ids$epi_id)) {
         #add an extra column of episode id if epi_id is present.
-        col_names <- c(col_names, "Episode")
-        col_extra <- cbind(col_extra, dim_info$epi_id)
+        col_extra <- c(col_extra, list(Episode = dim_ids$epi_id))
       }
       #col_names of values (channels)
-      if (is.null(dim_info$chan_id)) {
-        dim_info$chan_id <- as.character(mask_chan)
+      if (is.null(dim_ids$chan_id)) {
+        dim_ids$chan_id <- as.character(mask_chan)
       }
-      col_names <- c(col_names, dim_info$chan_id)
+      col_names <- dim_ids$chan_id
     } else {
       #along episode/channel, rows -> time
+
       #add an extra column of time.
-      col_names <- c(col_names, "Time")
-      col_extra <- cbind(col_extra, dim_info$time_id)
+      col_extra <- c(col_extra, list(Time = dim_ids$time_id))
 
       if (along == 2L) {
         #col_names of values (channels)
-        if (is.null(dim_info$chan_id)) {
-          dim_info$chan_id <- as.character(mask_chan)
+        if (is.null(dim_ids$chan_id)) {
+          dim_ids$chan_id <- as.character(mask_chan)
         }
-        col_names <- c(col_names, dim_info$chan_id)
-      }
-
-      if (along == 3L) {
+        col_names <- dim_ids$chan_id
+      } else {
         #col_names of values (episodes)
-        if (is.null(dim_info$epi_id)) {
-          dim_info$epi_id <- as.character(mask_epi)
+        if (is.null(dim_ids$epi_id)) {
+          dim_ids$epi_id <- as.character(mask_epi)
         }
-        col_names <- c(col_names, dim_info$epi_id)
+        col_names <- dim_ids$epi_id
       }
     }
 
-    col_info <- list()
-    col_info$col_names <- col_names
-    col_info$col_extra <- col_extra
-
-    col_info
+    list(
+      col_names = col_names,
+      col_extra = do.call(cbind, col_extra)
+    )
   }
   fix_dim <- function(data, dim_info) {
 
@@ -271,9 +269,11 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
     if (!warned_once) {
       #give a warning for the first time called.
       msg_dim <- switch(along, "Time", "Episode", "Channel")
-      msg_ndim <- extra_dim
-      msg <- sprintf("Returned values of mapping function have lengths > 1. %s axis is expanded to %d dimensions.",
-                     msg_dim, msg_ndim)
+      if (extra_dim == 1L) {
+        msg <- sprintf("Mapping function returned multiple values. %s axis is preserved for returned values.")
+      } else {
+        msg <- sprintf("Returned values of mapping function is multi-dimensional. %s axis is expanded to %d dimensions.")
+      }
       warning(msg)
       warned_once <<- TRUE
     }
@@ -306,66 +306,52 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
   }
   fix_col <- function(data, col_info) {
 
+    if (ret.df) {
+      data <- as.data.frame(data)
+    }
+    colnames(data) <- col_info$col_names
     if (!is.null(col_info$col_extra)) {
       data <- cbind(col_info$col_extra, data)
     }
-    colnames(data) <- col_info$col_names
 
     data
   }
 
-  f <- function(abf, intv = NULL, episode = NULL, channel = NULL) {
+  dots <- list(...)
+  f <- function(abf, intv = NULL,
+                episode = GetAvailEpisodes(abf),
+                channel = GetAllChannels(abf)) {
 
-    if (!IsAbf(abf)) {
-      err_class_abf()
-    }
+    mask_epi <- as.integer(unlist(episode))
+    mask_chan <- as.integer(unlist(channel))
+    CheckArgs(abf,  epi = mask_epi, chan = mask_chan)
 
-    mask_time = integer()
     if (is.null(intv) || any(is.na(intv))) {
       mask_time <- seq_len(nPts(abf))
     } else {
       mask_time <- MaskIntv(intv)
     }
-    mask_epi = integer()
-    if (is.null(episode)) {
-      mask_epi <- GetAvailEpisodes(abf)
-    } else {
-      mask_epi <- as.integer(unlist(episode))
-      if (!AssertEpisode(abf, mask_epi)) {
-        err_epi()
-      }
-    }
-    mask_chan = integer()
-    if (is.null(channel)) {
-      mask_chan <- GetAllChannels(abf)
-    } else {
-      mask_chan <- as.integer(unlist(channel))
-      if (!AssertChannel(abf, mask_chan)) {
-        err_channel()
-      }
-    }
 
-    #extract data
     xdata <- abf[mask_time, mask_epi, mask_chan, drop = FALSE]
-    #apply to map_func
-    ret <- mapnd(x = xdata, f = map_func, along = along, pack_args = pack_args, ...)
-    #get dimension info
+    args <- c(list(
+      x = xdata,
+      f = map_func,
+      along = along,
+      pack_args = pack_args
+      ), dots)
+    ret <- do.call(mapnd, args)
+
     dim_exp <- length(dim(ret)) > 2L
-    dim_info <- parse_dim_info(abf, mask_time, mask_epi, mask_chan, dim_exp)
+    dim_ids <- get_dim_ids(abf, mask_time, mask_epi, mask_chan, dim_exp)
 
     if (dim_exp) {
-      ret <- fix_dim(ret, dim_info)
+      ret <- fix_dim(ret, dim_ids)
     } else {
-      col_info <- parse_col_info(dim_info, mask_epi, mask_chan)
-      if (ret.df) {
-        ret <- as.data.frame(ret)
-      }
+      col_info <- get_col_info(dim_ids, mask_epi, mask_chan)
       ret <- fix_col(ret, col_info)
     }
 
-    ret <- CpChannelAttr(ret, abf, channel)
-
-    ret
+    CpChannelAttr(ret, abf, channel)
   }
 
   f
@@ -374,12 +360,15 @@ WrapMappingFuncAlong <- function(map_func, along = "time", pack_args = FALSE,
 #' @rdname WrapMappingFuncAlong
 #' @export
 #'
-wrap_along <- function(..., abf_id_func = NULL,
+wrap_along <- function(...,
+                       abf_id_func = NULL,
                        epi_id_func = DefaultEpiLabel,
                        chan_id_func = DefaultChanLabel,
-                       time_unit = "ms", ret.df = TRUE){
+                       time_unit = "ms",
+                       ret.df = TRUE){
 
   WrapMappingFuncAlong(..., abf_id_func = abf_id_func, epi_id_func = epi_id_func,
                        chan_id_func = chan_id_func, time_unit = time_unit,
                        ret.df = ret.df)
 }
+

@@ -4,10 +4,12 @@
 \alias{GetChannelName}
 \title{Get names of channels.}
 \usage{
-GetChannelName(abf)
+GetChannelName(abf, channel = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
+
+\item{channel}{channel id.}
 }
 \value{
 a character vector of channel names.

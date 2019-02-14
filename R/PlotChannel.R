@@ -17,13 +17,8 @@ PlotChannel <- function(abf, channel = 1L, intv = NULL, cursor = NULL,
                         colour = FALSE, time_unit = "tick", auto_zoom = FALSE,
                         title = NULL, ...) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
   channel <- unlist(channel)
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel)
 
   if (length(channel) == 1L) {
     p <- CollectCh(abf, channel = channel, intv = intv, curs = cursor,
@@ -55,7 +50,7 @@ PlotChannel <- function(abf, channel = 1L, intv = NULL, cursor = NULL,
     }
   }
 
-  return(p)
+  p
 }
 
 #' Plot a channel with an interval.
@@ -80,7 +75,7 @@ PlotChannel_Intv <- function(abf, channel = 1L, intv, colour = FALSE,
                    colour = colour, time_unit = time_unit, auto_zoom = auto_zoom,
                    title = title, ...)
 
-  return(p)
+  p
 }
 
 #' Plot a channel with cursors.
@@ -105,7 +100,7 @@ PlotChannel_Cursor <- function(abf, channel = 1L, cursor, colour = FALSE,
                    colour = colour, time_unit = time_unit, auto_zoom = auto_zoom,
                    title = title, ...)
 
-  return(p)
+  p
 }
 
 #' Fast plot a channel.
@@ -132,7 +127,7 @@ PeekChannel <- function(abf, channel = 1L, intv = NULL, cursor = NULL,
                    colour = colour, time_unit = time_unit, auto_zoom = auto_zoom,
                    title = title, sampling_ratio = ratio, ...)
 
-  return(p)
+  p
 }
 
 #' Fast plot a channel with interval.
@@ -158,7 +153,7 @@ PeekChannel_Intv <- function(abf, channel = 1L, intv, colour = FALSE,
                    colour = colour, time_unit = time_unit, auto_zoom = auto_zoom,
                    title = title, sampling_ratio = ratio, ...)
 
-  return(p)
+  p
 }
 
 #' Fast plot a channel with cursors.
@@ -184,7 +179,7 @@ PeekChannel_Cursor <- function(abf, channel = 1L, cursor, colour = FALSE,
                    colour = colour, time_unit = time_unit, auto_zoom = auto_zoom,
                    title = title, sampling_ratio = ratio, ...)
 
-  return(p)
+  p
 }
 
 #' Plot all channels of an abf object.
@@ -217,7 +212,7 @@ PlotAllChannel <- function(abf, intv = NULL, cursor = NULL, colour = FALSE,
     p[[1]] <- p[[1]] + ggtitle(as.character(title))
   }
 
-  return(ArrangePlot(p, arrange))
+  ArrangePlot(p, arrange)
 }
 
 #' Fastp lot all channels of an abf object.
@@ -244,5 +239,5 @@ PeekAllChannel <- function(abf, intv = NULL, cursor = NULL, colour = FALSE,
                       time_unit = time_unit, auto_zoom = auto_zoom, title = title,
                       arrange = arrange, sampling_ratio = ratio, ...)
 
-  return(p)
+  p
 }

@@ -14,7 +14,7 @@ SetChannelUnit(abf, unit, channel = 1L)
 \item{channel}{channel id.}
 }
 \value{
-a abf object with new unit set.
+a abf object with new unit set, invisibly.
 }
 \description{
 Set channel unit, by-ref behaviour.
