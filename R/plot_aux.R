@@ -51,14 +51,9 @@ TickToTime <- function(abf, time_unit, ctick) {
   ctime
 }
 
-GetAxisLabel <- function(desc, unit, style = "parenth") {
+GetAxisLabel <- function(desc, unit, style = "%s (%s)") {
 
-  switch(toupper(substr(style, 1, 1)),
-         #parenthesis
-         P = paste0(desc, " (", unit, ")"),
-         #fall through, slash
-         paste0(desc, " / ", unit)
-  )
+  sprintf(style, desc, unit)
 }
 
 
