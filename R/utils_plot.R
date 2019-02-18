@@ -85,14 +85,35 @@ CropValue <- function(abf, channel, max_value, min_value) {
 
   CheckArgs(abf, chan = channel)
 
-  if (!missing(max_value) && !is.null(max_value)) {
-    abf[abf > max_value] = NA
-  }
-  if (!missing(min_value) && !is.null(min_value)) {
-    abf[abf < min_value] = NA
+  for (ch in channel) {
+    data <- abf[,, ch]
+    if (!missing(max_value) && !is.null(max_value)) {
+      data[data > max_value] = NA
+    }
+    if (!missing(min_value) && !is.null(min_value)) {
+      data[data < min_value] = NA
+    }
+    abf[,, ch] <- data
   }
 
   abf
+}
+
+#' Get channel label for every channel of an abf object.
+#'
+#' @param abf an abf object
+#' @param style a format string
+#'
+#' @return a vector of characters.
+#' @export
+#'
+GetChanLabel <- function(abf, style = "%s (%s)") {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
+  GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf), style = style)
 }
 
 #' Get default channel label for every channel of an abf object.
@@ -104,11 +125,32 @@ CropValue <- function(abf, channel, max_value, min_value) {
 #'
 DefaultChanLabel <- function(abf) {
 
-  if (!IsAbf(abf)) {
+  GetChanLabel(abf)
+}
+
+#' Get label for every episode of an abf object
+#'
+#' @param abf an abf object
+#' @param style a format string
+#'
+#' @return a vector of characters.
+#' @export
+#'
+GetEpiLabel <- function(abf, style = "epi%d") {
+
+  if (IsAbf(abf)) {
+    nep <- nEpi(abf)
+  } else if (is.numeric(abf)) {
+    nep <- as.integer(abf)
+  } else {
     err_class_abf()
   }
 
-  GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf))
+  if (length(nep) == 1L) {
+    sprintf(style, seq_len(nep))
+  } else {
+    sprintf(style, nep)
+  }
 }
 
 #' Get default label for every episode of an abf object
@@ -120,19 +162,7 @@ DefaultChanLabel <- function(abf) {
 #'
 DefaultEpiLabel <- function(abf) {
 
-  if (IsAbf(abf)) {
-    nep <- nEpi(abf)
-  } else if (is.numeric(abf)) {
-    nep <- as.integer(abf)
-  } else {
-    err_class_abf()
-  }
-
-  if (length(nep) == 1L) {
-    paste0("epi", seq_len(nep))
-  } else {
-    paste0("epi", nep)
-  }
+  GetEpiLabel(abf)
 }
 
 
