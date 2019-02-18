@@ -372,6 +372,52 @@ wrap_along <- function(...,
                        ret.df = ret.df)
 }
 
+#sample a 3d data structure along dim 1
+Sample3d_dim1 <- function(x, sampling_ratio, sampling_func = NULL, ...) {
+
+  force(sampling_ratio)
+
+  d <- dim(x)
+  nch <- d[3]
+  nepi <- d[2]
+  npts <- d[1]
+
+  if (sampling_ratio == 1L) {
+    data <- x
+  } else {
+    idx_smpl <- seq(from = 1L, to = npts, by = sampling_ratio)
+    nsmpl <- length(idx_smpl)
+    data <- array(x[idx_smpl, , ], dim = c(nsmpl, nepi, nch))
+  }
+
+  if (sampling_ratio > 1L && !is.null(sampling_func)) {
+    for (ch in seq_len(nch)) {
+      for (epi in seq_len(nepi)) {
+        if (npts %% sampling_ratio == 0) {
+          block_data <- x[, epi, ch]
+          dim(block_data) <- c(sampling_ratio, npts %/% sampling_ratio)
+          block_sv <- sampling_func(block_data, ...)
+          data[, epi, ch] <- block_sv
+        } else {
+          #divisor
+          block_idx <- idx_smpl[nsmpl] - 1L
+          block_data <- x[seq_len(block_idx), epi, ch]
+          dim(block_data) <- c(sampling_ratio, block_idx %/% sampling_ratio)
+          block_sv <- sampling_func(block_data, ...)
+          #remainder
+          block_last <- x[seq(idx_smpl[nsmpl], npts), epi, ch]
+          dim(block_last) <- c(length(block_last), 1L)
+          last_sv <- sampling_func(block_last, ...)
+
+          data[, epi, ch] <- c(block_sv, last_sv)
+        }
+      }
+    }
+  }
+
+  data
+}
+
 #' Melt an abf object.
 #'
 #' Melt an abf object into a data.frame grouped by episodes. A time column with
@@ -400,35 +446,38 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
 
   CheckArgs(abf, chan = channel)
 
+  epi <- GetAvailEpisodes(abf)
+  nepi <- length(epi)
+
+  dots <- list(...)
   if (is.null(intv)) {
     npts <- nPts(abf)
     t_start <- 1L
     t_end <- npts
+    args <- c(list(
+      x = abf[, epi, channel, drop = FALSE],
+      sampling_ratio = sampling_ratio,
+      sampling_func = sampling_func
+    ), dots)
+    data <- do.call(Sample3d_dim1, args)
   } else {
     mask <- MaskIntv(intv)
     npts <- length(mask)
     t_start <- mask[1L]
     t_end <- mask[npts]
+    args <- c(list(
+      x = abf[mask, epi, channel, drop = FALSE],
+      sampling_ratio = sampling_ratio,
+      sampling_func = sampling_func
+    ), dots)
+    data <- do.call(Sample3d_dim1, args)
   }
 
-  tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
-  time <- TickToTime(abf, time_unit, tick)
-
-  value <- list()
-  for (idx in seq_along(channel)) {
-    data <- abf[[channel[idx]]]
-    value[[idx]] <- data[tick, , drop = FALSE]
-    if (sampling_ratio > 1L && !is.null(sampling_func)) {
-      ntick <- length(tick)
-      tick_end <- c(tick[2:ntick] - 1L, t_end)
-      for (i in seq_len(ntick)) {
-        mask <- seq.int(tick[i], tick_end[i])
-        sv <- sampling_func(data[mask, , drop = FALSE], ...)
-        value[[idx]][i, ] <- sv
-      }
-    }
-    dim(value[[idx]]) <- NULL
-  }
+  value <- lapply(seq_along(channel), function(idx) {
+    tmp <- data[,,idx]
+    dim(tmp) <- NULL
+    tmp
+  })
   if (is.null(value.name)) {
     names(value) <- GetChannelDesc(abf)[channel]
   } else {
@@ -436,11 +485,10 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
     names(value) <- sprintf("%s%d", as.character(value.name), channel)
   }
 
-  epi <- GetAvailEpisodes(abf)
-  nepi <- length(epi)
+  tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
+  time <- rep(abftools:::TickToTime(abf, time_unit, tick), nepi)
   epi <- matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE)
   dim(epi) <- NULL
-  time <- rep(time, nepi)
 
   ans <- list()
   ans$time <- time
