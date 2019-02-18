@@ -419,15 +419,13 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
     data <- abf[[channel[idx]]]
     value[[idx]] <- data[tick, , drop = FALSE]
     if (sampling_ratio > 1L && !is.null(sampling_func)) {
-      for (i in seq_len(length(tick) - 1L)) {
-        mask <- seq.int(tick[i], tick[i + 1L] - 1L)
+      ntick <- length(tick)
+      tick_end <- c(tick[2:ntick] - 1L, t_end)
+      for (i in seq_len(ntick)) {
+        mask <- seq.int(tick[i], tick_end[i])
         sv <- sampling_func(data[mask, , drop = FALSE], ...)
         value[[idx]][i, ] <- sv
       }
-      i <- length(tick)
-      mask <- seq.int(tick[i], npts)
-      sv <- sampling_func(data[mask, , drop = FALSE], ...)
-      value[[idx]][i, ] <- sv
     }
     dim(value[[idx]]) <- NULL
   }
