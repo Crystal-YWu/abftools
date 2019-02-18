@@ -372,3 +372,81 @@ wrap_along <- function(...,
                        ret.df = ret.df)
 }
 
+#' Melt an abf object.
+#'
+#' Melt an abf object into a data.frame grouped by episodes. A time column with
+#' unit provided by time_unit is added to encode time dimension of the orignal
+#' abf object.
+#'
+#' For performance consideration, sampling_func should be a vectorised col function
+#' such as colMeans etc, which apply sampling functions by columns of episodes.
+#'
+#' @param abf an abf object.
+#' @param intv a time interval to melt, default is the whole timespan of abj
+#' @param channel channels to melt.
+#' @param sampling_ratio sampling ratio.
+#' @param sampling_func sampling function.
+#' @param time_unit time unit of the melted data, can be tick, us, ms, s, min or hr.
+#' @param ... further arguments passed to sampling_func.
+#' @param value.name a string to identify/name channel columns, default is named
+#' by channel description without unit.
+#'
+#' @return a melted data frame.
+#' @export
+#'
+MeltAbf <- function(abf, intv = NULL, channel = 1L,
+                    sampling_ratio = 1L, sampling_func = NULL,
+                    time_unit = "tick", ..., value.name = NULL) {
+
+  CheckArgs(abf, chan = channel)
+
+  if (is.null(intv)) {
+    npts <- nPts(abf)
+    t_start <- 1L
+    t_end <- npts
+  } else {
+    mask <- MaskIntv(intv)
+    npts <- length(mask)
+    t_start <- mask[1L]
+    t_end <- mask[npts]
+  }
+
+  tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
+  time <- TickToTime(abf, time_unit, tick)
+
+  value <- list()
+  for (idx in seq_along(channel)) {
+    data <- abf[[channel[idx]]]
+    value[[idx]] <- data[tick, , drop = FALSE]
+    if (sampling_ratio > 1L && !is.null(sampling_func)) {
+      for (i in seq_len(length(tick) - 1L)) {
+        mask <- seq.int(tick[i], tick[i + 1L] - 1L)
+        sv <- sampling_func(data[mask, , drop = FALSE], ...)
+        value[[idx]][i, ] <- sv
+      }
+      i <- length(tick)
+      mask <- seq.int(tick[i], npts)
+      sv <- sampling_func(data[mask, , drop = FALSE], ...)
+      value[[idx]][i, ] <- sv
+    }
+    dim(value[[idx]]) <- NULL
+  }
+  if (is.null(value.name)) {
+    names(value) <- GetChannelDesc(abf)[channel]
+  } else {
+    value.name <- FirstElement(value.name)
+    names(value) <- sprintf("%s%d", as.character(value.name), channel)
+  }
+
+  epi <- GetAvailEpisodes(abf)
+  nepi <- length(epi)
+  epi <- matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE)
+  dim(epi) <- NULL
+  time <- rep(time, nepi)
+
+  ans <- list()
+  ans$time <- time
+  ans$Episode <- epi
+
+  as.data.frame(do.call(cbind, c(ans, value)))
+}
