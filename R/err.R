@@ -189,7 +189,7 @@ err_arrange <- function(arr) {
 
 err_not_func <- function(x) {
 
-  xname <- as.character(substitute(x))
+  xname <- as.character(deparse(substitute(x)))
   msg <- sprintf("%s is not a function.", xname)
 
   err(msg)
@@ -214,7 +214,7 @@ err_invalid_axis <- function(axis) {
 
 err_wrap_func_dim <- function(func) {
 
-  fname <- as.character(substitute(func))
+  fname <- as.character(deparse(substitute(func)))
   msg <- sprintf("Returned value of %s have length > 1. Please use mapnd() instead.", fname)
 
   err(msg)
@@ -240,7 +240,7 @@ err_channel_data <- function(chan) {
 
 err_channel_config <- function(x) {
 
-  xname <- as.character(substitute(x))
+  xname <- as.character(deparse(substitute(x)))
   msg <- sprintf("Elements of %s have different channel configurations.", xname)
 
   err(msg)
