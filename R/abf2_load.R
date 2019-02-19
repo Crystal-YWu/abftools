@@ -23,6 +23,10 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TR
   }
 
   fp <- file(filename, "rb")
+  on.exit({
+    close(fp)
+  })
+
   #header
   header <- abf2_header(fp)
   #section info
@@ -31,7 +35,6 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TR
   section <- abf2_section(fp, section_info)
   #data
   data <- read_data_section(fp, section_info$Data)
-  close(fp)
 
   #sampling interval
   sample_interval_us <- section$Protocol$fADCSequenceInterval
@@ -222,7 +225,6 @@ abf2_header <- function(fp) {
 
   header <- read_struct_n(fp, ABF2.Header.def)
   if (header$fFileSignature != "ABF2") {
-    close(fp)
     err_abf_file("Only ABF2 file format is supported.")
   }
 
@@ -249,13 +251,11 @@ abf2_section <- function(fp, section_info) {
     section$Protocol <- read_section(fp, section_info$Protocol, ABF2.Protocol.def,
                                      ret.df = FALSE)
   } else {
-    close(fp)
     err_abf_file("No protocol entries recorded.")
   }
   if (section_info$ADC$llNumEntries > 0) {
     section$ADC <- read_section(fp, section_info$ADC, ABF2.ADC.def, ret.df = TRUE)
   } else {
-    close(fp)
     err_abf_file("No ADC entries recorded.")
   }
   if (section_info$DAC$llNumEntries > 0) {
