@@ -57,59 +57,26 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
 
   CheckArgs(abf)
 
-  nch <- nChan(abf)
-  nepi <- nEpi(abf)
-  npts_abf <- nPts(abf)
-
-  idx_smpl <- seq(from = 1L, to = npts_abf, by = sampling_ratio)
-  npts <- length(idx_smpl)
-  data <- array(abf[idx_smpl, , ], dim = c(npts, nepi, nch))
-
-  if (!is.null(sampling_func)) {
-    idx_end <- c(idx_smpl[2:npts] - 1L, npts_abf)
-    if (GetMode(abf) == 1L) {
-      warned <- FALSE
-      for (ch in seq_len(nch)) {
-        for (i in seq_len(npts)) {
-          mask <- seq.int(idx_smpl[i], idx_end[i])
-          tmp <- abf[mask, , ch]
-          if (all(is.na(tmp))) {
-            break
-          }
-          val <- sampling_func(tmp)
-          nan <- which(is.nan(val))
-          if (length(nan) && !warned) {
-            val[nan] <- NA
-            warning("NaN values are replaced by NAs.")
-            warned <- TRUE
-          }
-          data[i, , ch] <- val
-        }
-      }
-    } else {
-      for (ch in seq_len(nch)) {
-        for (i in seq_len(npts)) {
-          mask <- seq.int(idx_smpl[i], idx_end[i])
-          data[i, , ch] <- sampling_func(abf[mask, , ch])
-        }
-      }
-    }
-  }
+  data <- Sample3d_dim1(abf, sampling_ratio, sampling_func, ...)
+  CpAbfAttr(data, abf)
 
   old_samp_intv <- GetSamplingIntv(abf)
   new_samp_intv <- old_samp_intv * sampling_ratio
-
-  #copy meta
-  CpAbfAttr(data, abf)
   attr(data, "SamplingInterval") <- new_samp_intv
 
   #alter meta
   meta <- get_meta(abf)
   meta$Protocol$fADCSequenceInterval <- new_samp_intv
-  if (GetMode(abf) != 3L) {
-    nepi <- nEpi(abf)
-    for (i in seq_len(nepi)) {
-      meta$SynchArray$lLength[i] <- sum(!is.na(data[, i, 1L])) * nch
+  if (!is.null(meta$SynchArray)) {
+    d <- dim(data)
+    if (GetMode(abf) == 1L) {
+      nepi <- d[2]
+      data[which(is.nan(data))] <- NA
+      for (event in seq_len(nepi)) {
+        meta$SynchArray$lLength[event] <- sum(!is.na(data[, event, 1L]))
+      }
+    } else {
+      meta$SynchArray$lLength <- d[1] %/% d[3]
     }
   }
   attr(data, "meta") <- meta
@@ -126,22 +93,22 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
 #' @return the sampled abf itself
 #' @export
 #'
-SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL) {
+SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
 
   if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
-        abf <- SmplAbf(abf, sampling_ratio, sampling_func)
+        abf <- SmplAbf(abf, sampling_ratio, sampling_func, ...)
       }))
     )
   } else if (IsAbfList(abf)) {
     return(
       eval.parent(substitute({
-        abf <- lapply(abf, function(x) SmplAbf(x, sampling_ratio, sampling_func))
+        abf <- lapply(abf, SmplAbf, sampling_ratio = sampling_ratio, sampling_func = sampling_func, ...)
       }))
     )
   } else {
-    err_class_abf_list()
+    err_class_abf()
   }
 }
 

@@ -449,28 +449,21 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
   epi <- GetAvailEpisodes(abf)
   nepi <- length(epi)
 
-  dots <- list(...)
   if (is.null(intv)) {
     npts <- nPts(abf)
     t_start <- 1L
     t_end <- npts
-    args <- c(list(
-      x = abf[, epi, channel, drop = FALSE],
-      sampling_ratio = sampling_ratio,
-      sampling_func = sampling_func
-    ), dots)
-    data <- do.call(Sample3d_dim1, args)
+    data <- Sample3d_dim1(abf[, epi, channel, drop = FALSE],
+                          sampling_ratio = sampling_ratio,
+                          sampling_func = sampling_func, ...)
   } else {
     mask <- MaskIntv(intv)
     npts <- length(mask)
     t_start <- mask[1L]
     t_end <- mask[npts]
-    args <- c(list(
-      x = abf[mask, epi, channel, drop = FALSE],
-      sampling_ratio = sampling_ratio,
-      sampling_func = sampling_func
-    ), dots)
-    data <- do.call(Sample3d_dim1, args)
+    data <- Sample3d_dim1(abf[mask, epi, channel, drop = FALSE],
+                          sampling_ratio = sampling_ratio,
+                          sampling_func = sampling_func, ...)
   }
 
   value <- lapply(seq_along(channel), function(idx) {
@@ -486,13 +479,14 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
   }
 
   tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
-  time <- rep(abftools:::TickToTime(abf, time_unit, tick), nepi)
+  time <- rep(TickToTime(abf, time_unit, tick), nepi)
   epi <- matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE)
   dim(epi) <- NULL
 
-  ans <- list()
-  ans$time <- time
-  ans$Episode <- epi
+  ans <- list(
+    time = time,
+    Episode = epi
+  )
 
   as.data.frame(do.call(cbind, c(ans, value)))
 }
