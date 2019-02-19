@@ -372,8 +372,53 @@ wrap_along <- function(...,
                        ret.df = ret.df)
 }
 
+Sample1d <- function(x, sampling_ratio, colFunc = NULL, ...) {
+
+  force(sampling_ratio)
+
+  n <- length(x)
+  idx <- seq.int(from = 1L, to = n, by = sampling_ratio)
+  nidx <- length(idx)
+  data <- x[idx]
+  if (!is.null(colFunc)) {
+    if (n %% sampling_ratio == 0) {
+      dim(x) <- c(sampling_ratio, n %/% sampling_ratio)
+      data <- colFunc(x, ...)
+    } else {
+      #divisor
+      block_idx <- idx[nidx] - 1L
+      block_data <- x[seq_len(block_idx)]
+      dim(block_data) <- c(sampling_ratio, block_idx %/% sampling_ratio)
+      block_sv <- colFunc(block_data, ...)
+      #remainder
+      block_data <- x[seq.int(idx[nidx], n)]
+      dim(block_data) <- c(length(block_data), 1L)
+      last_sv <- colFunc(block_data, ...)
+      data <- c(block_sv, last_sv)
+    }
+  }
+
+  data
+}
+
+Samplend <- function(x, sampling_ratio, colFunc = NULL, along = 1L, ...) {
+
+  force(sampling_ratio)
+
+  if (sampling_ratio == 1L) {
+    data <- x
+  } else {
+    ndim <- seq_len(length(dim(x)))
+    margin <- ndim[-along]
+    data <- apply(x, MARGIN = margin, FUN = smpl1d,
+                  sampling_ratio = sampling_ratio, colFunc = colFunc, ...)
+  }
+
+  data
+}
+
 #sample a 3d data structure along dim 1
-Sample3d_dim1 <- function(x, sampling_ratio, sampling_func = NULL, ...) {
+Sample3d_dim1 <- function(x, sampling_ratio, colFunc = NULL, ...) {
 
   force(sampling_ratio)
 
@@ -390,24 +435,25 @@ Sample3d_dim1 <- function(x, sampling_ratio, sampling_func = NULL, ...) {
     data <- array(x[idx_smpl, , ], dim = c(nsmpl, nepi, nch))
   }
 
-  if (sampling_ratio > 1L && !is.null(sampling_func)) {
+  if (sampling_ratio > 1L && !is.null(colFunc)) {
     for (ch in seq_len(nch)) {
       for (epi in seq_len(nepi)) {
+        #DO NOT call Sample1d to save some gc time.
         if (npts %% sampling_ratio == 0) {
           block_data <- x[, epi, ch]
           dim(block_data) <- c(sampling_ratio, npts %/% sampling_ratio)
-          block_sv <- sampling_func(block_data, ...)
+          block_sv <- colFunc(block_data, ...)
           data[, epi, ch] <- block_sv
         } else {
           #divisor
           block_idx <- idx_smpl[nsmpl] - 1L
           block_data <- x[seq_len(block_idx), epi, ch]
           dim(block_data) <- c(sampling_ratio, block_idx %/% sampling_ratio)
-          block_sv <- sampling_func(block_data, ...)
+          block_sv <- colFunc(block_data, ...)
           #remainder
           block_last <- x[seq(idx_smpl[nsmpl], npts), epi, ch]
           dim(block_last) <- c(length(block_last), 1L)
-          last_sv <- sampling_func(block_last, ...)
+          last_sv <- colFunc(block_last, ...)
 
           data[, epi, ch] <- c(block_sv, last_sv)
         }
@@ -424,16 +470,17 @@ Sample3d_dim1 <- function(x, sampling_ratio, sampling_func = NULL, ...) {
 #' unit provided by time_unit is added to encode time dimension of the orignal
 #' abf object.
 #'
-#' For performance consideration, sampling_func should be a vectorised col function
-#' such as colMeans etc, which apply sampling functions by columns of episodes.
+#' For performance consideration, sampling_colFunc should be a vectorised column
+#' function such as colMeans etc, which apply sampling functions to sampled data
+#' points by columns of episodes.
 #'
 #' @param abf an abf object.
 #' @param intv a time interval to melt, default is the whole timespan of abj
 #' @param channel channels to melt.
 #' @param sampling_ratio sampling ratio.
-#' @param sampling_func sampling function.
+#' @param sampling_colFunc sampling function.
 #' @param time_unit time unit of the melted data, can be tick, us, ms, s, min or hr.
-#' @param ... further arguments passed to sampling_func.
+#' @param ... further arguments passed to sampling_colFunc
 #' @param value.name a string to identify/name channel columns, default is named
 #' by channel description without unit.
 #'
@@ -441,7 +488,7 @@ Sample3d_dim1 <- function(x, sampling_ratio, sampling_func = NULL, ...) {
 #' @export
 #'
 MeltAbf <- function(abf, intv = NULL, channel = 1L,
-                    sampling_ratio = 1L, sampling_func = NULL,
+                    sampling_ratio = 1L, sampling_colFunc = NULL,
                     time_unit = "tick", ..., value.name = NULL) {
 
   CheckArgs(abf, chan = channel)
@@ -455,7 +502,7 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
     t_end <- npts
     data <- Sample3d_dim1(abf[, epi, channel, drop = FALSE],
                           sampling_ratio = sampling_ratio,
-                          sampling_func = sampling_func, ...)
+                          colFunc = sampling_colFunc, ...)
   } else {
     mask <- MaskIntv(intv)
     npts <- length(mask)
@@ -463,7 +510,7 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
     t_end <- mask[npts]
     data <- Sample3d_dim1(abf[mask, epi, channel, drop = FALSE],
                           sampling_ratio = sampling_ratio,
-                          sampling_func = sampling_func, ...)
+                          colFunc = sampling_colFunc, ...)
   }
 
   value <- lapply(seq_along(channel), function(idx) {
