@@ -5,7 +5,8 @@
 \title{Melt an abf object.}
 \usage{
 MeltAbf(abf, intv = NULL, channel = 1L, sampling_ratio = 1L,
-  sampling_func = NULL, time_unit = "tick", ..., value.name = NULL)
+  sampling_colFunc = NULL, time_unit = "tick", ...,
+  value.name = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
@@ -16,11 +17,11 @@ MeltAbf(abf, intv = NULL, channel = 1L, sampling_ratio = 1L,
 
 \item{sampling_ratio}{sampling ratio.}
 
-\item{sampling_func}{sampling function.}
+\item{sampling_colFunc}{sampling function.}
 
 \item{time_unit}{time unit of the melted data, can be tick, us, ms, s, min or hr.}
 
-\item{...}{further arguments passed to sampling_func.}
+\item{...}{further arguments passed to sampling_colFunc}
 
 \item{value.name}{a string to identify/name channel columns, default is named
 by channel description without unit.}
@@ -34,6 +35,7 @@ unit provided by time_unit is added to encode time dimension of the orignal
 abf object.
 }
 \details{
-For performance consideration, sampling_func should be a vectorised col function
-such as colMeans etc, which apply sampling functions by columns of episodes.
+For performance consideration, sampling_colFunc should be a vectorised column
+function such as colMeans etc, which apply sampling functions to sampled data
+points by columns of episodes.
 }

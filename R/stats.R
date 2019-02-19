@@ -47,17 +47,17 @@ IVSummary <- function(abf_list, intv_list = NULL,
 #'
 #' @param abf an abf object.
 #' @param sampling_ratio the sampling ratio. See melt.abf for more details.
-#' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
-#' @param ... arguments passed to sampling_func
+#' @param sampling_colFunc a sampling function applied to sampled points.
+#' @param ... arguments passed to sampling_colFunc
 #'
 #' @return a sampled abf object
 #' @export
 #'
-SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
+SmplAbf <- function(abf, sampling_ratio, sampling_colFunc = NULL, ...) {
 
   CheckArgs(abf)
 
-  data <- Sample3d_dim1(abf, sampling_ratio, sampling_func, ...)
+  data <- Sample3d_dim1(abf, sampling_ratio, sampling_colFunc, ...)
   CpAbfAttr(data, abf)
 
   old_samp_intv <- GetSamplingIntv(abf)
@@ -88,23 +88,25 @@ SmplAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
 #'
 #' @param abf an abf object.
 #' @param sampling_ratio the sampling ratio. See melt.abf for more details.
-#' @param sampling_func a sampling function applied to sampled points. See melt.abf for more details.
+#' @param sampling_colFunc a sampling function applied to sampled points.
+#' @param ... further arguments passed to sampling_colFunc
 #'
 #' @return the sampled abf itself
 #' @export
 #'
-SampleAbf <- function(abf, sampling_ratio, sampling_func = NULL, ...) {
+SampleAbf <- function(abf, sampling_ratio, sampling_colFunc = NULL, ...) {
 
   if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
-        abf <- SmplAbf(abf, sampling_ratio, sampling_func, ...)
+        abf <- SmplAbf(abf, sampling_ratio, sampling_colFunc, ...)
       }))
     )
   } else if (IsAbfList(abf)) {
     return(
       eval.parent(substitute({
-        abf <- lapply(abf, SmplAbf, sampling_ratio = sampling_ratio, sampling_func = sampling_func, ...)
+        abf <- lapply(abf, SmplAbf, sampling_ratio = sampling_ratio,
+                      sampling_colFunc = sampling_colFunc, ...)
       }))
     )
   } else {
