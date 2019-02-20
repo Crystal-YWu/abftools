@@ -2,10 +2,11 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
                       auto_zoom, ...) {
 
   #Data
-  df <- melt(abf, channel, time_unit = time_unit, ..., value.name = "value")
+  df <- MeltAbf(abf, channel = channel, time_unit = time_unit, ..., value.name = "value")
+  ytag <- sprintf("value%d", channel)
 
   #Plot
-  p <- ggplot(df, aes_string("time", "value")) + theme_classic()
+  p <- ggplot(df, aes_string("time", ytag)) + theme_classic()
   if (colour) {
     p <- p + geom_line(aes_string(colour = "Episode"))
   } else {

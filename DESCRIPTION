@@ -7,7 +7,7 @@ Maintainer: Jun <imlijunda@gmail.com>
 Description: A toolbox provide data structure and functions to manipulate and
     analyse ABF (Axon Binary File) data. Special funcions are created specially
     for episodic multi-channel data analysis and visualisation.
-Imports: cowplot, ggplot2, reshape2, matrixStats, stats, Matrix, wmtsa, splines
+Imports: cowplot, ggplot2, matrixStats, stats, Matrix, wmtsa, splines
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
