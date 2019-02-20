@@ -31,7 +31,7 @@ PackArgs <- function(f, ...) {
 #'
 #' @param x an nd-array.
 #' @param f a function to map.
-#' @param along the axis to map the function to (dims to collapse). Ignored if MARGIN is given
+#' @param along the axis to map the function to (dims to collapse). Ignored if MARGIN is given.
 #' @param MARGIN OPTIONAL, the dimensions to apply f over (dims to preserve).
 #' @param pack_args whether to pack arguments for f.
 #' @param ... other argumetns passed to f.
@@ -401,9 +401,17 @@ Sample1d <- function(x, sampling_ratio, colFunc = NULL, ...) {
   data
 }
 
-Samplend <- function(x, sampling_ratio, colFunc = NULL, along = 1L, ...) {
+samplend <- function(x, sampling_ratio, colFunc = NULL, along = 1L, ...) {
 
   force(sampling_ratio)
+
+  if (is.character(along)) {
+    along <- switch(substr(toupper(along), 1L, 1L),
+                    T = 1L,
+                    E = 2L,
+                    C = 3L,
+                    err_invalid_axis(along))
+  }
 
   if (sampling_ratio == 1L) {
     data <- x

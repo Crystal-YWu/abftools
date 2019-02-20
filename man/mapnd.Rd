@@ -11,7 +11,7 @@ mapnd(x, f, along = 1L, MARGIN = NULL, pack_args = FALSE, ...)
 
 \item{f}{a function to map.}
 
-\item{along}{the axis to map the function to (dims to collapse). Ignored if MARGIN is given}
+\item{along}{the axis to map the function to (dims to collapse). Ignored if MARGIN is given.}
 
 \item{MARGIN}{OPTIONAL, the dimensions to apply f over (dims to preserve).}
 

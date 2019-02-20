@@ -3,46 +3,89 @@
 abftools is a package for reading and analysing abf data in R. The tasks are
 splitted into three major parts: data acquisition, data processing and plotting.
 
-## Base data structure
+## Overview
 
-abftools is built around the data class abf. An abf object is essentially a 3-d
-array with some optional properties attached to it.
+Currently, a few R packages provide loading of abf files, notably abf2 and readABF.
 
-### Dimensions of abf objects.
+* abf2 by Matthew Caldwell provides functions to load gap-free ABF2 files and
+basic plotting functions.
 
-An abf object has dimensions of `c(time, episode, channel)`, though data recorded
-in abf files actually has the dimensions of `c(channel, time, episode)`. The load
-data is permutated since we usually access data channel by channel, and process
-data by episodes, such dim arrangement can help improve memory performance.
-When loading non-episodic abf file, the data is still represented in such 3-d
-structures as if it is episodic but has only one episode to guarantee consistent
-data subsetting convention. The same rule also applies to channel.
+* readABF by Stanislav Syekirin provides a better support of loading both ABF and 
+ABF2 files.
 
-In addition to using `dim(abf)`, you can also call nPts, nEpi and nChan
-(GetPointsPerEpisode/GetEpisodesPerChannel/GetNumOfChannel) to acquire the
-dimensions of an abf objects. However, nPts/nEpi/nChan return values parsed
-from the protocol of the abf objects. In some cases (mostly corrupted file), the
-values from nPts/nEpi/nChan can be different to dim.
+What makes abftools different to aforementioned packages are:
+
+* abftools not only provides functions to load ABF2 files, but also a set of 
+analysis and plotting functions that help streamline data processing of ABF2 data.
+
+* abftools is designed to be data-first and performance-focused.
+
+  * data-first: An abf object is designed to be a 3d array with dimensions of
+  `abf[time, episode, channel]`, regardless of op mode be it episodic, gapfree
+  or event driven variable length. This guarantees consistent subsetting across
+  all abf objects and compatibility of R base functions and 3rd party functions.
+  Compared to nested list with meta available immediately to userspace, getter
+  and setter functions are provided to access attributes that are still relevant.
+  
+  * performance-focused: abf objects are usually large, and dealing with large 
+  objects are slow. Thus calculation critical functions are implemented with 
+  performance in mind and profiled/optimised to save even microseconds of CPU time.
+
+## Task: Data Acquisition
+
+Abf files can be loaded by calling `abf2_load()` and `abf2_loadlist()` (to load
+multiple files). To facilitate easier batch loading by `abf2_loadlist()`, two
+simple helper functions `SelectSample()` and `ExcludeSample()` are provided to
+select desired files from an index file which contain a **filename** column and
+multiple conditional columns. By uing syntax like
+`SelectSample(df, cond1 = value1, cond1 = value2, ...)`, one can achieve simply
+data index management without loading extra packages.
+
+abftools currently does not support writing/saving an abf objects to abf files.
+We do not believe writing abf2 file structure our top priority since it's proprietary
+and not even documented. Please resort to other serialisation methods at the moment.
+
+### Base data structure
+
+abftools is built around the data class abf. An abf object is essentially a 3d
+array with some optional attributes attached to it.
+
+### Dimensions definition of abf objects.
+
+An abf object has dimensions of **`c(time, episode, channel)`** since the logic  
+of accessing data by channel, and processing data by episodes (sweeps) along time 
+and such  dim arrangement can help improve memory performance. Notice that the 
+dimensions are different to abf files stored on disk (which is `c(channel, time, episode)`),
+so if data is loaded by other means it may not be compatible with abftools before
+permutation.
+
+When loading non-episodic abf or single channel files, the 3d structures are still
+preserved i.e. indices are not dropped, so function calls are consistent for any
+op mode.
+
+In addition to using `dim(abf)`, you can also call `nPts()`, `nEpi()` and `nChan()`
+to acquire the dimensions of an abf object and improve code readability.
 
 ### Subsetting abf objects.
 
 You can subset an abf object by `abf[time, episode, channel]`, just like any array.
 Please notice that subsetting an abf object consequently removes all attributes
-assigned to it, making the returned value not an abf object any more.
+assigned to it, making the returned values not an abf object any more.
 
 An alternative way of subsetting is using `abf[[channel]]` to extract channel data
-of interest. The differences between `abf[,,channel]` and `abf[[channel]]` are:
+of interest. The differences between `abf[,, channel]` and `abf[[channel]]` are:
 
-* You can subset multiple channels using `abf[,,channel]`, however only one using
-`abf[[channel]]`. A warning is printed and only first channel will be used if
-multiple channels are supplied to [[.
+* You can subset multiple channels using `abf[,, channel]`, however only one using
+`abf[[channel]]`. A warning is printed and only first channel will be extracted 
+if multiple channels are supplied to [[.
 
-* `abf[,,channel]` returns all episodic data while `abf[[channel]]` excludes those
-marked "removed" using RemoveEpisode().
+* `abf[,, channel]` returns all episodic data while `abf[[channel]]` excludes those
+are marked "removed" using RemoveEpisode().
 
-* `abf[,,channel]` returns "raw" slices of the subset data, while `abf[[channel]]`
-does some extra steps to maintain returned shape, and attach proper colnames to the
-returned matrix by calling DefaultEpiLabel() for a clearer presentation.
+* `abf[,, channel]` returns "raw" slices of the subset data (some indices may be 
+dropped), while `abf[[channel]]` does some extra steps to maintain returned shape, 
+and attach  proper colnames to the returned matrix by calling `DefaultEpiLabel()` 
+for a clearer presentation.
 
 ### Attributes of abf objects.
 
@@ -53,252 +96,133 @@ currently assigned to an abf objects:
 * class: should always be "abf".
 
 * title: title of the abf object, defaults to the file name when loaded. You can
-access title by `GetTitle(abf)` and `SetTitle(abf, "new title")`.
+access title by `GetTitle()` and `SetTitle()`.
 
 * mode: op mode of the abf object, defined by voltage clamp protocol. Accesed by
-`GetMode(abf)` and you should not change this attr.
+`GetMode()` and you should not change this attr.
 
 * ChannelName, ChannelUnit and ChannelDesc: channel names, units and descriptions.
 These attributes are parsed from Strings section of an abf file. Accessed by
-`GetChannelName(abf)`, `GetChannelUnit(abf)` and `GetChannelDesc(abf)`.
+`GetChannelName()`, `GetChannelUnit()` and `GetChannelDesc()`, and can be set by
+`SetChannelName()`, `SetChannelUnit()` and `SetChannelDesc()`
 
 * SamplingInterval: the sampling frequency defined by voltage clamp protocol.
 Accessed by `GetSamplingIntv(abf)`.
 
-* EpiAvail: a vector maintained to record whether an episode is marked as "removed".
-Accessed by `GetAvailEpisodes(abf)`, `RemoveEpisode(abf, episodes)`,
-`RestoreEpisodes(abf, episodes)`.
+* EpiAvail: a vector maintained to record whether an episode is marked as "removed",
+accessed/set by `GetAvailEpisodes()`, `RemoveEpisode()`, `RestoreEpisodes()`.
 
-* meta: a list of raw (not parsed) properties of the abf files. Accessed by
-`GetProtocol(abf)`.
+* meta: a list of raw (not parsed) properties of the abf files. Most of the meta
+data is not maintained, however, meta$SynchArray is evaluated and maintained by
+some functions, espeically those related to var-len mode.
 
-## Data Acquisition
+## Task: Data Processing
 
-Abf files can be simply loaded by calling abf2_load and abf2_loadlist (to load
-multiple files).
+As 3d data structures, when processing/analysing abf data the final goals are 
+mostly "flatten" the object to some 2d forms, be it plotting or presenting statistics
+that can be printed on paper. Data processing in abftools follows the logic of
+map-reduce and is facilitated by functional programming, most notably the wrapper
+function `wrap()`. The following example demonstrates wrapping commonly used
+`mean()` to calculate averages of abf objects.
 
-Two simple helper functions SelectSample and ExcludeSample are also provided to
-further simplify data management. You can maintain a data frame like structure
-with file names and experiment conditions recorded in columns and use syntax like
-`SelectSample(df, cond1 = val1, cond1 = val2, ...)` to batch select and load abf
-files. `abf2_loadlist()` recognises filename/FileName column and can load abf files
-recorded in such column.
+```r
+f <- wrap(mean)
 
-abftools currently does not support writing/saving an abf objects to abf files.
-We do not believe writing abf2 file structure our top priority since it's proprietary
-and not even documented. Please resort to other serialisation methods such as
-hdf etc. at the moment.
+#f() now calculates mean I-V of an abf object
+f(abf, intv = c(7000, 7200))
+```
 
-## Data Processing
+|       |      I (nA)   |      V (mV)|
+|-------|--------------:|-----------:|
+|epi1   |25918.6251  |47.636025|
+|epi2   |19352.5715  |29.722206|
+|epi3   |13000.3191  |12.142201|
+|epi4   | 6907.2745  |-4.560712|
+|epi5   |  863.5107 |-20.718752|
+|epi6   |-5051.8364 |-36.100685|
+|epi7  |-11433.0079 |-52.206389|
+|epi8  |-18052.0749 |-68.457909|
+|epi9  |-24555.7584 |-84.004401|
+|epi10 |-31109.3744 |-99.271597|
+|epi11 |-12021.4602 |-53.548504|
 
-### Low-level data accessment
+In this case, `wrap(mean)` maps function `mean()` to time domain of an abf object,
+calculating average values of desired time interval for very corresponding episodes
+and channels. Then reduces those values by as.data.frame().
 
-Besides directly subsetting and assigning values of an abf object, a few functions
-are provided so one can maintain the consistency of data structure and the attributes
-of the abf object. These functions usually mimics a "by-ref" behaviour so that
-you don't need an extra assignment. A corresponding "normal" function is always
-available if such "by-ref" behaviour is not desired:
+### Built-in statistical functions
 
-* MaskEpisodes (MskEpi for non by-ref): Replace a whole episode with given value.
-You can't mask NA, since that doesn't make sense and you can use RemoveEpisode to
-remove a whole episode.
+Here is a breif overview of some most used statistical functions provided in
+abftools. For a full function list, please refer to package help.
 
-* CropValue (non by-ref): crop values that are larger than max_value and smaller
-than min_value from an abf object. This function can be handy when plotting.
+* The frequently used `mean()`, `sd_abf()` and `sem_abf()` are provided which can 
+be used directly on an abf object.
 
-* ReplaceChannel (RpclChan/[[<- for non by-ref): Replace a whole channel.
+* `IVSummary()` calculates mean and sem of mean voltage/current channels of a list 
+of abf objects and can be handy for repeat/replicate experiments.
 
-* AttachChannel (AtchChan for non by-ref): attach a new channel to an abf object.
-attributes such as ChannelXXXX, meta$ADC are updated to maintain data consistency.
-Please notice that RemoveChannel is not available since you can always exclude
-a channel by not subsetting it.
+* `CmpWaveform()` and `FindSamplingInterval()` find a representative time interval 
+of an abf object. `CmpWaveform()` returns a list of intervals which the current/voltage  
+record matches the waveform settings. `FindSamplingInterval()` has a more specific  
+usage: it finds an time interval that the voltage channel matches waveform while  
+the current channel is most stable, which can be useful for TEVC analysis.
+Combining fast plotting methods `PeekChannel()`, `QuickPlot()` for quick inspection,
+one can avoid time consuming manual cursor settings, especially for multiple files.
 
-* AverageAbf (non by-ref): calculate average of a list of abf objects. All attributes
-are directly copied from the first element of the list.
+* `SampleAbf()` reduces data points of an abf object, a sampling function can also
+be used to provide more flexible sampling.
 
-* SampleAbf (SmplAbf for non by-ref): subsample an abf object by sampling_ratio
-using sampling function. Attributes such as SamplingInterval, Protocol$lNumSamplesPerEpisode
-etc. are updated to maintain data consistency.
+### Low-level functions
 
-### Statistical functions
+In most cases, data processing of an abf object can be generalised as:
 
-The frequently used mean, sd_abf and sem_abf are provided which can be used directly
-on an abf object and do corresponding function on each channel by episode. Other
-functions can be easily implemented by using the powerful mapping function wrapper,
-which will elaborate in later sections.
+* Procedures that maintains time-episode-channel dimensions. This is implemented 
+by `samplend()`.
 
-IVSummary which calculates mean and sem of mean voltage/current of a list of
-abf objects can also be handy for repeat/replicate experiments.
+* Procedures that "collapse" a specific dimension and results in a 2d object. 
+This is implemented by `mapnd()`.
 
-Another commonly used feature is finding a representative interval of an abf object
-CmpWaveform and FindSamplingInterval are provided for such purposes. CmpWaveform
-returns a list of intervals which the current/voltage record matches the waveform
-settings. FindSamplingInterval has a more specific usage. It finds an interval that
-the voltage channel matches waveform and the current channel is most stable.
-Combining fast plotting methods PeekXXXX for quick inspection, one can avoid time
-consuming manual cursor settings, especially for multiple files.
+* Procedures that coerce a 3d structure to 2d form. This is implemented by 
+`MeltAbf()`.
 
-This usually involves four steps:
+### Examples:
+
+I-V plots of TEVC data:
 
 ```r
 
 #Step 1. Load data.
 alist <- abf2_loadlist(filelist)
-#Step 2. Find those representative intervals.
+#Step 2. Find representative time intervals.
 ilist <- FindAllSamplingIntervals(alist)
-#Step 3. Plot them for a quick inspection/sanity check.
-print(MultiPeekChannel(alist, intv = ilist, channel = c(1, 2), num_label = TRUE))
-#Step 4. Manual adjustment of improper intervals
-SetIntv(ilist[[3]], 4500, 5000)
-#Using noisy_data = TRUE could improve interval when the data is noisy.
-ilist[[5]] <- FindSamplingIntervals(alist[[5]], noisy_data = TRUE)
-
-#Following steps. Data processing, analysing, plotting over the intervals.
+#Step 3. Calculate IV summaries.
+ivs <- IVSummray(alist, ilist)
+#Step 4. Plot I-V chart
+QuickPlot(ivs, smooth = TRUE)
 
 ```
 
-### Other data processing functions
-
-Baseline calculation is available by calling BaselineEpoch or BaselineIntv, which
-calculates baselines in an epoch or an interval respectively. Only asymmetric least
-square smoothing (ALS) method (Paul H. C. Eilers, Hans F.M. Boelens, 2005) is
-available since it's not the focus of abftools and it's only supposed to provided
-rapid initial testing of data.
-
-Likewise, peak detection (PeakDetectEpoch, PeakDetectIntv) and denoising
-(DenoiseEpoch, DenoiseIntv) implemented in wmtsa package and wrapped with some
-empirical parameters are also provided for quick processing. However, one should
-always look for more sophisticated methods/packages for such purposes. Since
-abf objects are essientially arrays, most available package should be compatible
-and batch processing can also be achieved by combining existing algorithms with
-mapping function wrappers.
-
-### Mapping function wrapper
-
-A mapping function is a function that takes input along specific dimension/axis
-and is run along the whole object. One may already be familiar with lapply family
-functions and notice that apply should work flawlessly with and abf object. However,
-there are some drawbacks of using apply:
-
-  * apply assumes FUN takes a single data variable as input.
-  * `MARGIN = c(2,3)` may be less readable than `along = "time"`
-  * Reusing apply may also reduce readability.
-
-Some functions are provided in abftools in order to solve these problems:
-
-* `PackArgs()` and `mapnd()`: PackArgs wrap a function that takes multiple input
-argument to a function that takes a single vector as its input. `mapnd()` is
-essentially `apply()` that is able to pack arguments using PackArgs. It also
-accepts an along argument, which is just the opposite to MARGIN, and is usually
-more readable than MARGIN when appling mapping functions along only one dimension.
-
-* `WrapMappingFuncAlong()`/`wrap_along()`: Built on top PackArgs and mapnd, wrap_along
-works specifically with abf objects. It wraps a mapping function to a function that
-applies calculations on an abf object.
-
-* `WrapMappingFunc()`/`warp()`: Built on top wrap_along(), wrap works specifically
-along time axis of an abf object.
-
-Assuming an arbitrary analytic function `three_chan()`, which does some calculations
-using readings from three channels and two constant tao and k:
-
-```r
-three_chan <- function(ch1, ch2, ch3, tao, k) {
-
-  ii <- 1 - exp(ch1/tao)
-  jj <- 1 + exp((ch2 - ch3) / k)
-
-  ii / jj
-}
-```
-
-Now we want to apply this function to an list of abf objects alist, over different
-intervals stored in ilist respectively. Each abf object in the list might even
-have variable episodes removed.
+Custom plotting using ggplot:
 
 ```r
 
-#wrap along channel ("c"), and pack arguments since three_chan accepts ch1, ch2,
-#ch3 instead of a vector.
-f <- wrap_along(three_chan, "c", pack_args = TRUE, tao = 2.0, k = 1.5)
-#since lapply does not take two list
-result <- purrr::map2(alist, ilist, f)
-
-```
-
-The following example calculates mean values of an abf object over a time interval.
-
-```r
-
-#wrap run along time axis by default, by setting epi_id and chan_id the returned
-#value can set episode and channel names automatically.
-f <- wrap(mean, epi_id_func = DefaultEpiLabel, chan_id_func = DefaultChanLabel)
-
-m <- f(abf, c(5000, 7500))
-print(m)
-
-```
-
-You may also notice that the returned values from a wrapped mapping function can
-be easily row bound for plotting and consequent data processing.
-
-```r
-
-channel_labels <- c("Voltage", "Current")
-f <- wrap(mean, epi_id_func = DefaultEpiLabel, chan_id_func = channel_labels,
+channel_labels <- c("Current", "Voltage")
+f <- wrap(max, epi_id_func = DefaultEpiLabel, chan_id_func = channel_labels,
           #add an abf id column to identify each abf object
           abf_id_func = GetTitle)
-result <- lapply(abf_list, f)
-ggplot(rbindlist(result), aes(Voltage, Current)) + geom_line(aes(colour = id))
+data <- lapply(abf_list, f)
+ggplot(data.table::rbindlist(data), aes(Voltage, Current)) + geom_line(aes(colour = id))
 
 ```
 
 ## Plotting
 
-Plotting of an abf object can be easily achieved with the ggplot2 package. Since
-returned values from a wrapped mapping function is ready to plot by columns. In
-addition, several helper functions are also provided for a smoother plotting
-experience.
+Plotting of an abf object can be easily achieved with the ggplot2 package. Results
+from wrapped functions (to plot channel vs channel) and `MeltAbf()` (to plot
+channel vs time) are compatible with ggplot2.
 
-### Preparing data for plotting.
-
-Besides using wrapped mapping functions, there are `melt()` (s3 function for abf
-objects from reshape2 package) and `MeltAbfChannel()` for simple data preparing.
-
-* `melt()`: This function melts a channel of an abf object to a data.frame, which
-contains a time column as id var followed by a column of episodic data. By using
-`melt()` you can plot an abf object in time series easily. You can also use
-`sampling_ratio` argument to reduce data points and `sampling_func` to achieve
-some basic data processing.
-
-* `MeltAbfChannel()`: Unlike `melt()` treating data in time series perpective,
-`MeltAbfChannel()` melts episodic data, by applying `map_func` on `intv`, so you
-can plot an abf object's channel x vs channel y easily. In it's core, `MeltAbfChannel()`
-is simply a wrapped `map_func` applied to `rbindlist`, with some additional
-argument checkings.
-
-### Ready to plot functions.
-
-Multiple plotting functions are also provided so you can plot abf objects directly.
-Those functions usually have PlotChannelXXXX, MultiPlotChannelXXX, QuickPlotXXXX
-signatures. You can substitute Plot with Peek (except QuickPlot) for a sampled
-fast plot since an abf object can have thousands or even millions of points.
-
-All plotting functions accept similar arguments, and here are some most common ones:
-
-* `intv`, `cursor`: intervals and cursors to add to a plot. An interval is simply
-a vector of `c(start_pos, end_pos, length)` or can be simplified to `c(start_pos, end_pos)`.
-A cursor is a vector of positions `c(pos1, pos2, pos3, pos4, ...)` that do not
-indicate any time span but just the sampled moments.
-
-* `colour`: a boolean value determines wheter to plot in coloured mode.
-
-* `time_unit`: since data stored in an abf object is timed by "ticks" (array index
-of dim 1), converting to an actual time unit can make a plot more sense. A time_unit
-can be a character of tick, us, ms, s, min, hr.
-
-* `auto_zoom`: when an interval or cursors are given, they defines an interval of
-interest. Turning auto_zoom to TRUE will force the plot to zoom in to the interval
-regardless of other values in tha abf objects. However, if `intv = NULL` and `cursor = NULL`,
-auto_zoom won't work since it has no idea where to zoom in. In this case, you
-can still use `CropValue()` to force remove maxima/minima for a better looking plot.
+Predefined `PlotChannel()` and `PlotAllChannel()` plot channel time series of an
+abf object. `MultiPlotChannel()` arranges multiple channel time series of a list
+of abf objects into a single plot. `QuickPlot()` provides a unified interface to
+plot various types depending on supplied objects. Please refer to package help
+for a full list of plotting functions.
