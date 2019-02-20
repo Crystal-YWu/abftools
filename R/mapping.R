@@ -535,13 +535,13 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
 
   tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
   time <- rep(TickToTime(abf, time_unit, tick), nepi)
-  epi <- matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE)
-  dim(epi) <- NULL
+  ep <- as.factor(matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE))
+  levels(ep) <- DefaultEpiLabel(epi)
 
   ans <- list(
     time = time,
-    Episode = epi
+    Episode = ep
   )
 
-  as.data.frame(do.call(cbind, c(ans, value)))
+  data.frame(c(ans, value))
 }
