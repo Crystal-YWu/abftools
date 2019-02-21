@@ -1,39 +1,33 @@
 allowed_delta_abs <- function(channel_data, delta) {
 
   d <- dim(channel_data)
-
-  episode <- d[2]
-  if (length(delta) != 1L && length(delta) != episode) {
-    err_assert_len(delta, episode)
+  if (is.null(d)) {
+    ans <- rep_len(delta, length.out = length(channel_data))
+  } else {
+    delta <- rep_len(delta, length.out = d[2])
+    ans <- matrix(data = delta, nrow = d[1], ncol = d[2], byrow = TRUE)
   }
 
-  ret <- matrix(data = abs(delta), nrow = d[1], ncol = d[2], byrow = TRUE)
-  return(ret)
+  ans
 }
 
-allowed_delta_rel <- function(channel_data, delta) {
-
-  ret <- abs(channel_data * delta)
-
-  return(ret)
-}
-
-OverlapEpisodicIntv <- function(episodic_intv, episodes, npts) {
+OverlapEpisodicIntv <- function(episodic_intv, npts) {
 
   ret <- rep(TRUE, npts)
-  for (epi in episodes) {
-    ret <- ret & IntvToLogi(episodic_intv[[epi]], npts)
+  for (intv in episodic_intv) {
+    if (!is.null(intv)) {
+      ret <- ret & IntvToLogi(intv, npts)
+    }
   }
 
-  return(LogiToIntv(ret))
+  LogiToIntv(ret)
 }
 
-BinSearchIntv <- function(channel_data, intv, min_intv, f) {
-
+BinSearchIntv <- function(channel_data, intv, min_intv) {
 
   mask <- MaskIntv(intv)
   ret <- list()
-  ret$score <- matrixStats::colMads(channel_data[mask, ])
+  ret$score <- mean(channel_data[mask])
   ret$intv <- intv
 
   if (intv[3] %/% 2L <= min_intv) {
@@ -44,34 +38,13 @@ BinSearchIntv <- function(channel_data, intv, min_intv, f) {
   intv_l <- Intv(intv[1], mid_idx)
   intv_r <- Intv(mid_idx, intv[2])
 
-  ret_r <- BinSearchIntv(channel_data, intv_r, min_intv , f)
-  ret_l <- BinSearchIntv(channel_data, intv_l, min_intv, f)
-  if (f(ret_r$score, ret$score)) {
-    if (f(ret_l$score, ret_r$score)) {
-      return(ret_l)
-    } else {
-      return(ret_r)
-    }
-  } else {
-    if (f(ret_l$score, ret$score)) {
-      return(ret_l)
-    } else {
-      return(ret)
-    }
-  }
-}
+  ret_r <- BinSearchIntv(channel_data, intv_r, min_intv)
+  ret_l <- BinSearchIntv(channel_data, intv_l, min_intv)
 
-score_worst_half <- function(s1, best_s) {
-
-  #half length + 1
-  n <- length(best_s) %/% 2L + 1L
-  o <- order(best_s, decreasing = TRUE)
-  mask <- o[seq_len(n)]
-
-  return(all(s1[mask] <= best_s[mask]))
-}
-
-score_all <- function(s1, best_s) {
-
-  return(all(s1 <= best_s))
+  switch(which.min(c(ret$score,
+                     ret_l$score,
+                     ret_r$score)),
+         ret,
+         ret_l,
+         ret_r)
 }
