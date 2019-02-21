@@ -2,26 +2,29 @@
 % Please edit documentation in R/autointv.R
 \name{FindSamplingInterval}
 \alias{FindSamplingInterval}
+\alias{FindAllSamplingInterval}
 \title{FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.}
 \usage{
-FindSamplingInterval(abf, current_channel, voltage_channel,
-  min_sampling_size, max_sampling_size, allowed_voltage_delta,
-  epoch = "B", backward_search = TRUE, noisy_data = FALSE)
+FindSamplingInterval(abf, epoch = "B",
+  current_channel = GetFirstCurrentChan(abf),
+  voltage_channel = GetFirstVoltageChan(abf),
+  target_interval_size = NULL, allowed_voltage_delta = NULL,
+  backward_search = TRUE, noisy_data = FALSE)
+
+FindAllSamplingInterval(abf_list, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
+
+\item{epoch}{OPTIONAL, the epoch to search, defaults to B (second epoch).}
 
 \item{current_channel}{OPTIONAL, channel id for current data, channel id is 1-based.}
 
 \item{voltage_channel}{OPTIONAL, channel id for voltage data, channel id is 1-based.}
 
-\item{min_sampling_size}{OPTIONAL, min size in points of a sampling interval.}
-
-\item{max_sampling_size}{OPTIONAL, max size in points of a sampling interval.}
+\item{target_interval_size}{OPTIONAL, target size in **points** of the sampling interval. Default is 20ms of samples.}
 
 \item{allowed_voltage_delta}{OPTIONAL, allowed max deviation of voltage.}
-
-\item{epoch}{OPTIONAL, the epoch to search, defaults to B (second epoch).}
 
 \item{backward_search}{OPTIONAL, perform search along backward direction.}
 

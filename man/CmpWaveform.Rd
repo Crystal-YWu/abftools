@@ -4,19 +4,19 @@
 \alias{CmpWaveform}
 \title{Compare epoch waveform setting to a channel data.}
 \usage{
-CmpWaveform(abf, channel, epoch, delta, relative = FALSE,
-  min_win = NULL, max_win = NULL)
+CmpWaveform(abf, episode = GetAllEpisodes(abf), channel, epoch,
+  delta = NULL, min_win = NULL, max_win = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
+
+\item{episode}{the episodes to compare.}
 
 \item{channel}{the channel to compare, channel id is 1-based.}
 
 \item{epoch}{the epoch to compare.}
 
 \item{delta}{allowed max deviation.}
-
-\item{relative}{delta is given in relative value or absolute value.}
 
 \item{min_win}{OPTIONAL, minimum interval window size of the result.}
 
