@@ -372,15 +372,17 @@ wrap_along <- function(...,
                        ret.df = ret.df)
 }
 
-Sample1d <- function(x, sampling_ratio, colFunc = NULL, ...) {
+sample1d <- function(x, sampling_ratio, colFunc = NULL, ...) {
 
   force(sampling_ratio)
 
   n <- length(x)
   idx <- seq.int(from = 1L, to = n, by = sampling_ratio)
   nidx <- length(idx)
-  data <- x[idx]
-  if (!is.null(colFunc)) {
+
+  if (is.null(colFunc)) {
+    data <- x[idx]
+  } else {
     if (n %% sampling_ratio == 0) {
       dim(x) <- c(sampling_ratio, n %/% sampling_ratio)
       data <- colFunc(x, ...)
@@ -397,6 +399,16 @@ Sample1d <- function(x, sampling_ratio, colFunc = NULL, ...) {
       data <- c(block_sv, last_sv)
     }
   }
+
+  data
+}
+
+sample1d_filled <- function(x, sampling_ratio, colFunc = NULL, ...) {
+
+  data <- sample1d(x, sampling_ratio = sampling_ratio, colFunc = colFunc, ...)
+  data <- matrix(data, nrow = sampling_ratio, ncol = length(data), byrow = TRUE)
+  dim(data) <- NULL
+  length(data) <- length(x)
 
   data
 }
@@ -418,7 +430,7 @@ samplend <- function(x, sampling_ratio, colFunc = NULL, along = 1L, ...) {
   } else {
     ndim <- seq_len(length(dim(x)))
     margin <- ndim[-along]
-    data <- apply(x, MARGIN = margin, FUN = smpl1d,
+    data <- apply(x, MARGIN = margin, FUN = sample1d,
                   sampling_ratio = sampling_ratio, colFunc = colFunc, ...)
   }
 

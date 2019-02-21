@@ -2,10 +2,10 @@ MaskIntv <- function(intv) {
   #TODO: A good solution to distinguish intv and curs
 
   if (length(intv) == 2L) {
-    return(intv[1]:intv[2])
+    return(seq.int(intv[1], intv[2]))
   }
   if (length(intv) == 3L && (intv[2] - intv[1] + 1L == intv[3])) {
-    return(intv[1]:intv[2])
+    return(seq.int(intv[1], intv[2]))
   }
 
   intv
@@ -48,7 +48,7 @@ LogiToIntv <- function(logi) {
 
 IntvToLogi <- function(intv, full_length) {
 
-  ret <- rep(FALSE, full_length)
+  ret <- vector(length = full_length)
   for (i in seq_len(ncol(intv))) {
     mask <- MaskIntv(intv[, i])
     ret[mask] <- TRUE

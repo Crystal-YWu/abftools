@@ -78,7 +78,7 @@ GetWaveform <- function(abf,
                     err_wf_type())
 
       #copy tmp to mx
-      mask <- seq(from = idx, length.out = len)
+      mask <- seq.int(from = idx, length.out = len)
       #performance bottleneck is not this if, no need to move out from loop.
       if (nepi > 1L) {
         mx[mask, mx_epi_idx] <- tmp

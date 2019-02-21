@@ -7,9 +7,8 @@
 #'
 GetEpochId <- function(epoch_name) {
 
-  epoch <- 0
   epoch_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
-  epoch <- match(epoch_name, epoch_names)
+  epoch <- match(epoch_name, toupper(epoch_names))
 
   if (any(is.na(epoch))) {
     err_epoch_name()
