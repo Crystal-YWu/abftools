@@ -37,6 +37,22 @@ GetYLimit <- function(abf, intv = NULL, curs = NULL, channel, blank = 0.0125) {
   ret
 }
 
+#' Calculate time span of a frequency
+#'
+#' @param abf an abf object.
+#' @param freq a frequency in Hz.
+#'
+#' @return an integer of **point**/**tick** count.
+#' @export
+#'
+FreqToTick <- function(abf, freq) {
+
+  time <- 1e6 / freq
+  tick <- time / GetSamplingRate(abf)
+
+  ceiling(tick)
+}
+
 TickToTime <- function(abf, time_unit, ctick) {
 
   ctime <- switch(time_unit,

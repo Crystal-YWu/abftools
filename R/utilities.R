@@ -80,3 +80,36 @@ BlankAbf <- function(abf, ref_data, ref_intv = NULL,
 
   abf
 }
+
+ApplyLowpass <- function(abf, chan, freq, order) {
+
+  bf <- signal::butter(order, 1 / (2*freq), "low")
+  ff <- function(x) signal::filter(bf, x)
+  for (ch in chan) {
+
+    abf[,, ch] <- mapnd(abf[,, ch], ff, along = 1L)
+  }
+
+  abf
+}
+
+#' Apply low-pass filter to an abf object.
+#'
+#' @param abf an abf object.
+#' @param channel the channel to apply filter.
+#' @param freq low-pass frequency.
+#' @param order filter order.
+#'
+#' @return an abf object.
+#' @export
+#'
+LowpassAbf <- function(abf, channel, freq = 75, order = 6L) {
+
+  CheckArgs(abf, channel, allow_list = TRUE)
+
+  if (IsAbf(abf)) {
+    ApplyLowpass(abf, chan = channel, freq = freq, order = order)
+  } else {
+    lapply(abf, ApplyLowpass, chan = channel, freq = freq, order = order)
+  }
+}

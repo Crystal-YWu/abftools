@@ -4,5 +4,6 @@
 ##' @importFrom matrixStats colSds colMads
 ##' @importFrom Matrix Diagonal sparseMatrix solve diff
 ##' @importFrom splines bs
+##' @importFrom signal butter filter
 ##' @import wmtsa
 NULL
