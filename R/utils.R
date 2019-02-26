@@ -33,7 +33,7 @@ Intv <- function(startPos, endPos, len) {
   if (missing(endPos)) {
     endPos <- startPos + len - 1L
   }
-  if (startPos >= endPos) {
+  if (startPos > endPos) {
     err_intv_pos()
   }
   len <- endPos - startPos + 1L
