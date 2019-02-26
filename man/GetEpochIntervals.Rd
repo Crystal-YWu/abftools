@@ -16,5 +16,5 @@ a 3-d array, see details.
 }
 \description{
 The returned array contains all interval info, which can be accessed by:
-epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
+epoch[ , episode, epoch_id], an interval is defined as c(intv_start, intv_end, intv_length)
 }

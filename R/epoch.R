@@ -46,7 +46,7 @@ GetEpdac <- function(abf, dac) {
 #' Get intervals of all epochs.
 #'
 #' The returned array contains all interval info, which can be accessed by:
-#' epoch[ , epoch_id, episode], an interval is defined as c(intv_start, intv_end, intv_length)
+#' epoch[ , episode, epoch_id], an interval is defined as c(intv_start, intv_end, intv_length)
 #'
 #' @param abf an abf object.
 #' @param dac OPTIONAL, DAC channel, 1-based.
@@ -71,7 +71,7 @@ GetEpochIntervals <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
   #pre-allocate win
   nepi <- nEpi(abf)
   nepoch <- nrow(epdac)
-  win <- array(0L, dim = c(3L, nepoch, nepi))
+  win <- array(0L, dim = c(3L, nepi, nepoch))
 
   for (epi in seq_len(nepi)) {
 
@@ -80,9 +80,9 @@ GetEpochIntervals <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
     epoch_end <- cumsum(epoch_len) + holding_len
     epoch_start <- epoch_end - epoch_len + 1L
 
-    win[1L, , epi] <- epoch_start
-    win[2L, , epi] <- epoch_end
-    win[3L, , epi] <- epoch_len
+    win[1L, epi, ] <- epoch_start
+    win[2L, epi, ] <- epoch_end
+    win[3L, epi, ] <- epoch_len
 
   }
 
