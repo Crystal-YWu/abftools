@@ -24,12 +24,21 @@ OvlpIntv <- function(intv1, intv2) {
   }
 }
 
-ShftIntv <- function(intv, pts) {
+ShftIntv <- function(intv, pts, idx_min = 1L, idx_max = NULL) {
 
-  intv[1] <- intv[1] + pts
-  intv[2] <- intv[2] + pts
+  idx1 <- intv[1] + pts
+  idx2 <- intv[2] + pts
 
-  intv
+  if (!is.null(idx_min)) {
+    idx1 <- max(idx1, idx_min)
+    idx2 <- max(idx2, idx_min)
+  }
+  if (!is.null(idx_max)) {
+    idx1 <- min(idx1, idx_max)
+    idx2 <- min(idx2, idx_max)
+  }
+
+  Intv(idx1, idx2)
 }
 
 LogiToIntv <- function(logi) {
@@ -106,7 +115,7 @@ FirstElement <- function(x, elaborate = NULL) {
 ExtractFrom <- function(abf, epoch, episode, channel, lagL = 0L, lagR = lagL) {
 
   epoch_intv <- GetEpochIntervals(abf)
-  intv <- epoch_intv[, epoch, episode]
+  intv <- epoch_intv[, episode, epoch]
   if ((lagL + lagR) < intv[3]) {
     intv[1] <- intv[1] + lagL
     intv[2] <- intv[2] - lagR
