@@ -21,7 +21,7 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
   CheckArgs(abf, epi = episode, chan = channel, epo = epoch)
 
   nepi <- nEpi(abf)
-  epoch_intv <- GetEpochIntervals(abf)[, epoch, ]
+  epoch_intv <- GetEpochIntervals(abf)[, , epoch]
 
   wf <- GetWaveform(abf)
   wf_delta <- abs(wf - abf[,, channel])
@@ -80,13 +80,15 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
 #' 4. Intervals closer to the end of the epoch are preferred.
 #'
 #' @param abf an abf object.
-#' @param current_channel OPTIONAL, channel id for current data, channel id is 1-based.
-#' @param voltage_channel OPTIONAL, channel id for voltage data, channel id is 1-based.
-#' @param target_interval_size OPTIONAL, target size in **points** of the sampling interval. Default is 20ms of samples.
+#' @param epoch the epoch to search, defaults to B (second epoch).
+#' @param current_channel channel id for current data, channel id is 1-based.
+#' @param voltage_channel channel id for voltage data, channel id is 1-based.
+#' @param target_interval_size OPTIONAL, target size in **points** of the sampling interval.
+#' Default is 2x lowpass window.
 #' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage.
-#' @param epoch OPTIONAL, the epoch to search, defaults to B (second epoch).
-#' @param backward_search OPTIONAL, perform search along backward direction.
-#' @param noisy_data OPTIONAL, set to TURE if data is noisy, may improve position of the predicted sampling interval.
+#' @param noisy_opt enable optimisation for noisy data by applying a lowpass filter to current channel.
+#' @param lp_freq frequency of low-pass filter.
+#' @param lp_order order of low-pass filter.
 #'
 #' @return a named vector of 3 numeric: interval start position, end position, length
 #' @export
@@ -96,22 +98,22 @@ FindSamplingInterval <- function(abf, epoch = "B",
                                  voltage_channel = GetFirstVoltageChan(abf),
                                  target_interval_size = NULL,
                                  allowed_voltage_delta = NULL,
-                                 backward_search = TRUE, noisy_data = FALSE) {
+                                 noisy_opt = FALSE, lp_freq = 75, lp_order = 1L) {
 
-  if (IsAbfList(abf)) {
-    return(
-      lapply(abf, FindSamplingInterval, epoch = epoch,
-             current_channel = current_channel,
-             voltage_channel = voltage_channel,
-             target_interval_size = target_interval_size,
-             allowed_voltage_delta = allowed_voltage_delta)
-    )
+  list_mode <- IsAbfList(abf)
+  if (list_mode) {
+    nabf <- length(abf)
+    abf <- AverageAbf(abf)
   }
 
   if (is.character(epoch)) {
     epoch <- GetEpochId(epoch)
   }
   CheckArgs(abf, chan = c(current_channel, voltage_channel), epo = epoch)
+
+  if (noisy_opt) {
+    abf <- ApplyLowpass(abf, chan = current_channel, freq = lp_freq, order = lp_order)
+  }
 
   if (is.null(allowed_voltage_delta)) {
     epdac <- GetEpdac(abf, FirstElement(GetWaveformEnabledDAC(abf)))
@@ -121,9 +123,9 @@ FindSamplingInterval <- function(abf, epoch = "B",
                                  abs(epdac$fEpochLevelInc[epoch]))
   }
 
-  #Default target sampling size is 20ms/20000us scan
+  lp_interval_size <- FreqToTick(abf, freq = lp_freq)
   if (is.null(target_interval_size)) {
-    target_interval_size <- floor(20000.0 / GetSamplingIntv(abf))
+    target_interval_size <- 2L * lp_interval_size
   }
   target_interval_size <- max(3L, target_interval_size)
 
@@ -159,31 +161,34 @@ FindSamplingInterval <- function(abf, epoch = "B",
   }
 
   #CURRENT
-  sr <- max(3L, target_interval_size %/% 10L)
-  channel_data <- abf[[current_channel]]
-  channel_var <- rowSums(samplend(channel_data,
-                                  sampling_ratio = sr,
-                                  colFunc = matrixStats::colSds))
-  channel_var <- rep(channel_var, times = sr, length.out = npts)
-
-  #CURRENT
-  if (backward_search) {
-    itr <- seq(ncol(ovlp), 1L)
-  } else {
-    itr <- seq_len(ncol(ovlp))
+  sr <- max(3L, lp_interval_size %/% 10L)
+  channel_var <- samplend(abf[[current_channel]],
+                          sampling_ratio = sr,
+                          colFunc = matrixStats::colSds)
+  total_var <- rep(0.0, npts)
+  epoch_intv <- GetEpochIntervals(abf)[,, epoch]
+  for (i in seq_along(episodes)) {
+    x <- MaskIntv(epoch_intv[, episodes[i]])
+    tmp <- rep(channel_var[, i], each = sr, length.out = npts)
+    tmp[x] <- tmp[x] * (exp(min(x) / 2.0 / x))
+    total_var <- total_var + tmp
   }
+
   best_score <- Inf
   best_intv <- c(0, 0, 0)
-
-  for (i in itr) {
-    search_result <- BinSearchIntv(channel_var, ovlp[ , i], target_interval_size)
+  for (i in seq_len(ncol(ovlp))) {
+    search_result <- BinSearchIntv(total_var, ovlp[, i], target_interval_size)
     if (search_result$score < best_score) {
       best_score <- search_result$score
       best_intv <- search_result$intv
     }
   }
 
-  best_intv
+  if (list_mode) {
+    rep(list(best_intv), nabf)
+  } else {
+    best_intv
+  }
 }
 
 #' @rdname FindSamplingInterval

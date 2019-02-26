@@ -9,26 +9,29 @@ FindSamplingInterval(abf, epoch = "B",
   current_channel = GetFirstCurrentChan(abf),
   voltage_channel = GetFirstVoltageChan(abf),
   target_interval_size = NULL, allowed_voltage_delta = NULL,
-  backward_search = TRUE, noisy_data = FALSE)
+  noisy_opt = FALSE, lp_freq = 75, lp_order = 1L)
 
 FindAllSamplingInterval(abf_list, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{epoch}{OPTIONAL, the epoch to search, defaults to B (second epoch).}
+\item{epoch}{the epoch to search, defaults to B (second epoch).}
 
-\item{current_channel}{OPTIONAL, channel id for current data, channel id is 1-based.}
+\item{current_channel}{channel id for current data, channel id is 1-based.}
 
-\item{voltage_channel}{OPTIONAL, channel id for voltage data, channel id is 1-based.}
+\item{voltage_channel}{channel id for voltage data, channel id is 1-based.}
 
-\item{target_interval_size}{OPTIONAL, target size in **points** of the sampling interval. Default is 20ms of samples.}
+\item{target_interval_size}{OPTIONAL, target size in **points** of the sampling interval.
+Default is 2x lowpass window.}
 
 \item{allowed_voltage_delta}{OPTIONAL, allowed max deviation of voltage.}
 
-\item{backward_search}{OPTIONAL, perform search along backward direction.}
+\item{noisy_opt}{enable optimisation for noisy data by applying a lowpass filter to current channel.}
 
-\item{noisy_data}{OPTIONAL, set to TURE if data is noisy, may improve position of the predicted sampling interval.}
+\item{lp_freq}{frequency of low-pass filter.}
+
+\item{lp_order}{order of low-pass filter.}
 }
 \value{
 a named vector of 3 numeric: interval start position, end position, length

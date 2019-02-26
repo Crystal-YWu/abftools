@@ -27,7 +27,7 @@ GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", .
   channel <- FirstElement(channel)
   for (i in episodes) {
     if (missing_intv) {
-      intv <- epoch_intv[, epoch, i]
+      intv <- epoch_intv[, i, epoch]
       mask <- intv[1]:intv[2]
     }
     y <- abf[mask, i, channel]
