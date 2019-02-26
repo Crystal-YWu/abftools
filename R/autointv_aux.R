@@ -23,6 +23,13 @@ OverlapEpisodicIntv <- function(episodic_intv, npts) {
   LogiToIntv(ret)
 }
 
+td_penalty <- function(data, idx){
+
+  data[idx] <- data[idx] * exp(min(idx) / 2.0 / idx)
+
+  data
+}
+
 BinSearchIntv <- function(channel_data, intv, min_intv,
                           idx_min = NULL, idx_max = NULL) {
 

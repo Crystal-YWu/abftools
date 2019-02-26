@@ -75,9 +75,10 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
 #' to locate sampling intervals when using step voltage cmd waveform. Some common
 #' assumptions are made:
 #' 1. Waveform Cmd is outputing voltage command.
-#' 2. The function is looking for most stable voltage AND current channel.
-#' 3. The function prefers stability to the size of interval.
-#' 4. Intervals closer to the end of the epoch are preferred.
+#' 2. Waveform epochs are aligned, i.e. epoch duration incr is 0.
+#' 3. The function is looking for most stable voltage AND current channel.
+#' 4. The function prefers stability to the size of interval.
+#' 5. Intervals closer to the end of the epoch are preferred.
 #'
 #' @param abf an abf object.
 #' @param epoch the epoch to search, defaults to B (second epoch).
@@ -115,8 +116,11 @@ FindSamplingInterval <- function(abf, epoch = "B",
     abf <- ApplyLowpass(abf, chan = current_channel, freq = lp_freq, order = lp_order)
   }
 
+  epdac <- GetEpdac(abf, FirstElement(GetWaveformEnabledDAC(abf)))
+  if (any(epdac$lEpochDurationInc != 0)) {
+    err_epoch_align()
+  }
   if (is.null(allowed_voltage_delta)) {
-    epdac <- GetEpdac(abf, FirstElement(GetWaveformEnabledDAC(abf)))
     v_settings <- epdac$fEpochInitLevel[epoch] +
                   epdac$fEpochLevelInc[epoch] * (seq_len(nEpi(abf)) - 1L)
     allowed_voltage_delta <- min(max(abs(v_settings)) * 0.10,
@@ -124,10 +128,9 @@ FindSamplingInterval <- function(abf, epoch = "B",
   }
 
   lp_interval_size <- FreqToTick(abf, freq = lp_freq)
-  if (is.null(target_interval_size)) {
-    target_interval_size <- 2L * lp_interval_size
-  }
-  target_interval_size <- max(3L, target_interval_size)
+  target_interval_size <- max(3L, ifelse(is.null(target_interval_size),
+                                                 2L * lp_interval_size,
+                                                 target_interval_size))
 
   #VOLTAGE
   episodes <- GetAvailEpisodes(abf)
@@ -143,7 +146,6 @@ FindSamplingInterval <- function(abf, epoch = "B",
       episodic_intv[[epi]] <- episodic_fallback[[epi]]
     }
   }
-
   flagged <- unlist(lapply(episodes, function(i) if (!ncol(episodic_intv[[i]])) i))
   if (!is.null(flagged)) {
     fmt_str <- "In %s, no stable voltage interval found for episode %s. "
@@ -152,8 +154,8 @@ FindSamplingInterval <- function(abf, epoch = "B",
   }
 
   npts <- nPts(abf)
-  ovlp <- OverlapEpisodicIntv(episodic_intv, npts)
-  ovlp <- FilterMinIntervalSize(ovlp, target_interval_size)
+  ovlp <- FilterMinIntervalSize(OverlapEpisodicIntv(episodic_intv, npts),
+                                target_interval_size)
   if (!ncol(ovlp)) {
     fmt_str <- "In %s, no common stable voltage interval found for all episodes. "
     warning(sprintf(fmt_str, GetTitle(abf)))
@@ -162,22 +164,17 @@ FindSamplingInterval <- function(abf, epoch = "B",
 
   #CURRENT
   sr <- max(3L, lp_interval_size %/% 10L)
-  channel_var <- samplend(abf[[current_channel]],
-                          sampling_ratio = sr,
-                          colFunc = matrixStats::colSds)
-  total_var <- rep(0.0, npts)
-  epoch_intv <- GetEpochIntervals(abf)[,, epoch]
-  for (i in seq_along(episodes)) {
-    x <- MaskIntv(epoch_intv[, episodes[i]])
-    tmp <- rep(channel_var[, i], each = sr, length.out = npts)
-    tmp[x] <- tmp[x] * (exp(min(x) / 2.0 / x))
-    total_var <- total_var + tmp
-  }
+  channel_var <- rowSums(samplend(abf[[current_channel]],
+                                  sampling_ratio = sr,
+                                  colFunc = matrixStats::colSds))
+  channel_var <- td_penalty(rep(channel_var, each = sr, length.out = npts),
+                            MaskIntv(GetEpochIntervals(abf)[, 1L, epoch]))
 
+  #INTERVAL
   best_score <- Inf
   best_intv <- c(0, 0, 0)
   for (i in seq_len(ncol(ovlp))) {
-    search_result <- BinSearchIntv(total_var, ovlp[, i], target_interval_size)
+    search_result <- BinSearchIntv(channel_var, ovlp[, i], target_interval_size)
     if (search_result$score < best_score) {
       best_score <- search_result$score
       best_intv <- search_result$intv

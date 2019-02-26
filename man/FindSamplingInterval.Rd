@@ -41,7 +41,8 @@ FindSamplingInterval is a convenient alternative to CmpWaveform, best suited
 to locate sampling intervals when using step voltage cmd waveform. Some common
 assumptions are made:
 1. Waveform Cmd is outputing voltage command.
-2. The function is looking for most stable voltage AND current channel.
-3. The function prefers stability to the size of interval.
-4. Intervals closer to the end of the epoch are preferred.
+2. Waveform epochs are aligned, i.e. epoch duration incr is 0.
+3. The function is looking for most stable voltage AND current channel.
+4. The function prefers stability to the size of interval.
+5. Intervals closer to the end of the epoch are preferred.
 }

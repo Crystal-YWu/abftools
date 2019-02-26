@@ -52,6 +52,12 @@ err_epoch <- function() {
   err(msg)
 }
 
+err_epoch_align <- function() {
+
+  msg <- "Epochs are not aligned."
+  err(msg)
+}
+
 err_epoch_dac <- function() {
 
   msg <- "Epoch setting is not enabled for DAC channel."
