@@ -41,9 +41,21 @@ ShftIntv <- function(intv, pts, idx_min = 1L, idx_max = NULL) {
   Intv(idx1, idx2)
 }
 
+rle_logi <- function(logi) {
+
+  n <- length(logi)
+  y <- logi[-1L] != logi[-n]
+  #y <- xor(logi[-1L], logi[-n])
+  #y <- (logi[-1L] + logi[-n]) == 1L
+  i <- c(which(y), n)
+
+  list(lengths = diff(c(0L, i)),
+       values = logi[i])
+}
+
 LogiToIntv <- function(logi) {
 
-  r <- rle(logi)
+  r <- rle_logi(logi)
   endPos <- cumsum(r$lengths)
   startPos <- endPos - r$lengths + 1
   #exploit that logi is logical
