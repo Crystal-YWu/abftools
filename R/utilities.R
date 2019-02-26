@@ -103,7 +103,7 @@ ApplyLowpass <- function(abf, chan, freq, order) {
 #' @return an abf object.
 #' @export
 #'
-LowpassAbf <- function(abf, channel, freq = 75, order = 6L) {
+LowpassAbf <- function(abf, channel, freq = 75, order = 1L) {
 
   CheckArgs(abf, channel, allow_list = TRUE)
 

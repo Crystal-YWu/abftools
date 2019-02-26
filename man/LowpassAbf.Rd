@@ -4,7 +4,7 @@
 \alias{LowpassAbf}
 \title{Apply low-pass filter to an abf object.}
 \usage{
-LowpassAbf(abf, channel, freq = 75, order = 6L)
+LowpassAbf(abf, channel, freq = 75, order = 1L)
 }
 \arguments{
 \item{abf}{an abf object.}
