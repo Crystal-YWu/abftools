@@ -24,14 +24,9 @@ GetWaveform <- function(abf,
   }
 
   nepi <- length(episodes)
-
-  wf_holding <- meta$DAC$fInstrumentHoldingLevel[dac]
   npts <- nPts(abf)
-  if (nepi == 1L) {
-    mx <- rep(wf_holding, npts)
-  } else {
-    mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
-  }
+  wf_holding <- meta$DAC$fInstrumentHoldingLevel[dac]
+  mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
 
   #Extract epoch settings
   epdac <- GetEpdac(abf, dac)
@@ -45,54 +40,54 @@ GetWaveform <- function(abf,
   p_period <- epdac$lEpochPulsePeriod
   p_width <- epdac$lEpochPulseWidth
   wf_type <- epdac$nEpochType
+  epoch_aligned <- all(incr_len == 0)
 
   #Now simulate waveforms
-  idx_1stpts <- npts %/% 64L + 1L
-  mx_epi_idx <- 0L
-  for (epi in episodes) {
-    idx <- idx_1stpts
-    mx_epi_idx <- mx_epi_idx + 1L
-    for (epoch in seq_len(nepoch)) {
-
-      Vin <- ifelse(nepi > 1L, mx[idx - 1L, mx_epi_idx], mx[idx - 1L])
-      Vhi <- init_level[epoch] + incr_level[epoch] * (epi - 1L)
-      len <- init_len[epoch] + incr_len[epoch] * (epi - 1L)
-
-      #calculate simulated waveforms
-      tmp <- switch(wf_type[epoch],
-                    #waveform 1
-                    wf_step(len, Vhi),
-                    #waveform 2
-                    wf_ramp(len, Vin, Vhi),
-                    #waveform 3
-                    wf_pulse(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
-                    #waveform 4
-                    wf_trng(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
-                    #waveform 5
-                    wf_cos(len, Vin, Vhi, p_period[epoch]),
-                    #waveform 6
-                    err_wf_type(),
-                    #waveform 7
-                    wf_biphsc(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
-                    #other
-                    err_wf_type())
-
-      #copy tmp to mx
-      mask <- seq.int(from = idx, length.out = len)
-      #performance bottleneck is not this if, no need to move out from loop.
-      if (nepi > 1L) {
-        mx[mask, mx_epi_idx] <- tmp
-      } else {
-        mx[mask] <- tmp
+  idx_start <- npts %/% 64L + 1L
+  for (i in seq_len(nepi)) {
+    idx <- idx_start
+    if (epoch_aligned && i > 1L) {
+      for (epoch in seq_len(nepoch)) {
+        len <- init_len[epoch]
+        mask <- seq.int(from = idx, length.out = len)
+        if (incr_level == 0) {
+          mx[mask, i] <- mx[mask, 1L]
+        } else {
+          mx[mask, i] <- mx[mask, 1L] + incr_level[epoch] * (episodes[i] - episodes[1L])
+        }
+        idx <- idx + len
       }
-      idx <- idx + len
+    } else {
+      for (epoch in seq_len(nepoch)) {
+        Vin <- mx[idx - 1L, i]
+        Vhi <- init_level[epoch] + incr_level[epoch] * (episodes[i] - 1L)
+        len <- init_len[epoch] + incr_len[epoch] * (episodes[i] - 1L)
+        wf_epoch <- switch(wf_type[epoch],
+                           #waveform 1
+                           wf_step(len, Vhi),
+                           #waveform 2
+                           wf_ramp(len, Vin, Vhi),
+                           #waveform 3
+                           wf_pulse(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
+                           #waveform 4
+                           wf_trng(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
+                           #waveform 5
+                           wf_cos(len, Vin, Vhi, p_period[epoch]),
+                           #waveform 6
+                           err_wf_type(),
+                           #waveform 7
+                           wf_biphsc(len, Vin, Vhi, p_period[epoch], p_width[epoch]),
+                           #other
+                           err_wf_type())
+        mx[seq.int(from = idx, length.out = len), i] <- wf_epoch
+        idx <- idx + len
+      }
     }
   }
 
   #set colnames
-  if (nepi > 1L) {
-    colnames(mx) <- DefaultEpiLabel(episodes)
-  }
+  epilabel <- DefaultEpiLabel(abf)
+  colnames(mx) <- DefaultEpiLabel(epilabel[episodes])
 
   mx
 }
