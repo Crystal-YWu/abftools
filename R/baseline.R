@@ -1,157 +1,73 @@
-GetBaseline <- function(abf, epoch, intv, episodes, channel = 1, algo = "als", ...) {
+BaselineChannel <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
+                            epoch = NULL, ...) {
 
-  missing_epoch <- missing(epoch)
-  missing_intv <- missing(intv)
-  if (missing_epoch && missing_intv) {
-    err_wrong_arg_num("Expected epoch or intv.")
-  }
-  if (!xor(missing_intv, missing_epoch)) {
-    warning("GetBaseline: argument epoch will be ignored since intv is provided.")
-  }
-
-  if (missing_intv) {
-    epoch_intv <- GetEpochIntervals(abf)
-    intv <- c(1L, 1L, 1L)
-    if (is.character(epoch)) {
-      epoch <- GetEpochId(epoch)
-    }
-  }
-
-  mask <- intv[1]:intv[2]
-
-  baseline_f <- paste0("baseline_", algo)
-  bl <- list()
-  if (missing(episodes)) {
-    episodes <- seq_len(nEpi(abf))
-  }
   channel <- FirstElement(channel)
-  for (i in episodes) {
-    if (missing_intv) {
-      intv <- epoch_intv[, i, epoch]
-      mask <- intv[1]:intv[2]
+  CheckArgs(abf, epi = episode, chan = channel, epo = epoch)
+
+  nepo <- nEpoch(abf)
+  npts <- nPts(abf)
+  nepi <- length(episode)
+
+  if (nepo) {
+    epoch_intv <- GetEpochIntervals(abf)
+  } else {
+    nepo <- 1L
+    epoch_intv <- array(c(1L, npts, npts), dim = c(3L, nepi, 1L))
+  }
+
+  mx <- abf[, , channel]
+  for (i in seq_len(nepi)) {
+    if (is.null(epoch)) {
+      for (epo in seq_len(nepo)) {
+        mask <- MaskIntv(epoch_intv[, episode[i], epo])
+        mx[mask, i] <- baseline_als(abf[mask, episode[i], channel], ...)
+      }
+    } else {
+      mask <- MaskIntv(epoch_intv[, episode[i], epoch])
+      mx[mask, i] <- baseline_als(abf[mask, episode[i], channel], ...)
     }
-    y <- abf[mask, i, channel]
-    bl[[i]] <- do.call(baseline_f, list(y = y, ...))
   }
 
-  return(bl)
+  mx
 }
-
-#' Calculate baselines of an abf object.
-#'
-#' Currently only als (Asymmetric Least Squares Smoothing) is available.
-#'
-#' @param abf an abf object.
-#' @param epoch the epoch name/id to evaluate baselines in.
-#' @param episodes OPTIONAL, episodes/sweeps to calculate.
-#' @param channel OPTIONAL, channel id, 1-based.
-#' @param algo OPTIONAL, algorithm to calculate baselines.
-#' @param ... other arguments to pass to the selected algorithm.
-#'
-#' @return baselines of selected episodes/sweeps in a list of vectors
-#' @export
-#'
-BaselineEpoch <- function(abf, epoch, episodes, channel = 1L, algo = "als", ...) {
-
-  epoch <- FirstElement(epoch)
-  if (is.character(epoch)) {
-    epoch <- GetEpochId(epoch)
-  }
-  if (!AssertEpoch(abf, epoch)) {
-    err_epoch()
-  }
-  if (missing(episodes) || is.null(episodes)) {
-    episodes <- seq_len(nEpi(abf))
-  } else if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
-  baseline <- ExternalAlgoEpoch(abf, epoch, episodes, channel, "baseline", algo, ...)
-
-  return(baseline)
-}
-
-#' Calculate baselines of an abf object.
-#'
-#' Currently only als (Asymmetric Least Squares Smoothing) is available.
-#'
-#' @param abf an abf object.
-#' @param intv the interval to evaluate baselines in.
-#' @param episodes episodes/sweeps to calculates.
-#' @param channel channel id, 1-based.
-#' @param algo algorithm to calculate baselines.
-#' @param ... other arguments to pass to the selected algorithm.
-#'
-#' @return baselines of selected episodes/sweeps in a named column matrix
-#' @export
-#'
-BaselineIntv <- function(abf, intv, episodes, channel = 1L, algo = "als", ...) {
-
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (missing(episodes) || is.null(episodes)) {
-    episodes <- seq_len(nEpi(abf))
-  } else if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
-  baseline <- ExternalAlgoIntv(abf, intv, episodes, channel, "baseline", algo, ...)
-
-  return(baseline)
-}
-
-#baseline removal from DWT?
 
 ###Baseline Correction with Asymmetric Least Squares Smoothing
 ###Paul H. C. Eilers, Hans F.M. Boelens, 2005
-baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10,
+baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10L,
                          converge_warning = FALSE) {
 
-  #Calculate D
-  m <- length(y)
-  diag_idx <- seq_len(m)
+  n <- length(y)
+  diag_idx <- seq_len(n)
 
-  D <- Matrix::diff(Matrix::Diagonal(m), differences = 2)
-  lambda <- 10^lambda_pow10
+  D <- Matrix::diff(Matrix::Diagonal(n), differences = 2)
+  lambda <- 10.0^lambda_pow10
   Delta <- lambda * Matrix::t(D) %*% D
 
-  w <- rep(1, m)
-  np <- 1 - p
-  old_v <- rep(TRUE, m)
-  v <- rep(TRUE, m)
+  w <- rep(1.0, n)
+  np <- 1.0 - p
+  v <- rep(TRUE, n)
+  old_v <- rep(TRUE, n)
 
-  cflag <- FALSE
-
+  cflag <- TRUE
   for (i in seq_len(maxitr)) {
-    #W <- Diagonal(x = w)
     #solving sparseMatrix is much faster than Diagonal, W is sparse anyway
     W <- Matrix::sparseMatrix(i = diag_idx, j = diag_idx, x = w)
-
-    #Note of as.vector: solved z should be an dgeMatrix, coercing it to a vector
-    #greatly improve the speed of the following calculation by vectorisation
     z <- as.vector(Matrix::solve(W + Delta, w * y))
 
     #update w
     v <- y > z
     if (all(v == old_v)) {
-      cflag <- TRUE
+      cflag <- FALSE
       break
     }
     old_v <- v
 
-    #ifelse is painfully slow
-    #w <- ifelse(y > z, p, np)
     w <- v * p + (!v) * np
   }
 
-  if (!cflag && converge_warning) {
+  if (converge_warning && cflag) {
     warning("baseline_als: Convergence not achieved.")
   }
 
-  return(z)
+  z
 }

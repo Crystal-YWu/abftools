@@ -1,90 +1,37 @@
-#' Denoise an abf object by epoch
-#'
-#' Currently available algorithms are: wavshrink (hard threshold), sureshrink
-#' (soft threshold)
-#'
-#' @param abf an abf object.
-#' @param epoch epoch name/id.
-#' @param episodes episodes/sweeps to denoise.
-#' @param channel channel id, 1-based.
-#' @param algo algorithm to denoise.
-#' @param ... other arguments to pass to the selected algorithm.
-#'
-#' @return a named list of denoised episodes/sweeps.
-#' @export
-#'
-DenoiseEpoch <- function(abf, epoch, episodes, channel = 1,
-                         algo = "sureshrink", ...) {
+DenoiseChannel <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
+                           epoch = NULL, ...) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  epoch <- FirstElement(epoch)
-  if (is.character(epoch)) {
-    epoch <- GetEpochId(epoch)
-  }
-  if (!AssertEpoch(abf, epoch)) {
-    err_epoch()
-  }
-  if (missing(episodes) || is.null(episodes)) {
-    episodes <- seq_len(nEpi(abf))
-  } else if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
-  denoised <- ExternalAlgoEpoch(abf, epoch, episodes, channel,
-                                "denoise", algo, ...)
+  channel <- FirstElement(channel)
+  CheckArgs(abf, epi = episode, chan = channel, epo = epoch)
 
-  return(denoised)
+  nepo <- nEpoch(abf)
+  npts <- nPts(abf)
+  nepi <- length(episode)
+
+  if (nepo) {
+    epoch_intv <- GetEpochIntervals(abf)
+  } else {
+    nepo <- 1L
+    epoch_intv <- array(c(1L, npts, npts), dim = c(3L, nepi, 1L))
+  }
+
+  mx <- abf[, , channel]
+  for (i in seq_len(nepi)) {
+    if (is.null(epoch)) {
+      for (epo in seq_len(nepo)) {
+        mask <- MaskIntv(epoch_intv[, episode[i], epo])
+        mx[mask, i] <- denoise_wavshrink(abf[mask, episode[i], channel], ...)
+      }
+    } else {
+      mask <- MaskIntv(epoch_intv[, episode[i], epoch])
+      mx[mask, i] <- denoise_wavshrink(abf[mask, episode[i], channel], ...)
+    }
+  }
+
+  mx
 }
 
-#' Denoise an abf object by an interval
-#'
-#' Currently available algorithms are: wavshrink (hard threshold), sureshrink
-#' (soft threshold)
-#'
-#' @param abf an abf object.
-#' @param intv an interval to denoise.
-#' @param episodes episodes/sweeps to denoise.
-#' @param channel channel id, 1-based.
-#' @param algo algorithm to denoise.
-#' @param ... other arguments to pass to the selected algorithm.
-#'
-#' @return a named list of denoised episodes/sweeps.
-#' @export
-#'
-DenoiseIntv <- function(abf, intv, episodes, channel = 1,
-                        algo = "sureshrink", ...) {
+denoise_wavshrink <- function(y, thresh.scale = 1.0, xform = "dwt", ...) {
 
-  if (!IsAbf(abf)) {
-    err_class_abf()
-  }
-  if (missing(episodes) || is.null(episodes)) {
-    episodes <- seq_len(nEpi(abf))
-  } else if (!AssertEpisode(abf, episodes)) {
-    err_epi()
-  }
-  if (!AssertChannel(abf, channel)) {
-    err_channel()
-  }
-  denoised <- ExternalAlgoIntv(abf, intv, episodes, channel,
-                               "denoise", algo, ...)
-
-  return(denoised)
-}
-
-#hard thresholding
-denoise_wavshrink <- function(y, smoothness = 1, ...) {
-
-  z <- wmtsa::wavShrink(y, thresh.fun = "universal", thresh.scale = smoothness, ...)
-  return(z)
-}
-
-#soft thresholding
-denoise_sureshrink <- function(y, smoothness = 1, ...) {
-
-  z <- wmtsa::wavShrink(y, thresh.fun = "adaptive", thresh.scale = smoothness, ...)
-  return(z)
+  wmtsa::wavShrink(y, thresh.scale = thresh.scale, xform = xform, ...)
 }
