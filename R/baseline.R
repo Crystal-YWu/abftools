@@ -1,4 +1,15 @@
-BaselineChannel <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
+#' Calculate baseline of a channel
+#'
+#' @param abf an abf object.
+#' @param episode episodes to calculate baseline
+#' @param channel channel to calculate baseline
+#' @param epoch OPTIONAL, specific epoch to calculate baseline, if NULL all epochs are calculated.
+#' @param ... arguments passed to baseline_als
+#'
+#' @return baseline of the channel
+#' @export
+#'
+ChannelBaseline <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
                             epoch = NULL, ...) {
 
   channel <- FirstElement(channel)
@@ -28,19 +39,32 @@ BaselineChannel <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
     }
   }
 
+  epilabel <- DefaultEpiLabel(abf)
+  colnames(mx) <- epilabel[episode]
+
   mx
 }
 
-###Baseline Correction with Asymmetric Least Squares Smoothing
-###Paul H. C. Eilers, Hans F.M. Boelens, 2005
-baseline_als <- function(y, lambda_pow10 = 6, p = 0.05, maxitr = 10L,
+#' Baseline Correction with Asymmetric Least Squares Smoothing
+#'
+#' Ref: Paul H. C. Eilers, Hans F.M. Boelens, 2005
+#'
+#' @param y a numeric vector
+#' @param lambda large numeric
+#' @param p numeric between (0, 1)
+#' @param maxitr integer maximum iteration
+#' @param converge_warning whether to give a warning if not converged.
+#'
+#' @return a numeric vector, baseline of y
+#' @export
+#'
+baseline_als <- function(y, lambda = 1e6, p = 0.05, maxitr = 10L,
                          converge_warning = FALSE) {
 
   n <- length(y)
   diag_idx <- seq_len(n)
 
   D <- Matrix::diff(Matrix::Diagonal(n), differences = 2)
-  lambda <- 10.0^lambda_pow10
   Delta <- lambda * Matrix::t(D) %*% D
 
   w <- rep(1.0, n)
