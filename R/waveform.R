@@ -1,18 +1,18 @@
 #' Simulate waveform.
 #'
 #' @param abf an abf object.
-#' @param episodes the episodes to simulate.
+#' @param episode the episodes to simulate.
 #' @param dac waveform DAC channel, 1-based.
 #'
 #' @return channel data of the simulated waveform.
 #' @export
 #'
 GetWaveform <- function(abf,
-                        episodes = GetAllEpisodes(abf),
+                        episode = GetAllEpisodes(abf),
                         dac = GetWaveformEnabledDAC(abf)) {
 
   dac <- FirstElement(dac)
-  CheckArgs(abf, epi = episodes, dac = dac)
+  CheckArgs(abf, epi = episode, dac = dac)
   if (GetMode(abf) != 5L) {
     err_wf_mode()
   }
@@ -23,7 +23,7 @@ GetWaveform <- function(abf,
     err_wf_support()
   }
 
-  nepi <- length(episodes)
+  nepi <- length(episode)
   npts <- nPts(abf)
   wf_holding <- meta$DAC$fInstrumentHoldingLevel[dac]
   mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
@@ -53,15 +53,15 @@ GetWaveform <- function(abf,
         if (incr_level == 0) {
           mx[mask, i] <- mx[mask, 1L]
         } else {
-          mx[mask, i] <- mx[mask, 1L] + incr_level[epoch] * (episodes[i] - episodes[1L])
+          mx[mask, i] <- mx[mask, 1L] + incr_level[epoch] * (episode[i] - episode[1L])
         }
         idx <- idx + len
       }
     } else {
       for (epoch in seq_len(nepoch)) {
         Vin <- mx[idx - 1L, i]
-        Vhi <- init_level[epoch] + incr_level[epoch] * (episodes[i] - 1L)
-        len <- init_len[epoch] + incr_len[epoch] * (episodes[i] - 1L)
+        Vhi <- init_level[epoch] + incr_level[epoch] * (episode[i] - 1L)
+        len <- init_len[epoch] + incr_len[epoch] * (episode[i] - 1L)
         wf_epoch <- switch(wf_type[epoch],
                            #waveform 1
                            wf_step(len, Vhi),
@@ -87,7 +87,7 @@ GetWaveform <- function(abf,
 
   #set colnames
   epilabel <- DefaultEpiLabel(abf)
-  colnames(mx) <- DefaultEpiLabel(epilabel[episodes])
+  colnames(mx) <- DefaultEpiLabel(epilabel[episode])
 
   mx
 }
