@@ -50,7 +50,7 @@ GetWaveform <- function(abf,
       for (epoch in seq_len(nepoch)) {
         len <- init_len[epoch]
         mask <- seq.int(from = idx, length.out = len)
-        if (incr_level == 0) {
+        if (incr_level[epoch] == 0) {
           mx[mask, i] <- mx[mask, 1L]
         } else {
           mx[mask, i] <- mx[mask, 1L] + incr_level[epoch] * (episode[i] - episode[1L])
@@ -87,7 +87,7 @@ GetWaveform <- function(abf,
 
   #set colnames
   epilabel <- DefaultEpiLabel(abf)
-  colnames(mx) <- DefaultEpiLabel(epilabel[episode])
+  colnames(mx) <- epilabel[episode]
 
   mx
 }
@@ -126,7 +126,7 @@ AtchWaveform <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 #' @return an abf object with a new waveform channel attached, invisibly.
 #' @export
 #'
-AttachWaveform <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
+AttachWaveform <- function(abf, dac) {
 
   eval.parent(substitute({
     abf <- AtchWaveform(abf, dac)
