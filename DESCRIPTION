@@ -2,8 +2,12 @@ Package: abftools
 Type: Package
 Title: ABF Tools: Toolbox for Visualising and Analysing Electrophysiology ABF2 Data
 Version: 0.9.9
-Author: Yue Wu <yue.wu@adelaide.edu.au>
-Maintainer: Jun <imlijunda@gmail.com>
+Author: Yue Wu [aut, cre],
+    Junda Li [aut]
+Authors@R: c(
+  person("Yue", "Wu", role = c("aut", "cre"), email = "yue.wu@adelaide.edu.au"),
+  person("Junda", "Li", role = c("aut"), email = "imlijunda@gmail.com"))
+Maintainer: Junda Li <imlijunda@gmail.com>
 Description: A toolbox provide data structure and functions to manipulate and
     analyse ABF (Axon Binary File) data. Special funcions are created specially
     for episodic multi-channel data analysis and visualisation.
