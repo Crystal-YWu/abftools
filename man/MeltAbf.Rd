@@ -5,29 +5,32 @@
 \title{Melt an abf object.}
 \usage{
 MeltAbf(abf, intv = NULL, channel = 1L, sampling_ratio = 1L,
-  sampling_colFunc = NULL, time_unit = "tick", ...,
+  sampling_func = NULL, sampling_colFunc = NULL,
+  time_unit = c("tick", "us", "ms", "s", "min", "hr"), ...,
   value.name = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{intv}{a time interval to melt, default is the whole timespan of abj}
+\item{intv}{a time interval to melt.}
 
 \item{channel}{channels to melt.}
 
-\item{sampling_ratio}{sampling ratio.}
+\item{sampling_ratio}{a sampling ratio if need to reduce data points.}
 
-\item{sampling_colFunc}{sampling function.}
+\item{sampling_func}{a sampling function if sampling_ratio > 1.}
 
-\item{time_unit}{time unit of the melted data, can be tick, us, ms, s, min or hr.}
+\item{sampling_colFunc}{a column vectorised sampling function, use instead of
+sampling_func for better performance.}
 
-\item{...}{further arguments passed to sampling_colFunc}
+\item{time_unit}{a time unit.}
 
-\item{value.name}{a string to identify/name channel columns, default is named
-by channel description without unit.}
+\item{...}{passed to sampling_func or sampling_colFunc.}
+
+\item{value.name}{a character vector to identity channel columns.}
 }
 \value{
-a melted data frame.
+a data.frame
 }
 \description{
 Melt an abf object into a data.frame grouped by episodes. A time column with
@@ -35,7 +38,6 @@ unit provided by time_unit is added to encode time dimension of the orignal
 abf object.
 }
 \details{
-For performance consideration, sampling_colFunc should be a vectorised column
-function such as colMeans etc, which apply sampling functions to sampled data
-points by columns of episodes.
+For performance consideration, using a column function by sampling_colFunc is
+strongly encouraged.
 }

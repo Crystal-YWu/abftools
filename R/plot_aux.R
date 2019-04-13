@@ -53,16 +53,16 @@ FreqToTick <- function(abf, freq) {
   ceiling(tick)
 }
 
-TickToTime <- function(abf, time_unit, ctick) {
+TickToTime <- function(abf, time_unit = c("tick", "us", "ms", "s", "min", "hr"), ctick) {
 
+  time_unit <- match.arg(time_unit)
   ctime <- switch(time_unit,
                   tick = ctick,
                   us =  (ctick - 1L) * GetSamplingIntv(abf),
                   ms =  (ctick - 1L) * GetSamplingIntv(abf) / 1000,
                   s  =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000,
                   min = (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60,
-                  hr =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60,
-                  err_time_unit())
+                  hr =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60)
 
   ctime
 }

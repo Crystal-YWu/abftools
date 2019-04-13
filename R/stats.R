@@ -57,7 +57,7 @@ SmplAbf <- function(abf, sampling_ratio, sampling_colFunc = NULL, ...) {
 
   CheckArgs(abf)
 
-  data <- Sample3d_dim1(abf, sampling_ratio, sampling_colFunc, ...)
+  data <- sample3d_dim1(abf, sampling_ratio, sampling_colFunc, ...)
   CpAbfAttr(data, abf)
 
   old_samp_intv <- GetSamplingIntv(abf)

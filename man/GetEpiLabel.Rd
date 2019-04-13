@@ -4,7 +4,7 @@
 \alias{GetEpiLabel}
 \title{Get label for every episode of an abf object}
 \usage{
-GetEpiLabel(abf, style = "epi\%d")
+GetEpiLabel(abf, style)
 }
 \arguments{
 \item{abf}{an abf object}
