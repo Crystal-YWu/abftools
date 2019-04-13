@@ -1,3 +1,10 @@
+#' Mask a time interval
+#'
+#' @param intv
+#'
+#' @return an integer vector
+#' @export
+#'
 MaskIntv <- function(intv) {
   #TODO: A good solution to distinguish intv and curs
 
