@@ -4,7 +4,7 @@
 \alias{GetChanLabel}
 \title{Get channel label for every channel of an abf object.}
 \usage{
-GetChanLabel(abf, style = "\%s (\%s)")
+GetChanLabel(abf, style)
 }
 \arguments{
 \item{abf}{an abf object}

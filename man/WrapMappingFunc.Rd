@@ -6,8 +6,8 @@
 \title{Wrap a mapping function to batch process abf channel data.}
 \usage{
 WrapMappingFunc(map_func, channel, abf_id_func = NULL,
-  epi_id_func = NULL, chan_id_func = DefaultChanLabel, ret.df = TRUE,
-  ...)
+  epi_id_func = DefaultEpiLabel, chan_id_func = DefaultChanLabel,
+  ret.df = TRUE, ...)
 
 wrap(...)
 }
@@ -22,9 +22,9 @@ wrap(...)
 
 \item{chan_id_func}{OPTIONAL, a function accepts an abf object and returns a vectors of identifiers of all channels.}
 
-\item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE}
+\item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE.}
 
-\item{...}{further arguments passed to map_func}
+\item{...}{further arguments passed to map_func.}
 }
 \value{
 a function of f(abf, intv).

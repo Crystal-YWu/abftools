@@ -38,7 +38,7 @@ CropValue <- function(abf, channel, max_value, min_value) {
 #' @return a vector of characters.
 #' @export
 #'
-GetChanLabel <- function(abf, style = "%s (%s)") {
+GetChanLabel <- function(abf, style) {
 
   if (!IsAbf(abf)) {
     err_class_abf()
@@ -56,7 +56,7 @@ GetChanLabel <- function(abf, style = "%s (%s)") {
 #'
 DefaultChanLabel <- function(abf) {
 
-  GetChanLabel(abf)
+  GetChanLabel(abf, style = "%s (%s)")
 }
 
 #' Get label for every episode of an abf object
@@ -67,7 +67,7 @@ DefaultChanLabel <- function(abf) {
 #' @return a vector of characters.
 #' @export
 #'
-GetEpiLabel <- function(abf, style = "epi%d") {
+GetEpiLabel <- function(abf, style) {
 
   if (IsAbf(abf)) {
     nep <- nEpi(abf)
@@ -93,7 +93,7 @@ GetEpiLabel <- function(abf, style = "epi%d") {
 #'
 DefaultEpiLabel <- function(abf) {
 
-  GetEpiLabel(abf)
+  GetEpiLabel(abf, style = "epi%d")
 }
 
 
