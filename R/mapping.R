@@ -81,7 +81,7 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
       chan <- sprintf("%s%d", value.name, channel)
     }
   }
-  data <- reduce_lastdim(data, cols = chan)
+  data <- reduce_lastdim(data, names = chan)
 
   tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
   time <- rep(TickToTime(abf, time_unit, tick), nepi)
@@ -207,7 +207,7 @@ WrapMappingFuncAlong <- function(map_func, along = c("time", "episode", "channel
 
     #reduce
     dim_names <- get_dim_names(abf, mask_time, mask_epi, mask_chan)
-    ans <- reduce_lastdim(ans, col = dim_names[[dim_col]])
+    ans <- reduce_lastdim(ans, names = dim_names[[dim_col]])
 
     #extra id columns
     xcol <- list()
