@@ -39,13 +39,13 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
     t_start <- 1L
     t_end <- npts
     if (!is.null(sampling_colFunc)) {
-      data <- samplend_col(x = abf[, epi, channel],
+      data <- samplend_col(x = abf[, epi, channel, drop = FALSE],
                            ratio = sampling_ratio,
                            colFunc = sampling_colFunc,
                            along = 1L,
                            ...)
     } else {
-      data <- samplend(x = abf[, epi, channel],
+      data <- samplend(x = abf[, epi, channel, drop = FALSE],
                        ratio = sampling_ratio,
                        func = sampling_func,
                        along = 1L,
@@ -57,13 +57,13 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
     t_start <- mask[1L]
     t_end <- mask[npts]
     if (!is.null(sampling_colFunc)) {
-      data <- samplend_col(x = abf[mask, epi, channel],
+      data <- samplend_col(x = abf[mask, epi, channel, drop = FALSE],
                            ratio = sampling_ratio,
                            colFunc = sampling_colFunc,
                            along = 1L,
                            ...)
     } else {
-      data <- samplend(x = abf[mask, epi, channel],
+      data <- samplend(x = abf[mask, epi, channel, drop = FALSE],
                        ratio = sampling_ratio,
                        func = sampling_func,
                        along = 1L,
@@ -75,11 +75,7 @@ MeltAbf <- function(abf, intv = NULL, channel = 1L,
   if (is.null(value.name)) {
     chan <- GetChannelDesc(abf, channel = channel)
   } else {
-    if (length(value.name) == length(channel)) {
-      chan <- as.character(value.name)
-    } else {
-      chan <- sprintf("%s%d", value.name, channel)
-    }
+    chan <- sprintf("%s%d", value.name, channel)
   }
   data <- reduce_lastdim(data, names = chan)
 
