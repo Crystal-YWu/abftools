@@ -4,7 +4,7 @@
 \alias{apply_unsafe}
 \title{An unsafe apply()}
 \usage{
-apply_unsafe(x, along, func_, ...)
+apply_unsafe(x, along, func_, keep_dim = FALSE, ...)
 }
 \arguments{
 \item{x}{an array.}
@@ -12,6 +12,8 @@ apply_unsafe(x, along, func_, ...)
 \item{along}{dimension to apply along.}
 
 \item{func_}{a function to apply.}
+
+\item{keep_dim}{keep dim order}
 
 \item{...}{passed to func_}
 }

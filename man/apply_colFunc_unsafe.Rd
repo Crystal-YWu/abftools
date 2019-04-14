@@ -4,7 +4,7 @@
 \alias{apply_colFunc_unsafe}
 \title{An unsafe apply() that applies a column function}
 \usage{
-apply_colFunc_unsafe(x, along, colFunc_, ...)
+apply_colFunc_unsafe(x, along, colFunc_, keep_dim = FALSE, ...)
 }
 \arguments{
 \item{x}{an array.}
@@ -13,10 +13,12 @@ apply_colFunc_unsafe(x, along, colFunc_, ...)
 
 \item{colFunc_}{a column function to apply.}
 
+\item{keep_dim}{keep dim order}
+
 \item{...}{passed to colFunc_}
 }
 \value{
-
+an array
 }
 \description{
 Same as apply_unsafe() but applies a column function. The same funtionality

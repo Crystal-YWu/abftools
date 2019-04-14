@@ -180,13 +180,12 @@ PackArgs <- function(f, ...) {
 #' @param func_name a optimised function name.
 #' @param along the axis to map the function to (dims to collapse).
 #' @param pack_args whether to pack arguments for func.
-#' @param keep_dim whether to preserve original dim order.
 #' @param ... other arguments passed to func.
 #'
 #' @return an array (dimension depending on returned dimension of func)
 #' @export
 #'
-mapnd <- function(x, func, along = 1L, pack_args = FALSE, keep_dim = FALSE, ...) {
+mapnd <- function(x, func, along = 1L, pack_args = FALSE, ...) {
 
   if (length(along) > 1L) {
     err_invalid_axis(along)
@@ -200,24 +199,24 @@ mapnd <- function(x, func, along = 1L, pack_args = FALSE, keep_dim = FALSE, ...)
       guess_func <- find_colFunc(func_name = func)
       if (!is.null(guess_func)) {
         return(
-          apply_colFunc_unsafe(x = x, along = along, colFunc_ = guess_func, keep_dim = keep_dim, ...)
+          apply_colFunc_unsafe(x = x, along = along, colFunc_ = guess_func, ...)
         )
       }
     }
-    apply_unsafe(x = x, along = along, func_ = func, keep_dim = keep_dim, ...)
+    apply_unsafe(x = x, along = along, func_ = func, ...)
   }
 }
 
 #' @rdname mapnd
 #' @export
 #'
-mapnd_col <- function(x, colFunc, along = 1L, keep_dim = FALSE, ...) {
+mapnd_col <- function(x, colFunc, along = 1L, ...) {
 
   if (length(along) > 1L) {
     err_invalid_axis(along)
   }
 
-  apply_colFunc_unsafe(x = x, along = along, colFunc_ = colFunc, keep_dim = keep_dim, ...)
+  apply_colFunc_unsafe(x = x, along = along, colFunc_ = colFunc, ...)
 }
 
 #' Sample an nd-array evenly by ratio.
