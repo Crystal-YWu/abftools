@@ -8,11 +8,12 @@
 #' @param x an array.
 #' @param along dimension to apply along.
 #' @param func_ a function to apply.
+#' @param keep_dim keep dim order
 #' @param ... passed to func_
 #'
 #' @return an array.
 #'
-apply_unsafe <- function(x, along, func_, ...) {
+apply_unsafe <- function(x, along, func_, keep_dim = FALSE, ...) {
 
   func_ <- match.fun(func_)
 
@@ -44,13 +45,21 @@ apply_unsafe <- function(x, along, func_, ...) {
 
   if (l_ans == 1L) {
     #collapse dim
-    dim(ans) <- dim_loop
+    if (keep_dim) {
+      dim(ans) <- c(1L, dim_loop)
+    } else {
+      dim(ans) <- dim_loop
+    }
   } else {
     #attach dim
     dim(ans) <- c(length(ans) %/% len_loop, dim_loop)
   }
 
-  ans
+  if (keep_dim) {
+    aperm(ans, order(c(data_dim, loop_dim)))
+  } else {
+    ans
+  }
 }
 
 #' An unsafe apply() that applies a column function
@@ -62,11 +71,12 @@ apply_unsafe <- function(x, along, func_, ...) {
 #' @param x an array.
 #' @param along dimension to apply along.
 #' @param colFunc_ a column function to apply.
+#' @param keep_dim keep dim order
 #' @param ... passed to colFunc_
 #'
-#' @return
+#' @return an array
 #'
-apply_colFunc_unsafe <- function(x, along, colFunc_, ...) {
+apply_colFunc_unsafe <- function(x, along, colFunc_, keep_dim = FALSE, ...) {
 
   colFunc_ <- match.fun(colFunc_)
 
@@ -107,14 +117,22 @@ apply_colFunc_unsafe <- function(x, along, colFunc_, ...) {
 
   if (l_ans == dim_col) {
     #collapse dim
-    dim(ans) <- c(dim_col, dim_loop)
+    if (keep_dim) {
+      dim(ans) <- c(1L, dim_col, dim_loop)
+    } else {
+      dim(ans) <- c(dim_col, dim_loop)
+    }
   } else {
     #I can't think of any colFunc would return multiple values for each cols,
     #but anyway, attach dim
     dim(ans) <- c(length(ans) %/% prod(c(dim_col, dim_loop)), dim_col, dim_loop)
   }
 
-  ans
+  if (keep_dim) {
+    aperm(ans, order(c(data_dim, col_dim, loop_dim)))
+  } else {
+    ans
+  }
 }
 
 #' Packing arguments in function call
@@ -162,12 +180,13 @@ PackArgs <- function(f, ...) {
 #' @param func_name a optimised function name.
 #' @param along the axis to map the function to (dims to collapse).
 #' @param pack_args whether to pack arguments for func.
+#' @param keep_dim whether to preserve original dim order.
 #' @param ... other arguments passed to func.
 #'
 #' @return an array (dimension depending on returned dimension of func)
 #' @export
 #'
-mapnd <- function(x, func, along = 1L, pack_args = FALSE, ...) {
+mapnd <- function(x, func, along = 1L, pack_args = FALSE, keep_dim = FALSE, ...) {
 
   if (length(along) > 1L) {
     err_invalid_axis(along)
@@ -181,24 +200,24 @@ mapnd <- function(x, func, along = 1L, pack_args = FALSE, ...) {
       guess_func <- find_colFunc(func_name = func)
       if (!is.null(guess_func)) {
         return(
-          apply_colFunc_unsafe(x = x, along = along, colFunc_ = guess_func)
+          apply_colFunc_unsafe(x = x, along = along, colFunc_ = guess_func, keep_dim = keep_dim, ...)
         )
       }
     }
-    apply_unsafe(x = x, along = along, func_ = func, ...)
+    apply_unsafe(x = x, along = along, func_ = func, keep_dim = keep_dim, ...)
   }
 }
 
 #' @rdname mapnd
 #' @export
 #'
-mapnd_col <- function(x, colFunc, along = 1L, ...) {
+mapnd_col <- function(x, colFunc, along = 1L, keep_dim = FALSE, ...) {
 
   if (length(along) > 1L) {
     err_invalid_axis(along)
   }
 
-  apply_colFunc_unsafe(x = x, along = along, colFunc_ = colFunc, ...)
+  apply_colFunc_unsafe(x = x, along = along, colFunc_ = colFunc, keep_dim = keep_dim, ...)
 }
 
 #' Sample an nd-array evenly by ratio.
@@ -227,13 +246,14 @@ samplend <- function(x, ratio = 1L, func = NULL, along = 1L, ...) {
     guess_func <- find_colFunc(func_name = func)
     if (!is.null(guess_func)) {
       return(
-        apply_colFunc_unsafe(x = x, along = along, colFunc_ = sample1d_col,
-                             ratio = ratio, colFunc = guess_func, ...)
+        apply_unsafe(x = x, along = along, func_ = sample1d_col,
+                     ratio = ratio, colFunc = guess_func, ...)
       )
     }
   }
 
-  apply_unsafe(x = x, along = along, func_ = sample1d, ratio = ratio, func = func, ...)
+  apply_unsafe(x = x, along = along, func_ = sample1d, keep_dim = TRUE,
+               ratio = ratio, func = func, ...)
 }
 
 #' @rdname samplend
@@ -245,8 +265,8 @@ samplend_col <- function(x, ratio = 1L, colFunc = NULL, along = 1L, ...) {
     err_invalid_axis(along)
   }
 
-  apply_colFunc_unsafe(x = x, along = along, colFunc_ = sample1d_col,
-                       ratio = ratio, colFunc = colFunc, ...)
+  apply_unsafe(x = x, along = along, func_ = sample1d_col, keep_dim = TRUE,
+               ratio = ratio, colFunc = colFunc, ...)
 }
 
 sample1d <- function(x, ratio, func = NULL, ...) {
