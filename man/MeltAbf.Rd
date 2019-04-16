@@ -5,36 +5,46 @@
 \title{Melt an abf object.}
 \usage{
 MeltAbf(abf, intv = NULL, along = c("episode", "channel"),
+  format = c("wide", "long"), abf_id_func = NULL,
   epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
-  sample_ratio = 1L, sample_func = "mean", time_unit = c("tick",
-  "us", "ms", "s", "min", "hr"), ..., value.name = NULL)
+  sample_ratio = 1L, sample_func = "mean", sample_colFunc = NULL,
+  time_unit = c("tick", "us", "ms", "s", "min", "hr"), ...,
+  value.name = "value")
 }
 \arguments{
 \item{abf}{an abf object.}
 
 \item{intv}{a time interval to melt.}
 
+\item{along}{the axis/dimension to melt along.}
+
+\item{format}{the format of returned data.frame.}
+
+\item{abf_id_func}{function to tag id column.}
+
+\item{epi_id_func}{function to tag episode column.}
+
+\item{chan_id_func}{function to tag channel column.}
+
 \item{sample_ratio}{a sampling ratio if need to reduce data points.}
 
 \item{sample_func}{a sampling function if sample_ratio > 1.}
+
+\item{sample_colFunc}{a sampling column function.}
 
 \item{time_unit}{a time unit.}
 
 \item{...}{passed to sample_func or sample_colFunc.}
 
-\item{value.name}{a character vector to identity channel columns.}
-
-\item{channel}{channels to melt.}
+\item{value.name}{a character vector to tag value column, only used when format is long.}
 }
 \value{
 a data.frame
 }
 \description{
-Melt an abf object into a data.frame grouped by episodes. A time column with
-unit provided by time_unit is added to encode time dimension of the orignal
-abf object.
+Flatten an abf object to 2d data.frame by sampling along time dimension.
 }
 \details{
-For performance consideration, using a column function by sample_colFunc is
-strongly encouraged.
+For performance consideration, using a column function by sample_colFunc or
+a function name supported by find_colFunc() is strongly encouraged.
 }

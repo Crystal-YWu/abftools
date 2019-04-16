@@ -30,30 +30,6 @@ CropValue <- function(abf, channel, max_value, min_value) {
   abf
 }
 
-#' Get default channel label for every channel of an abf object.
-#'
-#' @param abf an abf object
-#'
-#' @return a vector of characters.
-#' @export
-#'
-DefaultChanLabel <- function(abf) {
-
-  GetChanLabel(abf, style = "%s (%s)")
-}
-
-#' Get default label for every episode of an abf object
-#'
-#' @param abf an abf object
-#'
-#' @return a vector of characters.
-#' @export
-#'
-DefaultEpiLabel <- function(abf) {
-
-  GetEpiLabel(abf, style = "epi%d")
-}
-
 ZeroAxes2 <- function(xlimit, ylimit,
                      xlabel = NULL, ylabel = NULL,
                      xticks = 5, yticks = 5,
