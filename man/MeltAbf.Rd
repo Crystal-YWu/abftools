@@ -4,8 +4,9 @@
 \alias{MeltAbf}
 \title{Melt an abf object.}
 \usage{
-MeltAbf(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
-  sample_func = NULL, sample_colFunc = NULL, time_unit = c("tick",
+MeltAbf(abf, intv = NULL, along = c("episode", "channel"),
+  epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
+  sample_ratio = 1L, sample_func = "mean", time_unit = c("tick",
   "us", "ms", "s", "min", "hr"), ..., value.name = NULL)
 }
 \arguments{
@@ -13,20 +14,17 @@ MeltAbf(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
 
 \item{intv}{a time interval to melt.}
 
-\item{channel}{channels to melt.}
-
 \item{sample_ratio}{a sampling ratio if need to reduce data points.}
 
 \item{sample_func}{a sampling function if sample_ratio > 1.}
-
-\item{sample_colFunc}{a column vectorised sampling function, used instead of
-sample_func for better performance if not NULL.}
 
 \item{time_unit}{a time unit.}
 
 \item{...}{passed to sample_func or sample_colFunc.}
 
 \item{value.name}{a character vector to identity channel columns.}
+
+\item{channel}{channels to melt.}
 }
 \value{
 a data.frame
