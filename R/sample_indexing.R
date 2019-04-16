@@ -13,24 +13,30 @@
 #'
 SelectSample <- function(sample_index, ...) {
 
-  cvalue <- list(...)
-  df <- as.data.frame(sample_index)
+  args <- list(...)
+  idx <- rep(TRUE, nrow(sample_index))
 
-  idx <- rep(TRUE, nrow(df))
-  for (i in names(cvalue)) {
-    if (i == "") {
-      nvpair <- cvalue[[i]]
-      if (length(nvpair) != 2L) {
-        warning(paste0("Unnamed value ", nvpair, " ignored."))
+  keys <- names(args)
+  cols <- names(sample_index)
+  for (i in seq_along(args)) {
+    if (keys[i] == "") {
+      if (length(args[i]) != 2L) {
+        warning(paste("Unnamed value", args[i], "ignored."))
         next
       }
-      idx <- idx & (unlist(df[nvpair[1]]) %in% nvpair[2])
+      k <- args[[i]][1]
+      v <- args[[i]][2]
     } else {
-      idx <- idx & (unlist(df[i]) %in% cvalue[[i]])
+      k <- keys[i]
+      v <- args[[i]]
     }
+    if (!k %in% cols) {
+      next
+    }
+    idx <- idx & (sample_index[[k]] %in% v)
   }
 
-  return(sample_index[idx, ])
+  sample_index[idx, ]
 }
 
 #' Exclude samples conditionally
@@ -48,22 +54,28 @@ SelectSample <- function(sample_index, ...) {
 #'
 ExcludeSample <- function(sample_index, ...) {
 
-  cvalue <- list(...)
-  df <- as.data.frame(sample_index)
+  args <- list(...)
+  idx <- rep(TRUE, nrow(sample_index))
 
-  idx <- rep(TRUE, nrow(df))
-  for (i in names(cvalue)) {
-    if (i == "") {
-      nvpair <- cvalue[[i]]
-      if (length(nvpair) != 2L) {
-        warning(paste0("Unnamed value ", nvpair, " ignored."))
+  keys <- names(args)
+  cols <- names(sample_index)
+  for (i in seq_along(args)) {
+    if (keys[i] == "") {
+      if (length(args[i]) != 2L) {
+        warning(paste("Unnamed value", args[i], "ignored."))
         next
       }
-      idx <- idx & !(unlist(df[nvpair[1]]) %in% nvpair[2])
+      k <- args[[i]][1]
+      v <- args[[i]][2]
     } else {
-      idx <- idx & !(unlist(df[i]) %in% cvalue[[i]])
+      k <- keys[i]
+      v <- args[[i]]
     }
+    if (!k %in% cols) {
+      next
+    }
+    idx <- idx & !(sample_index[[k]] %in% v)
   }
 
-  return(sample_index[idx, ])
+  sample_index[idx, ]
 }
