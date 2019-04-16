@@ -243,3 +243,62 @@ ApplyForceZoomY <- function(p, xrange, yrange = NULL, space = 0.0125, clipping =
   p + ForceZoomY(xrange = xrange, yrange = yrange,
                  xdata = xdata, ydata = ydata, space = space, clipping = clipping)
 }
+
+
+#' Get default facet labeller for an abf object.
+#'
+#' @param abf an abf object.
+#'
+#' @return a labeller.
+#' @export
+#'
+DefaultLabeller <- function(abf) {
+
+  CheckArgs(abf)
+
+  channel.labs <- DefaultChanLabel(abf)
+  names(channel.labs) <- GetChanTag(GetAllChannels(abf))
+
+  episode.labs <- DefaultEpiLabel(abf)
+  names(episode.labs) <- GetEpiTag(GetAllEpisodes(abf))
+
+  ggplot2::labeller(Channel = channel.labs, Episode = episode.labs)
+}
+
+#' @rdname ApplyCursor
+#' @export
+#'
+CursorX <- function(cursor) {
+
+  geom_vline(xintercept = cursor, linetype = "dashed")
+}
+
+#' @rdname ApplyCursor
+#' @export
+#'
+CursorY <- function(cursor) {
+
+  geom_vline(yintercept = cursor, linetype = "dashed")
+}
+
+#' Apply indicative cursors on plot.
+#'
+#' @param p a ggplot object
+#' @param cursor a numeric vector.
+#' @param cursor_x a numeric vector.
+#' @param cursor_y a numeric vector.
+#'
+#' @return a ggplot object.
+#' @export
+#'
+ApplyCursor <- function(p, cursor_x = NULL, cursor_y = NULL) {
+
+  if (!is.null(cursor_x)) {
+    p <- p + CursorX(cursor = cursor_x)
+  }
+  if (!is.null(cursor_y)) {
+    p <- p + CursorY(cursor = cursor_y)
+  }
+
+  p
+}
