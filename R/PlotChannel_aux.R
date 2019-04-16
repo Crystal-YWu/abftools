@@ -6,7 +6,7 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   ytag <- sprintf("value%d", channel)
 
   #Plot
-  p <- ggplot(df, aes_string("time", ytag)) + theme_classic()
+  p <- ggplot(df, aes_string("Time", ytag)) + theme_classic()
   if (colour) {
     p <- p + geom_line(aes_string(colour = "Episode"))
   } else {
@@ -21,11 +21,11 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   #remove NAs from cursor
   curs <- curs[!is.na(curs)]
   if (!is.null(intv)) {
-    intv_tu <- TickToTime(abf, time_unit, intv)
+    intv_tu <- TickToTime(abf, intv, time_unit)
     p <- p + geom_vline(xintercept = intv_tu[1:2], linetype = "dashed")
   }
   if (!is.null(curs)) {
-    curs_tu <- TickToTime(abf, time_unit, curs)
+    curs_tu <- TickToTime(abf, curs, time_unit)
     p <- p + geom_vline(xintercept = curs_tu, linetype = "dashed")
   }
 

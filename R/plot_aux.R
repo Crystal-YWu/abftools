@@ -53,23 +53,118 @@ FreqToTick <- function(abf, freq) {
   ceiling(tick)
 }
 
-TickToTime <- function(abf, time_unit = c("tick", "us", "ms", "s", "min", "hr"), ctick) {
+#' Convert tick (array index) to time unit.
+#'
+#' @param abf an abf object.
+#' @param tick a vector of integer.
+#' @param time_unit desired time unit.
+#'
+#' @return a vector of numeric.
+#' @export
+#'
+TickToTime <- function(abf, tick, time_unit = c("tick", "us", "ms", "s", "min", "hr")) {
 
   time_unit <- match.arg(time_unit)
-  ctime <- switch(time_unit,
-                  tick = ctick,
-                  us =  (ctick - 1L) * GetSamplingIntv(abf),
-                  ms =  (ctick - 1L) * GetSamplingIntv(abf) / 1000,
-                  s  =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000,
-                  min = (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60,
-                  hr =  (ctick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60)
+  time <- switch(time_unit,
+                 tick = tick,
+                 us =  (tick - 1L) * GetSamplingIntv(abf),
+                 ms =  (tick - 1L) * GetSamplingIntv(abf) / 1000,
+                 s  =  (tick - 1L) * GetSamplingIntv(abf) / 1000 / 1000,
+                 min = (tick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60,
+                 hr =  (tick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60)
 
-  ctime
-}
-
-GetAxisLabel <- function(desc, unit, style = "%s (%s)") {
-
-  sprintf(style, desc, unit)
+  time
 }
 
 
+#####################################
+
+
+GetAxisLabel <- function(desc, unit, style) sprintf(style, desc, unit)
+
+
+
+#' Compose labels for every episode/channel of an abf object
+#'
+#' @param abf an abf object
+#' @param style a format string
+#'
+#' @return a vector of characters.
+#' @export
+#'
+GetEpiLabel <- function(abf, style = "epi%d") {
+
+  if (IsAbf(abf)) {
+    nep <- nEpi(abf)
+  } else if (is.numeric(abf)) {
+    nep <- as.integer(abf)
+  } else {
+    err_class_abf()
+  }
+
+  if (length(nep) == 1L) {
+    sprintf(style, seq_len(nep))
+  } else {
+    sprintf(style, nep)
+  }
+}
+
+#' @rdname GetEpiLabel
+#' @export
+#'
+GetChanLabel <- function(abf, style = "%s (%s)") {
+
+  if (!IsAbf(abf)) {
+    err_class_abf()
+  }
+
+  GetAxisLabel(GetChannelDesc(abf), GetChannelUnit(abf), style = style)
+}
+
+#' @rdname GetEpiLabel
+#' @export
+#'
+DefaultEpiLabel <- function(abf) {
+
+  GetEpiLabel(abf, style = "epi%d")
+}
+
+#' @rdname GetEpiLabel
+#' @export
+#'
+DefaultChanLabel <- function(abf) {
+
+  GetChanLabel(abf, style = "%s (%s)")
+}
+
+#' Compose default episode/channel number tag.
+#'
+#' @param episode episode numbers
+#' @param channel channel numbers
+#'
+#' @return a vector of characters
+#' @export
+#'
+#' @examples
+#' epi_tag <- GetEpiTag(c(1,3,4,5))
+#' ch_tag <- GetChanTag(2:3)
+GetEpiTag <- function(episode) {
+
+  if (IsAbf(episode)) {
+    episode <- GetAllEpisodes(episode)
+  }
+
+  sprintf("epi%d", episode)
+}
+
+#' @rdname GetEpiTag
+#' @export
+#'
+GetChanTag <- function(channel) {
+
+  if (IsAbf(channel)) {
+    channel <- GetAllChannels(channel)
+  }
+
+  sprintf("chan%d", channel)
+}

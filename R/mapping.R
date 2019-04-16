@@ -4,93 +4,107 @@
 #' unit provided by time_unit is added to encode time dimension of the orignal
 #' abf object.
 #'
-#' For performance consideration, using a column function by sampling_colFunc is
+#' For performance consideration, using a column function by sample_colFunc is
 #' strongly encouraged.
 #'
 #' @param abf an abf object.
 #' @param intv a time interval to melt.
 #' @param channel channels to melt.
-#' @param sampling_ratio a sampling ratio if need to reduce data points.
-#' @param sampling_func a sampling function if sampling_ratio > 1.
-#' @param sampling_colFunc a column vectorised sampling function, use instead of
-#' sampling_func for better performance.
+#' @param sample_ratio a sampling ratio if need to reduce data points.
+#' @param sample_func a sampling function if sample_ratio > 1.
 #' @param time_unit a time unit.
-#' @param ... passed to sampling_func or sampling_colFunc.
+#' @param ... passed to sample_func or sample_colFunc.
 #' @param value.name a character vector to identity channel columns.
 #'
 #' @return a data.frame
 #' @export
 #'
-MeltAbf <- function(abf, intv = NULL, channel = 1L,
-                    sampling_ratio = 1L, sampling_func = NULL, sampling_colFunc = NULL,
+MeltAbf <- function(abf, intv = NULL, along = c("episode", "channel"),
+                    epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
+                    sample_ratio = 1L, sample_func = "mean",
                     time_unit = c("tick", "us", "ms", "s", "min", "hr"), ...,
                     value.name = NULL) {
 
-  CheckArgs(abf, chan = channel)
+  CheckArgs(abf)
 
   time_unit <- match.arg(time_unit)
+  along <- match.arg(along)
 
   epi <- GetAvailEpisodes(abf)
   nepi <- length(epi)
+  chan <- GetAllChannels(abf)
+  nchan <- length(chan)
 
   #map
   if (is.null(intv)) {
     npts <- nPts(abf)
     t_start <- 1L
     t_end <- npts
-    if (!is.null(sampling_colFunc)) {
-      data <- samplend_col(x = abf[, epi, channel, drop = FALSE],
-                           ratio = sampling_ratio,
-                           colFunc = sampling_colFunc,
-                           along = 1L,
-                           ...)
-    } else {
-      data <- samplend(x = abf[, epi, channel, drop = FALSE],
-                       ratio = sampling_ratio,
-                       func = sampling_func,
-                       along = 1L,
-                       ...)
-    }
+    data <- samplend(x = abf[, epi, chan, drop = FALSE],
+                     ratio = sample_ratio,
+                     func = sample_func,
+                     along = 1L,
+                     ...)
   } else {
     mask <- MaskIntv(intv)
     npts <- length(mask)
     t_start <- mask[1L]
     t_end <- mask[npts]
-    if (!is.null(sampling_colFunc)) {
-      data <- samplend_col(x = abf[mask, epi, channel, drop = FALSE],
-                           ratio = sampling_ratio,
-                           colFunc = sampling_colFunc,
-                           along = 1L,
-                           ...)
+    data <- samplend(x = abf[mask, epi, chan, drop = FALSE],
+                     ratio = sample_ratio,
+                     func = sample_func,
+                     along = 1L,
+                     ...)
+  }
+
+  #time
+  tick <- seq.int(from = t_start, to = t_end, by = sample_ratio)
+  #episode
+  if (is.function(epi_id_func)) {
+    epi_id <- epi_id_func(abf)[epi]
+  } else {
+    epi_id <- unlist(epi_id_func)[epi]
+  }
+  #channel
+  if (is.function(chan_id_func)) {
+    chan_id <- chan_id_func(abf)[chan]
+  } else {
+    chan_id <- unlist(chan_id_func)[chan]
+  }
+  #time & episode/channel id column
+  if (along == "episode") {
+    if (is.null(value.name)) {
+      value.name <- chan_id
     } else {
-      data <- samplend(x = abf[mask, epi, channel, drop = FALSE],
-                       ratio = sampling_ratio,
-                       func = sampling_func,
-                       along = 1L,
-                       ...)
+      value.name <- sprintf("%s%d", value.name, chan)
     }
+    ep <- as.factor(matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE))
+    levels(ep) <- epi_id
+    time <- rep(TickToTime(abf, tick = tick, time_unit = time_unit), nepi)
+    xcol <- list(
+      Time = time,
+      Episode = ep
+    )
+  } else {
+    if (is.null(value.name)) {
+      value.name <- epi_id
+    } else {
+      value.name <- sprintf("%s%d", value.name, epi)
+    }
+    ch <- as.factor(matrix(chan, nrow = length(tick), ncol = nchan, byrow = TRUE))
+    levels(ch) <- chan_id
+    time <- rep(TickToTime(abf, tick = tick, time_unit = time_unit), nchan)
+    xcol <- list(
+      Time = time,
+      Channel = ch
+    )
   }
 
   #reduce
-  if (is.null(value.name)) {
-    chan <- GetChannelDesc(abf, channel = channel)
-  } else {
-    chan <- sprintf("%s%d", value.name, channel)
-  }
-  data <- reduce_lastdim(data, names = chan)
-
-  tick <- seq.int(from = t_start, to = t_end, by = sampling_ratio)
-  time <- rep(TickToTime(abf, time_unit, tick), nepi)
-
-  ep <- as.factor(matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE))
-  levels(ep) <- DefaultEpiLabel(epi)
-
-  time_ep <- list(
-    Time = time,
-    Episode = ep
-  )
-
-  data.frame(c(time_ep, data))
+  data <- reduce_along(data,
+                       along = switch(along, episode = 3L, channel = 2L),
+                       names = value.name)
+  data.frame(c(xcol, data))
 }
 
 #' Wrap a mapping function along specific axis to batch process abf data.
@@ -140,7 +154,7 @@ WrapMappingFuncAlong <- function(map_func, along = c("time", "episode", "channel
       #do not generate dim 1 if along time
       ans[[1]] <- NA
     } else {
-      ans[[1]] <- TickToTime(abf, time_unit, mask_time)
+      ans[[1]] <- TickToTime(abf, tick = mask_time, time_unit = time_unit)
     }
     #dim 2
     if (is.null(epi_id_func)) {

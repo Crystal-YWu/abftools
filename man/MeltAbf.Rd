@@ -4,10 +4,9 @@
 \alias{MeltAbf}
 \title{Melt an abf object.}
 \usage{
-MeltAbf(abf, intv = NULL, channel = 1L, sampling_ratio = 1L,
-  sampling_func = NULL, sampling_colFunc = NULL,
-  time_unit = c("tick", "us", "ms", "s", "min", "hr"), ...,
-  value.name = NULL)
+MeltAbf(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
+  sample_func = NULL, sample_colFunc = NULL, time_unit = c("tick",
+  "us", "ms", "s", "min", "hr"), ..., value.name = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
@@ -16,16 +15,16 @@ MeltAbf(abf, intv = NULL, channel = 1L, sampling_ratio = 1L,
 
 \item{channel}{channels to melt.}
 
-\item{sampling_ratio}{a sampling ratio if need to reduce data points.}
+\item{sample_ratio}{a sampling ratio if need to reduce data points.}
 
-\item{sampling_func}{a sampling function if sampling_ratio > 1.}
+\item{sample_func}{a sampling function if sample_ratio > 1.}
 
-\item{sampling_colFunc}{a column vectorised sampling function, use instead of
-sampling_func for better performance.}
+\item{sample_colFunc}{a column vectorised sampling function, used instead of
+sample_func for better performance if not NULL.}
 
 \item{time_unit}{a time unit.}
 
-\item{...}{passed to sampling_func or sampling_colFunc.}
+\item{...}{passed to sample_func or sample_colFunc.}
 
 \item{value.name}{a character vector to identity channel columns.}
 }
@@ -38,6 +37,6 @@ unit provided by time_unit is added to encode time dimension of the orignal
 abf object.
 }
 \details{
-For performance consideration, using a column function by sampling_colFunc is
+For performance consideration, using a column function by sample_colFunc is
 strongly encouraged.
 }

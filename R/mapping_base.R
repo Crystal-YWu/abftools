@@ -5,38 +5,38 @@
 #'
 #' Basically apply() without validating anything.
 #'
-#' @param x an array.
-#' @param along dimension to apply along.
+#' @param x_ an array.
+#' @param along_ dimension to apply along.
 #' @param func_ a function to apply.
-#' @param keep_dim keep dim order
+#' @param keep_dim_ keep dim order
 #' @param ... passed to func_
 #'
 #' @return an array.
 #'
-apply_unsafe <- function(x, along, func_, keep_dim = FALSE, ...) {
+apply_unsafe <- function(x_, along_, func_, keep_dim_ = FALSE, ...) {
 
   func_ <- match.fun(func_)
 
-  d <- dim(x)
+  d <- dim(x_)
   dim_len <- length(d)
   dim_perm <- seq_len(dim_len)
   if (!dim_len) {
     stop("x must be multi-dimensional.")
   }
 
-  data_dim <- along
+  data_dim <- along_
 
   dim_data <- d[data_dim]
   dim_loop <- d[-data_dim]
   len_loop <- prod(dim_loop)
-  loop_dim <- dim_perm[-along]
+  loop_dim <- dim_perm[-along_]
 
-  x <- aperm(x, c(data_dim, loop_dim))
-  dim(x) <- c(dim_data, len_loop)
+  x_ <- aperm(x_, c(data_dim, loop_dim))
+  dim(x_) <- c(dim_data, len_loop)
 
   ans <- vector(mode = "list", length = len_loop)
   for (i in seq_len(len_loop)) {
-    ans[[i]] <- forceAndCall(1, func_, x[, i], ...)
+    ans[[i]] <- forceAndCall(1, func_, x_[, i], ...)
   }
 
   #lengths are not checked, should throw error in dim<-() if anything wrong
@@ -45,7 +45,7 @@ apply_unsafe <- function(x, along, func_, keep_dim = FALSE, ...) {
 
   if (l_ans == 1L) {
     #collapse dim
-    if (keep_dim) {
+    if (keep_dim_) {
       dim(ans) <- c(1L, dim_loop)
     } else {
       dim(ans) <- dim_loop
@@ -55,7 +55,7 @@ apply_unsafe <- function(x, along, func_, keep_dim = FALSE, ...) {
     dim(ans) <- c(length(ans) %/% len_loop, dim_loop)
   }
 
-  if (keep_dim) {
+  if (keep_dim_ && data_dim != 1L) {
     aperm(ans, order(c(data_dim, loop_dim)))
   } else {
     ans
@@ -76,21 +76,21 @@ apply_unsafe <- function(x, along, func_, keep_dim = FALSE, ...) {
 #'
 #' @return an array
 #'
-apply_colFunc_unsafe <- function(x, along, colFunc_, keep_dim = FALSE, ...) {
+apply_colFunc_unsafe <- function(x_, along_, colFunc_, keep_dim_ = FALSE, ...) {
 
   colFunc_ <- match.fun(colFunc_)
 
-  d <- dim(x)
+  d <- dim(x_)
   dim_len <- length(d)
   dim_perm <- seq_len(dim_len)
   if (dim_len < 3L) {
     stop("x must be at least 3-dimensional.")
   }
 
-  data_dim <- along
+  data_dim <- along_
   max_dim <- which.max(d)
 
-  if (along == max_dim) {
+  if (along_ == max_dim) {
     #along is already largest dim, set to 1st dim of remaining dimensions to
     #reduce memory footprint.
     col_dim <- dim_perm[-data_dim][1L]
@@ -104,12 +104,12 @@ apply_colFunc_unsafe <- function(x, along, colFunc_, keep_dim = FALSE, ...) {
   len_loop <- prod(dim_loop)
   loop_dim <- dim_perm[-c(data_dim, col_dim)]
 
-  x <- aperm(x, c(data_dim, col_dim, loop_dim))
-  dim(x) <- c(dim_data, dim_col, len_loop)
+  x_ <- aperm(x_, c(data_dim, col_dim, loop_dim))
+  dim(x_) <- c(dim_data, dim_col, len_loop)
 
   ans <- vector(mode = "list", length = len_loop)
   for (i in seq_len(len_loop)) {
-    ans[[i]] <- forceAndCall(1, colFunc_, x[,, i], ...)
+    ans[[i]] <- forceAndCall(1, colFunc_, x_[,, i], ...)
   }
 
   l_ans <- length(ans[[1]])
@@ -117,7 +117,7 @@ apply_colFunc_unsafe <- function(x, along, colFunc_, keep_dim = FALSE, ...) {
 
   if (l_ans == dim_col) {
     #collapse dim
-    if (keep_dim) {
+    if (keep_dim_) {
       dim(ans) <- c(1L, dim_col, dim_loop)
     } else {
       dim(ans) <- c(dim_col, dim_loop)
@@ -128,7 +128,7 @@ apply_colFunc_unsafe <- function(x, along, colFunc_, keep_dim = FALSE, ...) {
     dim(ans) <- c(length(ans) %/% prod(c(dim_col, dim_loop)), dim_col, dim_loop)
   }
 
-  if (keep_dim) {
+  if (keep_dim_) {
     aperm(ans, order(c(data_dim, col_dim, loop_dim)))
   } else {
     ans
@@ -193,17 +193,17 @@ mapnd <- function(x, func, along = 1L, pack_args = FALSE, ...) {
 
   if (pack_args) {
     packed <- PackArgs(func, ...)
-    apply_unsafe(x = x, along = along, func_ = packed)
+    apply_unsafe(x_ = x, along_ = along, func_ = packed)
   } else {
     if (is.character(func)) {
       guess_func <- find_colFunc(func_name = func)
       if (!is.null(guess_func)) {
         return(
-          apply_colFunc_unsafe(x = x, along = along, colFunc_ = guess_func, ...)
+          apply_colFunc_unsafe(x_ = x, along_ = along, colFunc_ = guess_func, ...)
         )
       }
     }
-    apply_unsafe(x = x, along = along, func_ = func, ...)
+    apply_unsafe(x_ = x, along_ = along, func_ = func, ...)
   }
 }
 
@@ -216,7 +216,7 @@ mapnd_col <- function(x, colFunc, along = 1L, ...) {
     err_invalid_axis(along)
   }
 
-  apply_colFunc_unsafe(x = x, along = along, colFunc_ = colFunc, ...)
+  apply_colFunc_unsafe(x_ = x, along_ = along, colFunc_ = colFunc, ...)
 }
 
 #' Sample an nd-array evenly by ratio.
@@ -245,13 +245,13 @@ samplend <- function(x, ratio = 1L, func = NULL, along = 1L, ...) {
     guess_func <- find_colFunc(func_name = func)
     if (!is.null(guess_func)) {
       return(
-        apply_unsafe(x = x, along = along, func_ = sample1d_col,
+        apply_unsafe(x_ = x, along_ = along, func_ = sample1d_col, keep_dim_ = TRUE,
                      ratio = ratio, colFunc = guess_func, ...)
       )
     }
   }
 
-  apply_unsafe(x = x, along = along, func_ = sample1d, keep_dim = TRUE,
+  apply_unsafe(x_ = x, along_ = along, func_ = sample1d, keep_dim_ = TRUE,
                ratio = ratio, func = func, ...)
 }
 
@@ -264,7 +264,7 @@ samplend_col <- function(x, ratio = 1L, colFunc = NULL, along = 1L, ...) {
     err_invalid_axis(along)
   }
 
-  apply_unsafe(x = x, along = along, func_ = sample1d_col, keep_dim = TRUE,
+  apply_unsafe(x_ = x, along_ = along, func_ = sample1d_col, keep_dim_ = TRUE,
                ratio = ratio, colFunc = colFunc, ...)
 }
 
@@ -287,16 +287,6 @@ sample1d <- function(x, ratio, func = NULL, ...) {
   for (i in seq_len(nidx)) {
     ans[i] <- func(x[seq.int(from = idx[i], to = idx2[i])], ...)
   }
-
-  ans
-}
-
-sample1d_rolled <- function(x, ratio, func = NULL, ...) {
-
-  ans <- sample1d(x = x, ratio = ratio, func = func, ...)
-  ans <- matrix(ans, nrow = ratio, ncol = length(ans), byrow = TRUE)
-  dim(ans) <- NULL
-  length(ans) <- length(x)
 
   ans
 }
@@ -332,6 +322,17 @@ sample1d_col <- function(x, ratio, colFunc = NULL, ...) {
   }
 
   data
+}
+
+
+sample1d_rolled <- function(x, ratio, func = NULL, ...) {
+
+  ans <- sample1d(x = x, ratio = ratio, func = func, ...)
+  ans <- matrix(ans, nrow = ratio, ncol = length(ans), byrow = TRUE)
+  dim(ans) <- NULL
+  length(ans) <- length(x)
+
+  ans
 }
 
 sample1d_col_rolled <- function(x, ratio, colFunc = NULL, ...) {

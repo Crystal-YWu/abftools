@@ -161,6 +161,15 @@ ExpandList <- function(x, ref) {
   x
 }
 
+MatchList <- function(x, len) {
+
+  if (is.list(x)) {
+    rep(x, length.out = len)
+  } else {
+    rep(list(x), length.out = len)
+  }
+}
+
 abf_list_copy_paste_place_holder <- function(abf) {
 
   if (IsAbf(abf)) {

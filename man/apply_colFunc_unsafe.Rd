@@ -4,18 +4,18 @@
 \alias{apply_colFunc_unsafe}
 \title{An unsafe apply() that applies a column function}
 \usage{
-apply_colFunc_unsafe(x, along, colFunc_, keep_dim = FALSE, ...)
+apply_colFunc_unsafe(x_, along_, colFunc_, keep_dim_ = FALSE, ...)
 }
 \arguments{
+\item{colFunc_}{a column function to apply.}
+
+\item{...}{passed to colFunc_}
+
 \item{x}{an array.}
 
 \item{along}{dimension to apply along.}
 
-\item{colFunc_}{a column function to apply.}
-
 \item{keep_dim}{keep dim order}
-
-\item{...}{passed to colFunc_}
 }
 \value{
 an array

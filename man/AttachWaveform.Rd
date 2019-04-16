@@ -4,7 +4,7 @@
 \alias{AttachWaveform}
 \title{Attach a waveform channel to an abf object, by-ref like behaviour.}
 \usage{
-AttachWaveform(abf, dac = GetWaveformEnabledDAC(abf))
+AttachWaveform(abf, dac)
 }
 \arguments{
 \item{abf}{an abf object.}

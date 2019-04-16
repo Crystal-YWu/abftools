@@ -1,108 +1,3 @@
-IsVoltageUnit <- function(x) endsWith(toupper(x), "V") | grepl("VO", toupper(x), fixed = TRUE)
-IsCurrentUnit <- function(x) endsWith(toupper(x), "A") | grepl("AM", toupper(x), fixed = TRUE)
-
-#' Get voltage channel id.
-#'
-#' @param abf an abf object or a list of abf objects.
-#'
-#' @return a vector of voltage channel id.
-#' @export
-#'
-GetVoltageChan <- function(abf) {
-
-  if (IsAbf(abf)) {
-    ans <- which(IsVoltageUnit(GetChannelUnit(abf)))
-  } else if (IsAbfList(abf)) {
-    ans <- unique(lapply(abf, GetVoltageChan))
-    if (length(ans) > 1L) {
-      err_channel_config(abf)
-    } else {
-      ans <- unlist(ans)
-    }
-  } else {
-    err_class_abf()
-  }
-
-  ans
-}
-
-#' Get current channel id.
-#'
-#' @param abf an abf object or a list of abf objects.
-#'
-#' @return a vector of current channel id.
-#' @export
-#'
-GetCurrentChan <- function(abf) {
-
-  if (IsAbf(abf)) {
-    ans <- which(IsCurrentUnit(GetChannelUnit(abf)))
-  } else if (IsAbfList(abf)) {
-    ans <- unique(lapply(abf, GetCurrentChan))
-    if (length(ans) > 1L) {
-      err_channel_config(abf)
-    } else {
-      ans <- unlist(ans)
-    }
-  } else {
-    err_class_abf()
-  }
-
-  ans
-}
-
-#' Get first voltage channel id.
-#'
-#' @param abf an abf object or a list of abf objects.
-#'
-#' @return an integer id of first voltage channel.
-#' @export
-#'
-GetFirstVoltageChan <- function(abf) {
-
-  voltage_channel <- GetVoltageChan(abf)
-  FirstElement(voltage_channel)
-}
-
-#' Get first current channel id.
-#'
-#' @param abf an abf object or a list of abf objects.
-#'
-#' @return an integer id of first current channel.
-#' @export
-#'
-GetFirstCurrentChan <- function(abf) {
-
-  current_channel <- GetCurrentChan(abf)
-  FirstElement(current_channel)
-}
-
-#' Return all channels of an abf object.
-#'
-#' @param abf an abf object.
-#'
-#' @return a vector of channel ids.
-#' @export
-#'
-GetAllChannels <- function(abf) {
-
-  if (IsAbf(abf)) {
-    seq_len(nChan(abf))
-  } else if (IsAbfList(abf)) {
-    lapply(abf, function(x) seq_len(nChan(x)))
-  } else {
-    err_class_abf()
-  }
-}
-
-CheckChannelDim <- function(abf, channel_data) {
-
-  d1 <- dim(abf)
-  d2 <- dim(channel_data)
-
-  length(d2) == 2L && all(d1[1:2] == d2)
-}
-
 #' Attach a new channel to an abf object.
 #'
 #' The attached channel_data's dimensions must match original dimensions,
@@ -123,20 +18,21 @@ AtchChan <- function(abf, channel_data,
 
   CheckArgs(abf)
 
-  if (!CheckChannelDim(abf, channel_data)) {
+  len1 <- length(abf[,, 1L])
+  len2 <- length(channel_data)
+  if (!len1 == len2) {
     eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
 
   #new dimension
   d <- dim(abf)
   d[3] <- d[3] + 1L
-  new_abf <- array(NA, dim = d)
+  new_abf <- c(abf, channel_data)
+  dim(new_abf) <- d
 
   #copy to data
   nchan_old <- nChan(abf)
   nchan_new <- nchan_old + 1L
-  new_abf[, , 1:nchan_old] <- abf
-  new_abf[, , nchan_new] <- channel_data
 
   #copy meta information
   meta <- get_meta(abf)
@@ -199,11 +95,13 @@ RplcChan <- function(abf, channel_data, channel = 1L) {
 
   CheckArgs(abf, chan = channel)
 
-  if (!CheckChannelDim(abf, channel_data)) {
+  len1 <- length(abf[,, 1L])
+  len2 <- length(channel_data)
+  if (!len1 == len2) {
     eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
-  abf[, , channel] <- channel_data
 
+  abf[, , channel] <- channel_data
   abf
 }
 
@@ -222,4 +120,20 @@ ReplaceChannel <- function(abf, channel_data, channel = 1L) {
       abf <- RplcChan(abf, channel_data, channel)
       invisible(abf)
     }))
+}
+
+AtchChan_unsafe <- function(abf, channel_data,
+                            channel_name, channel_unit, channel_desc = channel_name) {
+
+  d <- dim(abf)
+  d[3] <- d[3] + 1L
+  new_abf <- c(abf, channel_data)
+  dim(new_abf) <- d
+
+  ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
+               ChannelName = c(GetChannelName(abf), channel_name),
+               ChannelUnit = c(GetChannelUnit(abf), channel_unit),
+               ChannelDesc = c(GetChannelDesc(abf), channel_desc),
+               SamplingInterval = GetSamplingIntv(abf),
+               EpiAvail = GetEpiAvail(abf), meta = NULL)
 }
