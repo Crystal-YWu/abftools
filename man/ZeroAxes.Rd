@@ -2,10 +2,13 @@
 % Please edit documentation in R/plot_components.R
 \name{ZeroAxes}
 \alias{ZeroAxes}
+\alias{ApplyZeroAxes}
 \title{Draw axes centred at zero}
 \usage{
 ZeroAxes(xrange, yrange, xlabel, ylabel, xticks = 5, yticks = 5,
   basesize = 5)
+
+ApplyZeroAxes(p, xticks = 5, yticks = 5, basesize = 5)
 }
 \arguments{
 \item{xrange}{Range of x axis.}
@@ -21,6 +24,8 @@ ZeroAxes(xrange, yrange, xlabel, ylabel, xticks = 5, yticks = 5,
 \item{yticks}{Number of ticks on y axis.}
 
 \item{basesize}{Base textsize.}
+
+\item{p}{A ggplot object.}
 }
 \value{
 a list of ggplot objects.

@@ -5,6 +5,7 @@ axis_label <- function(desc, unit, style = "%s (%s)") sprintf(style, desc, unit)
 #' @details ZerosAxes() draw axes by annotating on (0, ) and (, 0). Since annotate()
 #' is used, theme settings are not inherited, thus basesize must be set independently.
 #'
+#' @param p A ggplot object.
 #' @param xrange Range of x axis.
 #' @param yrange Range of y axis.
 #' @param xlabel Label of x axis.
@@ -66,33 +67,49 @@ ZeroAxes <- function(xrange, yrange, xlabel, ylabel,
   )
 }
 
+#' @rdname ZeroAxes
+#' @export
+#'
+ApplyZeroAxes <- function(p, xticks = 5, yticks = 5, basesize = 5) {
+
+  xrange <- range(rlang::eval_tidy(p$mapping$x, p$data))
+  yrange <- range(rlang::eval_tidy(p$mapping$y, p$data))
+  xlabel <- p$labels$x
+  ylabel <- p$labels$y
+
+  p + ZeroAxes(xrange = xrange, yrange = yrange, xlabel = xlabel, ylabel = ylabel,
+               xticks = xticks, yticks = yticks, basesize = basesize)
+}
+
 #' Draw scale bars
 #'
+#' @param p a ggplot object.
 #' @param position Position to draw scale bars.
 #' @param xrange Range of x axis.
 #' @param yrange Range of y axis.
 #' @param xscale Size of x scale. If is NULL, 1/20 of xrange.
 #' @param yscale Size of y scale. If is NULL, 1/20 of yrange.
-#' @param xlabel Label of x scale bar, if xscale is NULL, used as unit of x instead.
-#' @param ylabel Label of y scale bar, if yscale is NULL, used as unit of x instead.
+#' @param xunit Label of x scale bar, if xscale is NULL, used as unit of x instead.
+#' @param yunit Label of y scale bar, if yscale is NULL, used as unit of x instead.
+#' @param label_format Format string for labeling.
 #' @param basesize Base textsize.
 #' @param linesize Line size.
 #'
 #' @return a list of ggplot objects.
 #' @export
 #'
-ScaleBars <- function(position = c("bl", "br", "tl", "tr"),
-                      xrange, yrange, xscale = NULL, yscale = NULL, xlabel = "", ylabel = "",
-                      basesize = 5, linesize = basesize / 4) {
+ScaleBars <- function(position = c("bl", "br", "tl", "tr"), xrange, yrange,
+                      xscale = NULL, yscale = NULL, xunit = "", yunit = "",
+                      label_format = "%g %s", basesize = 5, linesize = basesize / 4) {
 
   if (is.null(xscale)) {
     xscale <- (max(xrange) - min(xrange)) / 20
-    xlabel <- sprintf("%.1f %s", xscale, xlabel)
   }
+  xlabel <- sprintf("%g %s", xscale, xunit)
   if (is.null(yscale)) {
     yscale <- (max(yrange) - min(yrange)) / 20
-    ylabel <- sprintf("%.1f %s", yscale, ylabel)
   }
+  ylabel <- sprintf("%g %s", yscale, yunit)
 
   if (is.numeric(position)) {
     x <- position[1]
@@ -154,4 +171,75 @@ ScaleBars <- function(position = c("bl", "br", "tl", "tr"),
     x_label,
     y_label
   )
+}
+
+#' @rdname ScaleBars
+#' @export
+#'
+ApplyScaleBars <- function(p, position = c("bl", "br", "tl", "tr"),
+                           xscale = NULL, yscale = NULL, xunit = "", yunit = "",
+                           label_format = "%g %s", basesize = 5, linesize = basesize / 4) {
+
+  xrange <- range(rlang::eval_tidy(p$mapping$x, p$data))
+  yrange <- range(rlang::eval_tidy(p$mapping$y, p$data))
+  position <- match.arg(position)
+
+  p + ScaleBars(position = position, xrange = xrange, yrange = yrange,
+                xscale = xscale, yscale = yscale, xunit = xunit, yunit = yunit,
+                label_format = label_format, basesize = basesize, linesize = linesize)
+}
+
+#' Force zooming into Y axis.
+#'
+#' @details When clippling is TRUE, ylim() is applied directly to p, causing
+#' out-of-limit data to be removed.
+#'
+#' @param p A ggplot object.
+#' @param xrange Zoomed range of x axis.
+#' @param yrange Zoomed range of y axis. If NULL, ydata will be evaluated.
+#' @param xdata Data of x.
+#' @param ydata Data of y, indices correspond to xdata.
+#' @param space Spacing factor.
+#' @param clipping Whether to "throw away" out of limit data.
+#'
+#' @return ylim
+#' @export
+#'
+ForceZoomY <- function(xrange, yrange = NULL, xdata, ydata, space = 0.0125, clipping = FALSE) {
+
+  if (is.null(yrange)) {
+    xmin <- min(xrange)
+    xmax <- max(xrange)
+    #slow
+    idx <- which(xmin < xdata & xdata < xmax)
+    yrange <- range(ydata[idx])
+    delta <- abs(yrange[2] - yrange[1])
+    yrange[1] <- yrange[1] - delta * space
+    yrange[2] <- yrange[2] + delta * space
+  } else {
+    yrange <- range(yrange)
+  }
+
+  if (clipping) {
+    ggplot2::ylim(yrange)
+  } else {
+    ggplot2::coord_cartesian(ylim = yrange)
+  }
+}
+
+#' @rdname ForceZoomY
+#' @export
+#'
+ApplyForceZoomY <- function(p, xrange, yrange = NULL, space = 0.0125, clipping = FALSE) {
+
+  if (is.null(yrange)) {
+    xdata <- rlang::eval_tidy(p$mapping$x, p$data)
+    ydata <- rlang::eval_tidy(p$mapping$y, p$data)
+  } else {
+    xdata <- NULL
+    ydata <- NULL
+  }
+
+  p + ForceZoomY(xrange = xrange, yrange = yrange,
+                 xdata = xdata, ydata = ydata, space = space, clipping = clipping)
 }

@@ -1,4 +1,5 @@
 ##' @import ggplot2
+##' @import rlang
 ##' @importFrom cowplot plot_grid
 ##' @importFrom stats sd median
 ##' @importFrom matrixStats colSds colMads

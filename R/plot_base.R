@@ -23,7 +23,7 @@ abf_plot_td <- function(abf, intv = NULL, channel = 1L,
 
 #' Get an abf channel domain ggplot object, dimensionally corresponds to Wrap*()
 abf_plot_cd <- function(abf, intv = NULL, channel = c(2L, 1L),
-                        map_func, pack_args = FALSE, ...,
+                        map_func = "mean", pack_args = FALSE, ...,
                         colour = FALSE) {
 
   f <- WrapMappingFuncAlong(map_func = map_func, along = "time", pack_args = pack_args, ...,

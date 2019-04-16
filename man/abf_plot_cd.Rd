@@ -4,7 +4,7 @@
 \alias{abf_plot_cd}
 \title{Get an abf channel domain ggplot object, dimensionally corresponds to Wrap*()}
 \usage{
-abf_plot_cd(abf, intv = NULL, channel = c(2L, 1L), map_func,
+abf_plot_cd(abf, intv = NULL, channel = c(2L, 1L), map_func = "mean",
   pack_args = FALSE, ..., colour = FALSE)
 }
 \description{
