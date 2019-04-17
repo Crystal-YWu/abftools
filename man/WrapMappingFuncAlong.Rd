@@ -5,17 +5,17 @@
 \alias{wrap_along}
 \title{Wrap a mapping function along specific axis to batch process abf data.}
 \usage{
-WrapMappingFuncAlong(map_func, along = "time", pack_args = FALSE,
-  abf_id_func = NULL, epi_id_func = NULL, chan_id_func = NULL,
-  time_unit = "tick", ret.df = TRUE, dim_warn = TRUE, ...)
+WrapMappingFuncAlong(map_func, along = c("time", "episode", "channel"),
+  pack_args = FALSE, abf_id_func = NULL,
+  epi_id_func = DefaultEpiLabel, chan_id_func = DefaultChanLabel,
+  time_unit = "tick", ret.df = TRUE, ...)
 
-wrap_along(..., abf_id_func = NULL, epi_id_func = DefaultEpiLabel,
-  chan_id_func = DefaultChanLabel, time_unit = "ms", ret.df = TRUE)
+wrap_along(..., time_unit = "ms", ret.df = TRUE)
 }
 \arguments{
 \item{map_func}{a mapping function.}
 
-\item{along}{the axis to process along. Can be "time" (1L), "episode" (2L) or "channel" (3L).}
+\item{along}{the axis to process along. Can be "time", "episode" or "channel".}
 
 \item{pack_args}{wheter to pack arguments for map_func, see PackArgs() for more details.}
 
@@ -27,11 +27,9 @@ wrap_along(..., abf_id_func = NULL, epi_id_func = DefaultEpiLabel,
 
 \item{time_unit}{convert time unit of the return time axis.}
 
-\item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE}
+\item{ret.df}{wheter to return a data.frame, a matrix is returned instead if set to FALSE.}
 
-\item{dim_warn}{whether to warn about dimension expansion.}
-
-\item{...}{further arguments passed to map_func}
+\item{...}{further arguments passed to map_func.}
 }
 \value{
 a function
@@ -50,9 +48,4 @@ intv   OPTIONAL, a time interval to calcaulte. If NULL, the whole timespan is us
 episode   OPTIONAL, a vector of episodes to calculate. If missing, all episodes are used.
 
 channel   OPTIONAL, a vector of channels to calculate. If missing, all channels are used.
-
-Dimensional order of precedence: time < episode < channel (same as abf objects).
-If the mapping function spans multiple dimensions, result will be permutated
-to preserve the order. Meanwhile, a warning will be thrown for the first time
-wrapped function is called, notifying which dim will be expanded for the user.
 }

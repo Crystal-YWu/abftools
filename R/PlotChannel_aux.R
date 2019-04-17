@@ -3,10 +3,10 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
 
   #Data
   df <- MeltAbf(abf, channel = channel, time_unit = time_unit, ..., value.name = "value")
-  ytag <- sprintf("value%d", channel)
+  ytag <- sprintf("chan%d", channel)
 
   #Plot
-  p <- ggplot(df, aes_string("time", ytag)) + theme_classic()
+  p <- ggplot(df, aes_string("Time", ytag)) + theme_classic()
   if (colour) {
     p <- p + geom_line(aes_string(colour = "Episode"))
   } else {
@@ -21,11 +21,11 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   #remove NAs from cursor
   curs <- curs[!is.na(curs)]
   if (!is.null(intv)) {
-    intv_tu <- TickToTime(abf, time_unit, intv)
+    intv_tu <- TickToTime(abf, intv, time_unit)
     p <- p + geom_vline(xintercept = intv_tu[1:2], linetype = "dashed")
   }
   if (!is.null(curs)) {
-    curs_tu <- TickToTime(abf, time_unit, curs)
+    curs_tu <- TickToTime(abf, curs, time_unit)
     p <- p + geom_vline(xintercept = curs_tu, linetype = "dashed")
   }
 
@@ -40,8 +40,8 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   xdesc <- "Time"
   xunit <- time_unit
 
-  xlabel <- GetAxisLabel(xdesc, xunit)
-  ylabel <- GetAxisLabel(ydesc, yunit)
+  xlabel <- GetAxisLabel(xdesc, xunit, "%s (%s)")
+  ylabel <- GetAxisLabel(ydesc, yunit, "%s (%s)")
   p <- p + xlab(xlabel) + ylab(ylabel)
 
   #Good to go

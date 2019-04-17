@@ -1,3 +1,10 @@
+#' Mask a time interval
+#'
+#' @param intv
+#'
+#' @return an integer vector
+#' @export
+#'
 MaskIntv <- function(intv) {
   #TODO: A good solution to distinguish intv and curs
 
@@ -152,6 +159,15 @@ ExpandList <- function(x, ref) {
   }
 
   x
+}
+
+MatchList <- function(x, len) {
+
+  if (is.list(x)) {
+    rep(x, length.out = len)
+  } else {
+    rep(list(x), length.out = len)
+  }
 }
 
 abf_list_copy_paste_place_holder <- function(abf) {

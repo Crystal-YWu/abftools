@@ -187,8 +187,8 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
       vol_unit <- chan_unit[vol_id]
       cur_desc <- chan_desc[cur_id]
       cur_unit <- chan_unit[cur_id]
-      x_label <- GetAxisLabel(vol_desc, vol_unit)
-      y_label <- GetAxisLabel(cur_desc, cur_unit)
+      x_label <- GetAxisLabel(vol_desc, vol_unit, style = "%s (%s)")
+      y_label <- GetAxisLabel(cur_desc, cur_unit, style = "%s (%s)")
     }
 
   } else {
@@ -255,7 +255,7 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
   #plot axes
   p <- p + theme_classic()
   if (zero_axes) {
-    p <- p + ZeroAxes(xlimit = df$Voltage, ylimit = df$Current,
+    p <- p + ZeroAxes2(xlimit = df$Voltage, ylimit = df$Current,
                       xlabel = x_label, ylabel = y_label)
   } else {
     p <- p +
@@ -338,7 +338,7 @@ QuickPlotIV <- function(abf, pos, colour = FALSE, title = NULL, legend_title = N
       geom_hline(yintercept = 0, linetype = "dashed")
   }
   if (zero_axes) {
-    p <- p + ZeroAxes(xlimit = melted[, 2], ylimit = melted[, 3],
+    p <- p + ZeroAxes2(xlimit = melted[, 2], ylimit = melted[, 3],
                       xlabel = labs[voltage_channel], ylabel = labs[current_channel])
   }
 
@@ -429,7 +429,7 @@ QuickPlot_IVSummary <- function(df_summary, title = NULL, legend_title = NULL,
 
     p <- p + theme_classic()
     if (zero_axes) {
-      p <- p + ZeroAxes(xlimit = df_summary[, 1], ylimit = df_summary[, 3],
+      p <- p + ZeroAxes2(xlimit = df_summary[, 1], ylimit = df_summary[, 3],
                         xlabel = "Voltage", ylabel = "Current")
     }
 
@@ -470,7 +470,7 @@ QuickPlot_IVSummary <- function(df_summary, title = NULL, legend_title = NULL,
 
 
     if (zero_axes) {
-      p <- p + ZeroAxes(xlimit = df_melted[, 2], ylimit = df_melted[, 4],
+      p <- p + ZeroAxes2(xlimit = df_melted[, 2], ylimit = df_melted[, 4],
                         xlabel = "Voltage", ylabel = "Current")
     }
 

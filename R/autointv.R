@@ -164,9 +164,9 @@ FindSamplingInterval <- function(abf, epoch = "B",
 
   #CURRENT
   sr <- max(3L, lp_interval_size %/% 10L)
-  channel_var <- rowSums(samplend(abf[[current_channel]],
-                                  sampling_ratio = sr,
-                                  colFunc = matrixStats::colSds))
+  channel_var <- rowSums(samplend_col(abf[[current_channel]],
+                                      ratio = sr,
+                                      colFunc = matrixStats::colSds))
   channel_var <- td_penalty(rep(channel_var, each = sr, length.out = npts),
                             MaskIntv(GetEpochIntervals(abf)[, 1L, epoch]))
 
