@@ -79,10 +79,7 @@ TickToTime <- function(abf, tick, time_unit = c("tick", "us", "ms", "s", "min", 
 
 #####################################
 
-
 GetAxisLabel <- function(desc, unit, style) sprintf(style, desc, unit)
-
-
 
 #' Compose labels for every episode/channel of an abf object
 #'

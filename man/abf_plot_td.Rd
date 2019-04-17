@@ -11,7 +11,7 @@ abf_plot_td(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
 \arguments{
 \item{abf}{an abf object/list of abf objects.}
 
-\item{intv}{a TIME intv to sample abf.}
+\item{intv}{an INDEX intv to sample abf.}
 
 \item{channel}{channels to map.}
 
@@ -25,7 +25,7 @@ abf_plot_td(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
 
 \item{time_unit}{a time unit passed to TickToTime().}
 
-\item{colour}{wheter to plot in coloured mode.}
+\item{colour}{whether to plot in coloured mode.}
 }
 \value{
 a ggplot object.

@@ -11,14 +11,14 @@
 #' check performed. Use with caution.
 #'
 #' @param abf an abf object/list of abf objects.
-#' @param intv a TIME intv to sample abf.
+#' @param intv an INDEX intv to sample abf.
 #' @param channel channels to map.
 #' @param sample_ratio sample ratio.
 #' @param sample_func sample function.
 #' @param sample_colFunc a sample column function.
 #' @param ... passed to sample_func().
 #' @param time_unit a time unit passed to TickToTime().
-#' @param colour wheter to plot in coloured mode.
+#' @param colour whether to plot in coloured mode.
 #'
 #' @return a ggplot object.
 #' @export

@@ -3,7 +3,7 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
 
   #Data
   df <- MeltAbf(abf, channel = channel, time_unit = time_unit, ..., value.name = "value")
-  ytag <- sprintf("value%d", channel)
+  ytag <- sprintf("chan%d", channel)
 
   #Plot
   p <- ggplot(df, aes_string("Time", ytag)) + theme_classic()
@@ -40,8 +40,8 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   xdesc <- "Time"
   xunit <- time_unit
 
-  xlabel <- GetAxisLabel(xdesc, xunit)
-  ylabel <- GetAxisLabel(ydesc, yunit)
+  xlabel <- GetAxisLabel(xdesc, xunit, "%s (%s)")
+  ylabel <- GetAxisLabel(ydesc, yunit, "%s (%s)")
   p <- p + xlab(xlabel) + ylab(ylabel)
 
   #Good to go

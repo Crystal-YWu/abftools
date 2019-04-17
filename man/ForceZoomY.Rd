@@ -5,16 +5,15 @@
 \alias{ApplyForceZoomY}
 \title{Force zooming into Y axis.}
 \usage{
-ForceZoomY(xrange, yrange = NULL, xdata, ydata, space = 0.0125,
-  clipping = FALSE)
+ForceZoomY(xrange, yrange = NULL, xdata, ydata, space = 0.0125)
 
 ApplyForceZoomY(p, xrange, yrange = NULL, space = 0.0125,
-  clipping = FALSE)
+  clipping = FALSE, clipping_cols = "value")
 }
 \arguments{
 \item{xrange}{Zoomed range of x axis.}
 
-\item{yrange}{Zoomed range of y axis. If NULL, ydata will be evaluated.}
+\item{yrange}{Zoomed range of y axis. If NULL, ydata will be evaluated from xdata and ydata.}
 
 \item{xdata}{Data of x.}
 
@@ -22,9 +21,11 @@ ApplyForceZoomY(p, xrange, yrange = NULL, space = 0.0125,
 
 \item{space}{Spacing factor.}
 
-\item{clipping}{Whether to "throw away" out of limit data.}
-
 \item{p}{A ggplot object.}
+
+\item{clipping}{clip value from clipping_cols.}
+
+\item{clipping_cols}{columns to clip.}
 }
 \value{
 ylim
@@ -33,6 +34,8 @@ ylim
 Force zooming into Y axis.
 }
 \details{
-When clippling is TRUE, ylim() is applied directly to p, causing
-out-of-limit data to be removed.
+When clippling is TRUE, data values are directly clipped (set to NAs).
+This is a workaround when there are multiple measurements in different units/scales,
+since I haven't figure out a way to set coords to different group of data in
+a ggplot object.
 }

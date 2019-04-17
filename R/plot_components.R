@@ -191,21 +191,24 @@ ApplyScaleBars <- function(p, position = c("bl", "br", "tl", "tr"),
 
 #' Force zooming into Y axis.
 #'
-#' @details When clippling is TRUE, ylim() is applied directly to p, causing
-#' out-of-limit data to be removed.
+#' @details When clippling is TRUE, data values are directly clipped (set to NAs).
+#' This is a workaround when there are multiple measurements in different units/scales,
+#' since I haven't figure out a way to set coords to different group of data in
+#' a ggplot object.
 #'
 #' @param p A ggplot object.
 #' @param xrange Zoomed range of x axis.
-#' @param yrange Zoomed range of y axis. If NULL, ydata will be evaluated.
+#' @param yrange Zoomed range of y axis. If NULL, ydata will be evaluated from xdata and ydata.
 #' @param xdata Data of x.
 #' @param ydata Data of y, indices correspond to xdata.
 #' @param space Spacing factor.
-#' @param clipping Whether to "throw away" out of limit data.
+#' @param clipping clip value from clipping_cols.
+#' @param clipping_cols columns to clip.
 #'
 #' @return ylim
 #' @export
 #'
-ForceZoomY <- function(xrange, yrange = NULL, xdata, ydata, space = 0.0125, clipping = FALSE) {
+ForceZoomY <- function(xrange, yrange = NULL, xdata, ydata, space = 0.0125) {
 
   if (is.null(yrange)) {
     xmin <- min(xrange)
@@ -220,30 +223,42 @@ ForceZoomY <- function(xrange, yrange = NULL, xdata, ydata, space = 0.0125, clip
     yrange <- range(yrange)
   }
 
-  if (clipping) {
-    ggplot2::ylim(yrange)
-  } else {
-    ggplot2::coord_cartesian(ylim = yrange)
-  }
+  ggplot2::coord_cartesian(ylim = yrange)
 }
 
 #' @rdname ForceZoomY
 #' @export
 #'
-ApplyForceZoomY <- function(p, xrange, yrange = NULL, space = 0.0125, clipping = FALSE) {
+ApplyForceZoomY <- function(p, xrange, yrange = NULL, space = 0.0125, clipping = FALSE, clipping_cols = "value") {
 
   if (is.null(yrange)) {
     xdata <- rlang::eval_tidy(p$mapping$x, p$data)
     ydata <- rlang::eval_tidy(p$mapping$y, p$data)
-  } else {
-    xdata <- NULL
-    ydata <- NULL
+    #evaluate yrange
+    xmin <- min(xrange)
+    xmax <- max(xrange)
+    #slow
+    idx <- which(xmin < xdata & xdata < xmax)
+    yrange <- range(ydata[idx])
+    delta <- abs(yrange[2] - yrange[1])
+    yrange[1] <- yrange[1] - delta * space
+    yrange[2] <- yrange[2] + delta * space
   }
 
-  p + ForceZoomY(xrange = xrange, yrange = yrange,
-                 xdata = xdata, ydata = ydata, space = space, clipping = clipping)
+  if (clipping) {
+    #clip channel
+    for (cols in clipping_cols) {
+      idx <- p$data[[cols]] < yrange[1]
+      p$data[[cols]][idx] <- NA
+      idx <- p$data[[cols]] > yrange[2]
+      p$data[[cols]][idx] <- NA
+    }
+    p
+  } else {
+    p + ForceZoomY(xrange = xrange, yrange = yrange,
+                   xdata = NULL, ydata = NULL, space = space)
+  }
 }
-
 
 #' Get default facet labeller for an abf object.
 #'
