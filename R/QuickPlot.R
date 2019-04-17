@@ -187,8 +187,8 @@ QuickPlot.list <- function(data, pos = NULL, colour = TRUE,
       vol_unit <- chan_unit[vol_id]
       cur_desc <- chan_desc[cur_id]
       cur_unit <- chan_unit[cur_id]
-      x_label <- GetAxisLabel(vol_desc, vol_unit)
-      y_label <- GetAxisLabel(cur_desc, cur_unit)
+      x_label <- GetAxisLabel(vol_desc, vol_unit, style = "%s (%s)")
+      y_label <- GetAxisLabel(cur_desc, cur_unit, style = "%s (%s)")
     }
 
   } else {

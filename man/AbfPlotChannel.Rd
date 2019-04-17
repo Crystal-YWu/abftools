@@ -11,7 +11,7 @@ AbfPlotChannel(abf, intv = NULL, channel = 1L, cursor = NULL,
 
 AbfPeekChannel(abf, intv = NULL, channel = 1L, sample_ratio = 100L,
   cursor = NULL, time_unit = "tick", colour = TRUE,
-  auto_zoom = FALSE, title = NULL)
+  auto_zoom = FALSE, title = NULL, ...)
 }
 \arguments{
 \item{abf}{an abf object/a list of abf objects}
@@ -41,4 +41,8 @@ a ggplot object.
 AbfPlotChannel() is a unified wrapper to abf_plot_td(), it is
 capable of plotting multiple abf object facetted by id, multiple channels
 facetted by channel.
+
+When printing the returned plot with a large number of abf objects, it can be
+very slow. It is recommended to use AbfPeekChannel() for previewing and plot
+tuning.
 }
