@@ -11,7 +11,8 @@
 #' @param abf an abf object/a list of abf objects
 #' @param intv an INDEX intv to sample abf.
 #' @param channel channels to plot.
-#' @param sample_ratio used in AbfPeekChannel, to reduce data points by sample_ratio.
+#' @param episode episodes to group.
+#' @param concat_epi wheter to concatenate all episodes.
 #' @param cursor add indicative cursors to plot.
 #' @param time_unit time unit for X axis.
 #' @param colour wheter to plot in coloured mode.
@@ -22,14 +23,15 @@
 #' @return a ggplot object.
 #' @export
 #'
-AbfPlotChannel <- function(abf, intv = NULL, channel = 1L,
+AbfPlotChannel <- function(abf, intv = NULL, channel = GetAllChannels(abf),
+                           episode = GetAvailEpisodes(abf), concat_epi = FALSE,
                            cursor = NULL, time_unit = "tick", colour = max(nEpi(abf)) > 1L,
                            auto_zoom = FALSE, title = NULL, ...) {
 
   CheckArgs(abf, chan = channel, allow_list = TRUE)
 
-  p <- abf_plot_td(abf = abf, intv = intv, channel = channel,
-                   time_unit = time_unit, colour = colour, ...)
+  p <- abf_plot_td(abf = abf, intv = intv, channel = channel, episode = episode,
+                   concat_epi = concat_epi, time_unit = time_unit, colour = colour, ...)
 
 
   if (!is.null(cursor)) {

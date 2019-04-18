@@ -5,7 +5,8 @@
 \alias{AbfPeekChannel}
 \title{Plot channel data of abf objects.}
 \usage{
-AbfPlotChannel(abf, intv = NULL, channel = 1L, cursor = NULL,
+AbfPlotChannel(abf, intv = NULL, channel = GetAllChannels(abf),
+  episode = GetAvailEpisodes(abf), concat_epi = FALSE, cursor = NULL,
   time_unit = "tick", colour = max(nEpi(abf)) > 1L,
   auto_zoom = FALSE, title = NULL, ...)
 
@@ -20,6 +21,10 @@ AbfPeekChannel(abf, intv = NULL, channel = 1L, sample_ratio = 100L,
 
 \item{channel}{channels to plot.}
 
+\item{episode}{episodes to group.}
+
+\item{concat_epi}{wheter to concatenate all episodes.}
+
 \item{cursor}{add indicative cursors to plot.}
 
 \item{time_unit}{time unit for X axis.}
@@ -31,8 +36,6 @@ AbfPeekChannel(abf, intv = NULL, channel = 1L, sample_ratio = 100L,
 \item{title}{add title to the plot.}
 
 \item{...}{passed to MeltAbf().}
-
-\item{sample_ratio}{used in AbfPeekChannel, to reduce data points by sample_ratio.}
 }
 \value{
 a ggplot object.

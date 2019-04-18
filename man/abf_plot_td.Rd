@@ -4,9 +4,9 @@
 \alias{abf_plot_td}
 \title{Plot abf objects in time domain.}
 \usage{
-abf_plot_td(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
-  sample_func = "mean", sample_colFunc = NULL, ...,
-  time_unit = "tick", colour = TRUE)
+abf_plot_td(abf, intv = NULL, channel, episode, concat_epi,
+  sample_ratio = 1L, sample_func = "mean", sample_colFunc = NULL,
+  ..., time_unit = "tick", colour = TRUE)
 }
 \arguments{
 \item{abf}{an abf object/list of abf objects.}
@@ -14,6 +14,10 @@ abf_plot_td(abf, intv = NULL, channel = 1L, sample_ratio = 1L,
 \item{intv}{an INDEX intv to sample abf.}
 
 \item{channel}{channels to map.}
+
+\item{episode}{episodes to group.}
+
+\item{concat_epi}{wheter to concatenate all episodes.}
 
 \item{sample_ratio}{sample ratio.}
 

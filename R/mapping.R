@@ -8,6 +8,9 @@
 #' @param abf an abf object.
 #' @param intv a time interval to melt.
 #' @param channel channels to melt.
+#' @param episode episodes to melt.
+#' @param concat_epi wheter to concatenate all episodes, if TRUE, episode arguement
+#' is ignored and all episodes will be used instead.
 #' @param along the axis/dimension to melt along.
 #' @param format the format of returned data.frame.
 #' @param abf_id_func function to tag id column.
@@ -24,6 +27,7 @@
 #' @export
 #'
 MeltAbf <- function(abf, intv = NULL, channel = GetAllChannels(abf),
+                    episode = GetAvailEpisodes(abf), concat_epi = FALSE,
                     along = c("episode", "channel"), format = c("wide", "long"),
                     abf_id_func = NULL, epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
                     sample_ratio = 1L, sample_func = "mean", sample_colFunc = NULL,
@@ -36,11 +40,18 @@ MeltAbf <- function(abf, intv = NULL, channel = GetAllChannels(abf),
   along <- match.arg(along)
   format <- match.arg(format)
 
-  epi <- GetAvailEpisodes(abf)
-  nepi <- length(epi)
-
   chan <- channel
   nchan <- length(chan)
+
+  if (concat_epi) {
+    d <- dim(abf)
+    dim(abf) <- c(d[1] * d[2], 1L, d[3])
+    epi <- 1L
+    nepi <- 1L
+  } else {
+    epi <- episode
+    nepi <- length(epi)
+  }
 
   #map
   if (is.null(intv)) {

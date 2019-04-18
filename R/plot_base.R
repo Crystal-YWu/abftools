@@ -13,6 +13,8 @@
 #' @param abf an abf object/list of abf objects.
 #' @param intv an INDEX intv to sample abf.
 #' @param channel channels to map.
+#' @param episode episodes to group.
+#' @param concat_epi wheter to concatenate all episodes.
 #' @param sample_ratio sample ratio.
 #' @param sample_func sample function.
 #' @param sample_colFunc a sample column function.
@@ -23,7 +25,7 @@
 #' @return a ggplot object.
 #' @export
 #'
-abf_plot_td <- function(abf, intv = NULL, channel = 1L,
+abf_plot_td <- function(abf, intv = NULL, channel, episode, concat_epi,
                         sample_ratio = 1L, sample_func = "mean", sample_colFunc = NULL, ...,
                         time_unit = "tick", colour = TRUE) {
 
@@ -43,7 +45,8 @@ abf_plot_td <- function(abf, intv = NULL, channel = 1L,
     df <- do.call(
       rbind,
       lapply(seq_len(n), function(idx) {
-        args <- c(list(abf = abf[[idx]], intv = intv[[idx]], channel = channel, along = "episode", format = format,
+        args <- c(list(abf = abf[[idx]], intv = intv[[idx]], channel = channel, episode = episode,
+                       concat_epi = concat_epi, along = "episode", format = format,
                        sample_ratio = sample_ratio, sample_func = sample_func, sample_colFunc = sample_colFunc,
                        abf_id_func = GetTitle, epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
                        time_unit = time_unit),
@@ -52,7 +55,8 @@ abf_plot_td <- function(abf, intv = NULL, channel = 1L,
       })
     )
   } else {
-    df <- MeltAbf(abf = abf, intv = intv, channel = channel, along = "episode", format = format,
+    df <- MeltAbf(abf = abf, intv = intv, channel = channel, episode = episode,
+                  concat_epi = concat_epi, along = "episode", format = format,
                   sample_ratio = sample_ratio, sample_func = sample_func, sample_colFunc = sample_colFunc,
                   abf_id_func = GetTitle, epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
                   time_unit = time_unit, ...)
