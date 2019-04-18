@@ -174,9 +174,8 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TR
 abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
                           titlelist = NULL, short_desc = TRUE) {
 
-  names(filelist) <- tolower(names(filelist))
-
-  if (is.object(filelist)) {
+  if (is.object(filelist) && is.list(filelist)) {
+    names(filelist) <- tolower(names(filelist))
     #filename
     if ("filename" %in% names(filelist)) {
       extracted <- filelist$filename
@@ -199,7 +198,7 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
   } else {
     extracted <- filelist
   }
-  filelist <- as.character(unlist(extracted))
+  filelist <- as.character(extracted)
   if (attach_ext) {
     filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
   }
@@ -212,7 +211,7 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
 
   #set titles
   if (!is.null(titlelist)) {
-    titlelist <- as.character(unlist(titlelist))
+    titlelist <- as.character(titlelist)
     SetTitle(abf_list, titlelist)
   }
 
