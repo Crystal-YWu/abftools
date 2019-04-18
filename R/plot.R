@@ -23,8 +23,8 @@
 #' @export
 #'
 AbfPlotChannel <- function(abf, intv = NULL, channel = 1L,
-                           cursor = NULL, time_unit = "tick", colour = FALSE, auto_zoom = FALSE,
-                           title = NULL, ...) {
+                           cursor = NULL, time_unit = "tick", colour = length(channel) > 1L,
+                           auto_zoom = FALSE, title = NULL, ...) {
 
   CheckArgs(abf, chan = channel, allow_list = TRUE)
 
