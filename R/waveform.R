@@ -25,7 +25,7 @@ GetWaveform <- function(abf,
 
   nepi <- length(episode)
   npts <- nPts(abf)
-  wf_holding <- meta$DAC$fInstrumentHoldingLevel[dac]
+  wf_holding <- meta$DAC$fDACHoldingLevel[dac]
   mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
 
   #Extract epoch settings
@@ -142,11 +142,11 @@ wf_pulse <- function(len, Vin, Vhi, period, width) {
 wf_trng <- function(len, Vin, Vhi, period, width) {
   #waveform 4
 
-  win_l <- wf_ramp(width, Vhi, Vin)
+  win_l <- wf_ramp(width, Vin, Vhi)
   if (period == width) {
     rep(win_l, length.out = len)
   } else {
-    win_r <- wf_ramp(period - width, Vin, Vhi)
+    win_r <- wf_ramp(period - width, Vhi, Vin)
     win <- c(win_l, win_r)
     rep(win, length.out = len)
   }
