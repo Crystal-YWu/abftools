@@ -7,6 +7,7 @@
 #'
 #' @param abf an abf object.
 #' @param intv a time interval to melt.
+#' @param channel channels to melt.
 #' @param along the axis/dimension to melt along.
 #' @param format the format of returned data.frame.
 #' @param abf_id_func function to tag id column.
@@ -22,13 +23,14 @@
 #' @return a data.frame
 #' @export
 #'
-MeltAbf <- function(abf, intv = NULL, along = c("episode", "channel"), format = c("wide", "long"),
+MeltAbf <- function(abf, intv = NULL, channel = GetAllChannels(abf),
+                    along = c("episode", "channel"), format = c("wide", "long"),
                     abf_id_func = NULL, epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
                     sample_ratio = 1L, sample_func = "mean", sample_colFunc = NULL,
                     time_unit = c("tick", "us", "ms", "s", "min", "hr"), ...,
                     value.name = "value") {
 
-  CheckArgs(abf)
+  CheckArgs(abf, chan = channel)
 
   time_unit <- match.arg(time_unit)
   along <- match.arg(along)
@@ -36,7 +38,8 @@ MeltAbf <- function(abf, intv = NULL, along = c("episode", "channel"), format = 
 
   epi <- GetAvailEpisodes(abf)
   nepi <- length(epi)
-  chan <- GetAllChannels(abf)
+
+  chan <- channel
   nchan <- length(chan)
 
   #map

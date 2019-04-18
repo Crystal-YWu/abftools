@@ -6,7 +6,7 @@
 \title{Plot channel data of abf objects.}
 \usage{
 AbfPlotChannel(abf, intv = NULL, channel = 1L, cursor = NULL,
-  time_unit = "tick", colour = length(channel) > 1L,
+  time_unit = "tick", colour = max(nEpi(abf)) > 1L,
   auto_zoom = FALSE, title = NULL, ...)
 
 AbfPeekChannel(abf, intv = NULL, channel = 1L, sample_ratio = 100L,

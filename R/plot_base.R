@@ -43,7 +43,7 @@ abf_plot_td <- function(abf, intv = NULL, channel = 1L,
     df <- do.call(
       rbind,
       lapply(seq_len(n), function(idx) {
-        args <- c(list(abf = abf[[idx]], intv = intv[[idx]], along = "episode", format = format,
+        args <- c(list(abf = abf[[idx]], intv = intv[[idx]], channel = channel, along = "episode", format = format,
                        sample_ratio = sample_ratio, sample_func = sample_func, sample_colFunc = sample_colFunc,
                        abf_id_func = GetTitle, epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
                        time_unit = time_unit),
@@ -52,7 +52,7 @@ abf_plot_td <- function(abf, intv = NULL, channel = 1L,
       })
     )
   } else {
-    df <- MeltAbf(abf = abf, intv = intv, along = "episode", format = format,
+    df <- MeltAbf(abf = abf, intv = intv, channel = channel, along = "episode", format = format,
                   sample_ratio = sample_ratio, sample_func = sample_func, sample_colFunc = sample_colFunc,
                   abf_id_func = GetTitle, epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
                   time_unit = time_unit, ...)

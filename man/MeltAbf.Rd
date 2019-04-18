@@ -4,17 +4,19 @@
 \alias{MeltAbf}
 \title{Melt an abf object.}
 \usage{
-MeltAbf(abf, intv = NULL, along = c("episode", "channel"),
-  format = c("wide", "long"), abf_id_func = NULL,
-  epi_id_func = GetEpiTag, chan_id_func = GetChanTag,
-  sample_ratio = 1L, sample_func = "mean", sample_colFunc = NULL,
-  time_unit = c("tick", "us", "ms", "s", "min", "hr"), ...,
-  value.name = "value")
+MeltAbf(abf, intv = NULL, channel = GetAllChannels(abf),
+  along = c("episode", "channel"), format = c("wide", "long"),
+  abf_id_func = NULL, epi_id_func = GetEpiTag,
+  chan_id_func = GetChanTag, sample_ratio = 1L, sample_func = "mean",
+  sample_colFunc = NULL, time_unit = c("tick", "us", "ms", "s", "min",
+  "hr"), ..., value.name = "value")
 }
 \arguments{
 \item{abf}{an abf object.}
 
 \item{intv}{a time interval to melt.}
+
+\item{channel}{channels to melt.}
 
 \item{along}{the axis/dimension to melt along.}
 
