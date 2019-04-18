@@ -26,6 +26,7 @@ GetWaveform <- function(abf,
   nepi <- length(episode)
   npts <- nPts(abf)
   wf_holding <- meta$DAC$fDACHoldingLevel[dac]
+  inter_epi <- as.logical(meta$DAC$nInterEpisodeLevel[dac])
   mx <- matrix(wf_holding, nrow = npts, ncol = nepi)
 
   #Extract epoch settings
@@ -42,9 +43,18 @@ GetWaveform <- function(abf,
   wf_type <- epdac$nEpochType
 
   #Now simulate waveforms
-  idx_start <- npts %/% 64L + 1L
+  if (npts <= 64) {
+    npts_holding <- 1L
+  } else {
+    npts_holding <- npts %/% 64L
+  }
+  idx_start <- npts_holding + 1L
   for (i in seq_len(nepi)) {
     idx <- idx_start
+    #hold waveform value at last V
+    if (inter_epi && i > 1L) {
+      mx[seq.int(from = 1L, to = idx - 1L), i] <- mx[npts, i - 1L]
+    }
     for (epoch in seq_len(nepoch)) {
       Vin <- mx[idx - 1L, i]
       Vhi <- init_level[epoch] + incr_level[epoch] * (episode[i] - 1L)
@@ -69,6 +79,11 @@ GetWaveform <- function(abf,
       mx[seq.int(from = idx, length.out = len), i] <- wf_epoch
       idx <- idx + len
     }
+    #hold waveform value at Vin if idx to npts is not defined
+    if (inter_epi && idx < npts) {
+      Vin <- mx[idx - 1, i]
+      mx[seq.int(from = idx, to = npts), i] <- Vin
+    }
   }
 
   #set colnames
@@ -80,6 +95,7 @@ GetWaveform <- function(abf,
 
 #' Attach a waveform channel to an abf object.
 #'
+#'
 #' @param abf an abf object.
 #' @param dac waveform DAC channel, 1-based.
 #'
@@ -88,20 +104,24 @@ GetWaveform <- function(abf,
 #'
 AtchWaveform <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 
-  dac <- FirstElement(dac)
+  #dac <- FirstElement(dac)
   CheckArgs(abf, dac = dac)
 
-  #get waveform channel
-  wf <- GetWaveform(abf, dac = dac)
-  #figure out waveform unit
+  tmp <- abf
   meta <- get_meta(abf)
-  idx_name <- meta$DAC$lDACChannelNameIndex[dac]
-  idx_unit <- meta$DAC$lDACChannelUnitsIndex[dac]
-  dac_name <- meta$Strings[idx_name]
-  dac_unit <- meta$Strings[idx_unit]
-  dac_desc <- "Waveform"
+  for (d in dac) {
+    #get waveform channel
+    wf <- GetWaveform(abf, dac = d)
+    #figure out waveform unit
+    idx_name <- meta$DAC$lDACChannelNameIndex[d]
+    idx_unit <- meta$DAC$lDACChannelUnitsIndex[d]
+    dac_name <- meta$Strings[idx_name]
+    dac_unit <- meta$Strings[idx_unit]
+    dac_desc <- sprintf("Waveform %d", d)
+    tmp <- AtchChan(tmp, wf, dac_name, dac_unit, dac_desc)
+  }
 
-  AtchChan(abf, wf, dac_name, dac_unit, dac_desc)
+  tmp
 }
 
 #' Attach a waveform channel to an abf object, by-ref like behaviour.
