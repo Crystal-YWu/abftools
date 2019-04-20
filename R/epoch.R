@@ -17,29 +17,12 @@ GetEpochId <- function(epoch_name) {
   epoch
 }
 
-#' Get DAC id of which waveform is enabled.
-#'
-#' @param abf an abf object.
-#'
-#' @return DAC id, 1-based.
-#' @export
-#'
-GetWaveformEnabledDAC <- function(abf) {
-
-  CheckArgs(abf)
-
-  meta <- get_meta(abf)
-
-  mask <- as.logical(meta$DAC$nWaveformEnable)
-  meta$DAC$nDACNum[mask] + 1L
-}
-
 GetEpdac <- function(abf, dac) {
 
   meta <- get_meta(abf)
   epdac <- meta$EpochPerDAC
 
-  mask <- epdac$nDACNum == (dac - 1L)
+  mask <- epdac$nDACNum %in% (dac - 1L)
   epdac[mask, ]
 }
 
@@ -116,4 +99,40 @@ GetMultiStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 
   epdac <- GetEpdac(abf, FirstElement(dac))
   which(epdac$nEpochType == 1 & epdac$fEpochLevelInc != 0)
+}
+
+GeussMemtestEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf), type = c("step", "ramp")) {
+
+  CheckArgs(abf, dac = dac)
+  dac <- FirstElement(dac)
+  type <- match.arg(type)
+
+  switch(type,
+         step = GuessMemtestEpoch_Step(abf, dac),
+         ramp = GuessMemtestEpoch_Ramp(abf, dac),
+         integer(0))
+}
+
+GuessMemtestEpoch_Step <- function(abf, dac) {
+
+  # What we find: holding lvl + delta step + holding lvl
+  #
+  #        |------|
+  #        |      |
+  #  ______|      |______
+  #
+
+  integer(0)
+}
+
+GuessMemtestEpoch_Ramp <- function(abf, dac) {
+
+  # What we find: V-shaped ramp
+  #
+  # \         /
+  #  \      /
+  #   \   /
+  #    \/
+
+  integer(0)
 }

@@ -432,22 +432,73 @@ GetPointsPerEvent <- function(abf, event = 1L) {
 #' Get number of epochs.
 #'
 #' @param abf an abf object
+#' @param dac id of DAC channel
 #'
 #' @return number of epochs.
 #' @export
 #'
-GetNumOfEpoch <- function(abf) {
+GetNumOfEpoch <- function(abf, dac = 1L) {
+
+  f <- function(x) {
+    epdac <- GetEpdac(x, dac)
+    sapply(dac, function(d) sum(epdac$nDACNum == (d - 1L)))
+  }
 
   if (IsAbf(abf)) {
-    meta <- get_meta(abf)
-    ans <- length(meta$Epoch$nEpochNum)
+    f(abf)
   } else if (IsAbfList(abf)) {
-    ans <- lapply(abf, GetNumOfEpoch)
+    lapply(abf, f)
   } else {
     err_class_abf()
   }
+}
 
-  ans
+#' Get number of DAC.
+#'
+#' @param abf
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetNumOfDAC <- function(abf) {
+
+  f <- function(x) {
+    meta <- get_meta(x)
+    length(meta$DAC$nDACNum)
+  }
+
+  if (IsAbf(abf)) {
+    f(abf)
+  } else if (IsAbfList(abf)) {
+    lapply(abf, f)
+  } else {
+    err_class_abf()
+  }
+}
+
+#' Get DAC id of which waveform is enabled.
+#'
+#' @param abf an abf object.
+#'
+#' @return DAC id, 1-based.
+#' @export
+#'
+GetWaveformEnabledDAC <- function(abf) {
+
+  f <- function(x) {
+    meta <- get_meta(x)
+    idx <- as.logical(meta$DAC$nWaveformEnable)
+    meta$DAC$nDACNum[idx] + 1L
+  }
+
+  if (IsAbf(abf)) {
+    f(abf)
+  } else if (IsAbfList(abf)) {
+    lapply(abf, f)
+  } else {
+    err_class_abf()
+  }
 }
 
 #' @rdname GetNumOfChannel
@@ -485,7 +536,15 @@ nEpi <- function(abf) {
 #' @rdname GetNumOfEpoch
 #' @export
 #'
-nEpoch <- function(abf) {
+nEpoch <- function(abf, dac = 1L) {
 
-  GetNumOfEpoch(abf)
+  GetNumOfEpoch(abf, dac)
+}
+
+#' @rdname GetNumOfDAC
+#' @export
+#'
+nDAC <- function(abf) {
+
+  GetNumOfDAC(abf)
 }

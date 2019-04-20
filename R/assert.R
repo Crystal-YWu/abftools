@@ -42,54 +42,60 @@ AssertLength <- function(x, ..., explicit = NULL) {
 
 AssertEpisode <- function(abf, episode) {
 
-  f <- function(abf, episode) {
+  f <- function(abf) {
     length(episode) && all(nEpi(abf) >= episode & episode > 0L)
   }
 
   if (IsAbf(abf)) {
-    f(abf, episode)
+    f(abf)
   } else {
-    all(sapply(abf, f, episode = episode))
+    all(sapply(abf, f))
   }
 }
 
 AssertChannel <- function(abf, channel) {
 
-  f <- function(abf, channel) {
+  f <- function(abf) {
     length(channel) && all(nChan(abf) >= channel & channel > 0L)
   }
 
   if (IsAbf(abf)) {
-    f(abf, channel)
+    f(abf)
   } else {
-    all(sapply(abf, f, channel = channel))
+    all(sapply(abf, f))
   }
 }
 
-AssertEpoch <- function(abf, epoch) {
+AssertEpoch <- function(abf, epoch, dac) {
 
-  f <- function(abf, epoch) {
-    length(epoch) && all(nEpoch(abf) >= epoch & epoch > 0L)
+  if (is.null(dac)) {
+    dac <- 1L
+  }
+
+  f <- function(abf) {
+    ans <- sapply(dac, function(d) {
+      all(nEpoch(abf, d) >= epoch & epoch > 0L)
+    })
+    length(epoch) && all(ans)
   }
 
   if (IsAbf(abf)) {
-    f(abf, epoch)
+    f(abf)
   } else {
-    all(sapply(abf, f, epoch = epoch))
+    all(sapply(abf, f))
   }
 }
 
 AssertDac <- function(abf, dac) {
 
-  f <- function(abf, dac) {
-    nDACNum <- get_meta(abf)$EpochPerDAC$nDACNum
-    length(dac) && all((dac - 1L) %in% nDACNum)
+  f <- function(abf) {
+    length(dac) && all(nDAC(abf) >= dac & dac > 0L)
   }
 
   if (IsAbf(abf)) {
-    f(abf, dac)
+    f(abf)
   } else {
-    all(sapply(abf, f, dac = dac))
+    all(sapply(abf, f))
   }
 }
 
@@ -108,7 +114,7 @@ CheckArgs <- function(abf, epi = NULL, chan = NULL, epo = NULL, dac = NULL,
   if (!is.null(epi) && !AssertEpisode(abf, epi)) {
     err_episode()
   }
-  if (!is.null(epo) && !AssertEpoch(abf, epo)) {
+  if (!is.null(epo) && !AssertEpoch(abf, epo, dac)) {
     err_epoch()
   }
   if (!is.null(dac) && !AssertDac(abf, dac)) {
