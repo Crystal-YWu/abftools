@@ -90,3 +90,30 @@ GetEpochIntervals <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 
   win
 }
+
+#' Return all step epoch id.
+#'
+#' @param abf an abf object.
+#' @param dac DAC channel.
+#'
+#' @return an integer vector.
+#' @export
+#'
+GetStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
+
+  CheckArgs(abf, dac = dac)
+
+  epdac <- GetEpdac(abf, FirstElement(dac))
+  which(epdac$nEpochType == 1)
+}
+
+#' @rdname GetStepEpoch
+#' @export
+#'
+GetMultiStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
+
+  CheckArgs(abf, dac = dac)
+
+  epdac <- GetEpdac(abf, FirstElement(dac))
+  which(epdac$nEpochType == 1 & epdac$fEpochLevelInc != 0)
+}

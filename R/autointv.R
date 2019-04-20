@@ -81,7 +81,7 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
 #' 5. Intervals closer to the end of the epoch are preferred.
 #'
 #' @param abf an abf object.
-#' @param epoch the epoch to search, defaults to B (second epoch).
+#' @param epoch the epoch to search, defaults to first multi-step epoch.
 #' @param current_channel channel id for current data, channel id is 1-based.
 #' @param voltage_channel channel id for voltage data, channel id is 1-based.
 #' @param target_interval_size OPTIONAL, target size in **points** of the sampling interval.
@@ -94,7 +94,7 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
 #' @return a named vector of 3 numeric: interval start position, end position, length
 #' @export
 #'
-FindSamplingInterval <- function(abf, epoch = "B",
+FindSamplingInterval <- function(abf, epoch = NULL,
                                  current_channel = GetFirstCurrentChan(abf),
                                  voltage_channel = GetFirstVoltageChan(abf),
                                  target_interval_size = NULL,
@@ -107,9 +107,15 @@ FindSamplingInterval <- function(abf, epoch = "B",
     abf <- AverageAbf(abf)
   }
 
-  if (is.character(epoch)) {
-    epoch <- GetEpochId(epoch)
+  if (is.null(epoch)) {
+    epoch <- GetMultiStepEpoch(abf)
+    epoch <- FirstElement(epoch)
+  } else {
+    if (is.character(epoch)) {
+      epoch <- GetEpochId(epoch)
+    }
   }
+
   CheckArgs(abf, chan = c(current_channel, voltage_channel), epo = epoch)
 
   if (noisy_opt) {
