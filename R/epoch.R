@@ -69,7 +69,7 @@ GetEpochIntervals <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 
   }
 
-  dimnames(win) <- list(c("startPos", "endPos", "length"), NULL, NULL)
+  dimnames(win) <- list(c("startPos", "endPos", "length"), GetEpiTag(abf), NULL)
 
   win
 }
