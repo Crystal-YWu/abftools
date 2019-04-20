@@ -5,7 +5,8 @@
 \alias{FindAllSamplingInterval}
 \title{FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.}
 \usage{
-FindSamplingInterval(abf, epoch = "B",
+FindSamplingInterval(abf, epoch = NULL,
+  dac = GetWaveformEnabledDAC(abf),
   current_channel = GetFirstCurrentChan(abf),
   voltage_channel = GetFirstVoltageChan(abf),
   target_interval_size = NULL, allowed_voltage_delta = NULL,
@@ -16,7 +17,9 @@ FindAllSamplingInterval(abf_list, ...)
 \arguments{
 \item{abf}{an abf object.}
 
-\item{epoch}{the epoch to search, defaults to B (second epoch).}
+\item{epoch}{the epoch to search, defaults to first multi-step epoch.}
+
+\item{dac}{the dac channel to evaluate waveform.}
 
 \item{current_channel}{channel id for current data, channel id is 1-based.}
 

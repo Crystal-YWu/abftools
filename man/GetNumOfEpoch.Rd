@@ -5,12 +5,14 @@
 \alias{nEpoch}
 \title{Get number of epochs.}
 \usage{
-GetNumOfEpoch(abf)
+GetNumOfEpoch(abf, dac = 1L)
 
-nEpoch(abf)
+nEpoch(abf, dac = 1L)
 }
 \arguments{
 \item{abf}{an abf object}
+
+\item{dac}{id of DAC channel}
 }
 \value{
 number of epochs.

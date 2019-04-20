@@ -4,6 +4,7 @@
 #' @param episode the episodes to compare.
 #' @param channel the channel to compare, channel id is 1-based.
 #' @param epoch the epoch to compare.
+#' @param dac  the dac channel to evaluate waveform.
 #' @param delta allowed max deviation.
 #' @param min_win OPTIONAL, minimum interval window size of the result.
 #' @param max_win OPTIONAL, maximum interval window size of the result.
@@ -11,19 +12,20 @@
 #' @return a list of intervals of which pass comparison.
 #' @export
 #'
-CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
+CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
                         delta = NULL, min_win = NULL, max_win = NULL) {
 
-  epoch <- FirstElement(epoch)
   if (is.character(epoch)) {
     epoch <- GetEpochId(epoch)
   }
-  CheckArgs(abf, epi = episode, chan = channel, epo = epoch)
+  epoch <- FirstElement(epoch)
+
+  CheckArgs(abf, epi = episode, chan = channel, epo = epoch, dac = dac)
 
   nepi <- nEpi(abf)
   epoch_intv <- GetEpochIntervals(abf)[, , epoch]
 
-  wf <- GetWaveform(abf)
+  wf <- GetWaveform(abf, dac = dac)
   wf_delta <- abs(wf - abf[,, channel])
   if (is.null(delta)) {
     if (nepi == 1L) {
@@ -82,6 +84,7 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
 #'
 #' @param abf an abf object.
 #' @param epoch the epoch to search, defaults to first multi-step epoch.
+#' @param dac the dac channel to evaluate waveform.
 #' @param current_channel channel id for current data, channel id is 1-based.
 #' @param voltage_channel channel id for voltage data, channel id is 1-based.
 #' @param target_interval_size OPTIONAL, target size in **points** of the sampling interval.
@@ -94,7 +97,7 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch,
 #' @return a named vector of 3 numeric: interval start position, end position, length
 #' @export
 #'
-FindSamplingInterval <- function(abf, epoch = NULL,
+FindSamplingInterval <- function(abf, epoch = NULL, dac = GetWaveformEnabledDAC(abf),
                                  current_channel = GetFirstCurrentChan(abf),
                                  voltage_channel = GetFirstVoltageChan(abf),
                                  target_interval_size = NULL,
@@ -107,22 +110,23 @@ FindSamplingInterval <- function(abf, epoch = NULL,
     abf <- AverageAbf(abf)
   }
 
+  dac <- FirstElement(dac)
   if (is.null(epoch)) {
-    epoch <- GetMultiStepEpoch(abf)
-    epoch <- FirstElement(epoch)
+    epoch <- GetMultiStepEpoch(abf, dac = dac)
   } else {
     if (is.character(epoch)) {
       epoch <- GetEpochId(epoch)
     }
   }
+  epoch <- FirstElement(epoch)
 
-  CheckArgs(abf, chan = c(current_channel, voltage_channel), epo = epoch)
+  CheckArgs(abf, chan = c(current_channel, voltage_channel), epo = epoch, dac = dac)
 
   if (noisy_opt) {
     abf <- ApplyLowpass(abf, chan = current_channel, freq = lp_freq, order = lp_order)
   }
 
-  epdac <- GetEpdac(abf, FirstElement(GetWaveformEnabledDAC(abf)))
+  epdac <- GetEpdac(abf, dac)
   if (any(epdac$lEpochDurationInc != 0)) {
     err_epoch_align()
   }
@@ -140,7 +144,7 @@ FindSamplingInterval <- function(abf, epoch = NULL,
 
   #VOLTAGE
   episodes <- GetAvailEpisodes(abf)
-  episodic_intv <- CmpWaveform(abf, channel = voltage_channel, epoch = epoch,
+  episodic_intv <- CmpWaveform(abf, channel = voltage_channel, epoch = epoch, dac = dac,
                                delta = allowed_voltage_delta, min_win = target_interval_size)
 
   flagged <- unlist(lapply(episodes, function(i) if (!ncol(episodic_intv[[i]])) i))

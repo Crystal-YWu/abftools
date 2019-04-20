@@ -457,10 +457,9 @@ GetNumOfEpoch <- function(abf, dac = 1L) {
 #'
 #' @param abf
 #'
-#' @return
+#' @return a vector of integer, number of DAC
 #' @export
 #'
-#' @examples
 GetNumOfDAC <- function(abf) {
 
   f <- function(x) {

@@ -4,7 +4,7 @@
 \alias{CmpWaveform}
 \title{Compare epoch waveform setting to a channel data.}
 \usage{
-CmpWaveform(abf, episode = GetAllEpisodes(abf), channel, epoch,
+CmpWaveform(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
   delta = NULL, min_win = NULL, max_win = NULL)
 }
 \arguments{
@@ -15,6 +15,8 @@ CmpWaveform(abf, episode = GetAllEpisodes(abf), channel, epoch,
 \item{channel}{the channel to compare, channel id is 1-based.}
 
 \item{epoch}{the epoch to compare.}
+
+\item{dac}{the dac channel to evaluate waveform.}
 
 \item{delta}{allowed max deviation.}
 
