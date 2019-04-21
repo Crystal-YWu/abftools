@@ -46,22 +46,22 @@ IVSummary <- function(abf_list, intv_list = NULL,
 #' Sample abf object to reduce data points.
 #'
 #' @param abf an abf object.
-#' @param sampling_ratio the sampling ratio. See melt.abf for more details.
-#' @param sampling_colFunc a sampling function applied to sampled points.
+#' @param sample_ratio the sampling ratio. See melt.abf for more details.
+#' @param sample_func a sampling function applied to sampled points.
 #' @param ... arguments passed to sampling_colFunc
 #'
 #' @return a sampled abf object
 #' @export
 #'
-SmplAbf <- function(abf, sampling_ratio, sampling_colFunc = NULL, ...) {
+SmplAbf <- function(abf, sample_ratio, sample_func = NULL, ...) {
 
   CheckArgs(abf)
 
-  data <- sample3d_dim1(abf, sampling_ratio, sampling_colFunc, ...)
+  data <- samplend(abf, ratio = sample_ratio, func = sample_func, along = 1L, ...)
   CpAbfAttr(data, abf)
 
   old_samp_intv <- GetSamplingIntv(abf)
-  new_samp_intv <- old_samp_intv * sampling_ratio
+  new_samp_intv <- old_samp_intv * sample_ratio
   attr(data, "SamplingInterval") <- new_samp_intv
 
   #alter meta
@@ -87,26 +87,26 @@ SmplAbf <- function(abf, sampling_ratio, sampling_colFunc = NULL, ...) {
 #' Sample abf object to reduce data points, by-ref like behaviour.
 #'
 #' @param abf an abf object.
-#' @param sampling_ratio the sampling ratio. See melt.abf for more details.
-#' @param sampling_colFunc a sampling function applied to sampled points.
+#' @param sample_ratio the sampling ratio. See melt.abf for more details.
+#' @param sample_func a sampling function applied to sampled points.
 #' @param ... further arguments passed to sampling_colFunc
 #'
 #' @return the sampled abf itself
 #' @export
 #'
-SampleAbf <- function(abf, sampling_ratio, sampling_colFunc = NULL, ...) {
+SampleAbf <- function(abf, sample_ratio, sample_func = NULL, ...) {
 
   if (IsAbf(abf)) {
     return(
       eval.parent(substitute({
-        abf <- SmplAbf(abf, sampling_ratio, sampling_colFunc, ...)
+        abf <- SmplAbf(abf, sample_ratio, sample_func, ...)
       }))
     )
   } else if (IsAbfList(abf)) {
     return(
       eval.parent(substitute({
-        abf <- lapply(abf, SmplAbf, sampling_ratio = sampling_ratio,
-                      sampling_colFunc = sampling_colFunc, ...)
+        abf <- lapply(abf, SmplAbf, sample_ratio = sample_ratio,
+                      sample_func = sample_func, ...)
       }))
     )
   } else {

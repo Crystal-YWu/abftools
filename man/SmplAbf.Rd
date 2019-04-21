@@ -4,14 +4,14 @@
 \alias{SmplAbf}
 \title{Sample abf object to reduce data points.}
 \usage{
-SmplAbf(abf, sampling_ratio, sampling_colFunc = NULL, ...)
+SmplAbf(abf, sample_ratio, sample_func = NULL, ...)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{sampling_ratio}{the sampling ratio. See melt.abf for more details.}
+\item{sample_ratio}{the sampling ratio. See melt.abf for more details.}
 
-\item{sampling_colFunc}{a sampling function applied to sampled points.}
+\item{sample_func}{a sampling function applied to sampled points.}
 
 \item{...}{arguments passed to sampling_colFunc}
 }
