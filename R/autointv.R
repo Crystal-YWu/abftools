@@ -150,7 +150,7 @@ FindSamplingInterval <- function(abf, epoch = NULL, dac = GetWaveformEnabledDAC(
   flagged <- unlist(lapply(episodes, function(i) if (!ncol(episodic_intv[[i]])) i))
   if (!is.null(flagged)) {
     #Fallback
-    episodic_fallback <- CmpWaveform(abf, episode = flagged, channel = voltage_channel,
+    episodic_fallback <- CmpWaveform(abf, episode = flagged, channel = voltage_channel, dac = dac,
                                      epoch = epoch, delta = NULL, min_win = target_interval_size)
     for (epi in flagged) {
       episodic_intv[[epi]] <- episodic_fallback[[epi]]
