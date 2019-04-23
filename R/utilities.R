@@ -12,6 +12,10 @@ AverageAbf <- function(abf_list, w = NULL) {
     err_class_abf_list()
   }
 
+  if (length(abf_list) == 1L) {
+    return(abf_list[[1]])
+  }
+
   if (is.null(w)) {
     n <- length(abf_list)
     ret <- abf_list[[1]]
