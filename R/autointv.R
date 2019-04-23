@@ -214,6 +214,10 @@ FindSamplingInterval <- function(abf, epoch = NULL, dac = GetWaveformEnabledDAC(
 FindAllSamplingInterval <- function(abf_list, ...) {
 
   CheckArgs(abf_list, allow_list = TRUE)
-  lapply(abf_list, FindSamplingInterval, ...)
+  if (IsAbfList(abf_list)) {
+    lapply(abf_list, FindSamplingInterval, ...)
+  } else {
+    FindSamplingInterval(abf_list, ...)
+  }
 }
 
