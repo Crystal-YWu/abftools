@@ -283,17 +283,17 @@ DefaultLabeller <- function(abf) {
 #' @rdname ApplyCursor
 #' @export
 #'
-CursorX <- function(cursor) {
+CursorX <- function(cursor, colour = "black") {
 
-  geom_vline(xintercept = cursor, linetype = "dashed")
+  geom_vline(xintercept = cursor, linetype = "dashed", colour = colour)
 }
 
 #' @rdname ApplyCursor
 #' @export
 #'
-CursorY <- function(cursor) {
+CursorY <- function(cursor, colour = "black") {
 
-  geom_vline(yintercept = cursor, linetype = "dashed")
+  geom_vline(yintercept = cursor, linetype = "dashed", colour = colour)
 }
 
 #' Apply indicative cursors on plot.
@@ -306,13 +306,13 @@ CursorY <- function(cursor) {
 #' @return a ggplot object.
 #' @export
 #'
-ApplyCursor <- function(p, cursor_x = NULL, cursor_y = NULL) {
+ApplyCursor <- function(p, cursor_x = NULL, cursor_y = NULL, colour = "black") {
 
   if (!is.null(cursor_x)) {
-    p <- p + CursorX(cursor = cursor_x)
+    p <- p + CursorX(cursor = cursor_x, colour = colour)
   }
   if (!is.null(cursor_y)) {
-    p <- p + CursorY(cursor = cursor_y)
+    p <- p + CursorY(cursor = cursor_y, colour = colour)
   }
 
   p
