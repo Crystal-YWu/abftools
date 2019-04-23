@@ -158,18 +158,28 @@ FindSamplingInterval <- function(abf, epoch = NULL, dac = GetWaveformEnabledDAC(
   }
   flagged <- unlist(lapply(episodes, function(i) if (!ncol(episodic_intv[[i]])) i))
   if (!is.null(flagged)) {
-    fmt_str <- "In %s, no stable voltage interval found for episode %s. "
+    fmt_str <- "In %s, no stable voltage interval found for episode %s."
     warning(sprintf(fmt_str, GetTitle(abf), paste0(flagged, collapse = ", ")))
-    return(rep(NA, 3))
+    intv <- rep(NA, 3)
+    if (list_mode) {
+      return(rep(list(intv), nabf))
+    } else {
+      return(intv)
+    }
   }
 
   npts <- nPts(abf)
   ovlp <- FilterMinIntervalSize(OverlapEpisodicIntv(episodic_intv, npts),
                                 target_interval_size)
   if (!ncol(ovlp)) {
-    fmt_str <- "In %s, no common stable voltage interval found for all episodes. "
+    fmt_str <- "In %s, no common stable voltage interval found for all episodes."
     warning(sprintf(fmt_str, GetTitle(abf)))
-    return(rep(NA, 3))
+    intv <- rep(NA, 3)
+    if (list_mode) {
+      return(rep(list(intv), nabf))
+    } else {
+      return(intv)
+    }
   }
 
   #CURRENT
