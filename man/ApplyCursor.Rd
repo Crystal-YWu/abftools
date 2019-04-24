@@ -6,11 +6,11 @@
 \alias{ApplyCursor}
 \title{Apply indicative cursors on plot.}
 \usage{
-CursorX(cursor)
+CursorX(cursor, colour = "black")
 
-CursorY(cursor)
+CursorY(cursor, colour = "black")
 
-ApplyCursor(p, cursor_x = NULL, cursor_y = NULL)
+ApplyCursor(p, cursor_x = NULL, cursor_y = NULL, colour = "black")
 }
 \arguments{
 \item{cursor}{a numeric vector.}

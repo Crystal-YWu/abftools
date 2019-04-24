@@ -137,3 +137,142 @@ AtchChan_unsafe <- function(abf, channel_data,
                SamplingInterval = GetSamplingIntv(abf),
                EpiAvail = GetEpiAvail(abf), meta = NULL)
 }
+
+parse_unit_prefix <- function(unit) {
+
+  long_prefix_regex <- "^(pico|nano|micro|milli|kilo|mega|Giga|Tera)"
+  grepl(long_prefix_regex, unit)
+}
+parse_unit_suffix <- function(unit) {
+
+  n <- nchar(unit)
+  long_prefix <- parse_unit_prefix(unit)
+
+  if (long_prefix) {
+    idx <- switch(substr(unit, 1, 4),
+                  micr = ,
+                  mill = 6,
+                  pico = ,
+                  nano = ,
+                  kilo = ,
+                  mega = ,
+                  Giga = ,
+                  Tera = 5,
+                  1)
+  } else {
+    idx <- switch(substr(unit, 1, 1),
+                  µ = ,
+                  u = ,
+                  m = ,
+                  p = ,
+                  n = ,
+                  k = ,
+                  M = ,
+                  G = ,
+                  T = 2,
+                  1)
+  }
+
+  substr(unit, idx, n)
+}
+parse_unit_scale <- function(unit) {
+
+  long_prefix <- parse_unit_prefix(unit)
+  if (long_prefix) {
+    ans <- switch(substr(unit, 1, 4),
+                  pico = 1e-12,
+                  nano = 1e-9,
+                  micr = 1e-6,
+                  mill = 1e-3,
+                  kilo = 1e3,
+                  mega = 1e6,
+                  Giga = 1e9,
+                  Tera = 1e12,
+                  1)
+  } else {
+    ans <- switch(substr(unit, 1, 1),
+                  p = 1e-12,
+                  n = 1e-9,
+                  µ = ,
+                  u = 1e-6,
+                  m = 1e-3,
+                  k = 1e3,
+                  M = 1e6,
+                  G = 1e9,
+                  T = 1e12,
+                  1)
+  }
+
+  ans
+}
+
+#' Rescale channel unit.
+#'
+#' @param abf an abf object
+#' @param channel channel to rescale
+#' @param scale scale to use
+#'
+#' @return abf itself
+#' @export
+#'
+RescaleChannel <- function(abf, channel, scale = c("1", "pico", "nano", "micro", "milli",
+                                                   "kilo", "mega", "Giga", "Tera")) {
+  eval.parent(substitute({
+    abf <- RsclChan(abf, channel, scale)
+    invisible(abf)
+  }))
+}
+
+#' @rdname RescaleChannel
+#' @export
+#'
+RsclChan <- function(abf, channel = GetAllChannels(abf),
+                     scale = c("1", "pico", "nano", "micro", "milli",
+                               "kilo", "mega", "Giga", "Tera")) {
+
+  CheckArgs(abf, chan = channel)
+  scale <- as.character(scale)
+  scale <- match.arg(scale)
+
+  scale_factor <- function(unit, scale) {
+    old_scale <- parse_unit_scale(unit)
+    new_scale <- parse_unit_scale(scale)
+    old_scale / new_scale
+  }
+
+  do_scale <- function(abf, channel, scale) {
+    unit <- GetChannelUnit(abf)
+    for (ch in channel) {
+      abf[,, ch] <- abf[,, ch] * scale_factor(unit[ch], scale)
+      prefix <- parse_unit_prefix(unit[ch])
+      suffix <- parse_unit_suffix(unit[ch])
+      if (prefix) {
+        if (scale == "noprefix") {
+          prefix <- ""
+        } else {
+          prefix <- scale
+        }
+      } else {
+        prefix <- switch(scale,
+                         pico  = "p",
+                         nano  = "n",
+                         micro = "µ",
+                         milli = "m",
+                         kilo  = "k",
+                         mega  = "M",
+                         Giga  = "G",
+                         Tera  = "T",
+                         "")
+      }
+      new_unit <- paste0(prefix, suffix)
+      SetChannelUnit(abf, new_unit, channel = ch)
+    }
+    abf
+  }
+
+  if (IsAbfList(abf)) {
+    lapply(abf, do_scale, channel = channel, scale = scale)
+  } else {
+    do_scale(abf, channel, scale)
+  }
+}
