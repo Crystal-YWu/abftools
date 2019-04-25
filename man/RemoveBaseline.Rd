@@ -17,7 +17,7 @@ RemoveBaseline(abf, channel, method = c("interval", "episode",
 
 \item{intv}{used in interval method. An interval to evaluate baseline level.}
 
-\item{episode}{used in interval and episode method. The episode to evaluate baseline.}
+\item{episode}{used in episode method. The episode to evaluate baseline.}
 
 \item{by_epoch}{used in episode method, see \code{\link[abftools:EpisodeBaseline]{EpisodeBaseline()}} for details.}
 

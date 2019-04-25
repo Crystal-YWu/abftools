@@ -61,7 +61,7 @@ EpisodeBaseline <- function(abf, episode, channel, by_epoch = TRUE, dac = GetWav
 #' @param channel a channel to perform baseline removal
 #' @param method method to use. See details.
 #' @param intv used in interval method. An interval to evaluate baseline level.
-#' @param episode used in interval and episode method. The episode to evaluate baseline.
+#' @param episode used in episode method. The episode to evaluate baseline.
 #' @param by_epoch used in episode method, see \code{\link[abftools:EpisodeBaseline]{EpisodeBaseline()}} for details.
 #' @param dac used in holding and episode method, waveform dac channel.
 #' @param ... used in episode method, passed to baseline_als, see \code{\link[abftools:baseline_als]{baseline_als()}} for details.
@@ -79,7 +79,7 @@ RemoveBaseline <- function(abf, channel, method = c("interval", "episode", "hold
 
   switch(method,
          holding = CheckArgs(abf, chan = channel, dac = dac),
-         interval = CheckArgs(abf, epi = episode, chan = channel),
+         interval = CheckArgs(abf, chan = channel),
          episode = CheckArgs(abf, epi = episode, chan = channel, dac = dac))
 
   bl <- switch(method,
@@ -88,9 +88,10 @@ RemoveBaseline <- function(abf, channel, method = c("interval", "episode", "hold
                  meta$DAC$fDACHoldingLevel[dac]
                },
                interval = {
-                 episode <- FirstElement(episode)
                  mask <- MaskIntv(intv)
-                 mean(abf[mask, episode, channel])
+                 tmp <- mapnd(abf[mask,, channel, drop = FALSE], func = mean)
+                 npts <- nPts(abf)
+                 matrix(data = tmp, nrow = npts, ncol = length(tmp), byrow = TRUE)
                },
                episode = {
                  episode <- FirstElement(episode)
