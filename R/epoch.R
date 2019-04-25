@@ -101,6 +101,18 @@ GetMultiStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
   which(epdac$nEpochType == 1 & epdac$fEpochLevelInc != 0)
 }
 
+#' Guess first epoch that can perform a membrane test.
+#'
+#' @param abf an abf object.
+#' @param dac dac channel.
+#' @param type type of membrane test. When type is "step", the function searches
+#' for pattern of holding level -> step -> holding level. When type is "ramp",
+#' the function searches for pattern of holding level -> ramp up/down -> ramp down/up
+#' -> holding level.
+#'
+#' @return an epoch number
+#' @export
+#'
 GeussMemtestEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf), type = c("step", "ramp")) {
 
   CheckArgs(abf, dac = dac)
@@ -122,17 +134,41 @@ GuessMemtestEpoch_Step <- function(abf, dac) {
   #  ______|      |______
   #
 
+  meta <- get_meta(abf)
+  nepo <- nEpoch(abf, dac = dac)
+  epdac <- GetEpdac(abf, dac = dac)
+  holding <- meta$DAC$fDACHoldingLevel[dac]
+
+  for (epo in seq_len(nepo - 1L)) {
+    if (epdac$nEpochType[epo] == 1 && epdac$fEpochInitLevel[epo] == holding && epdac$fEpochLevelInc[epo] == 0 &&
+        epdac$nEpochType[epo + 1L] == 1 && epdac$fEpochInitLevel[epo + 1L] != holding || epdac$fEpochLevelInc[epo + 1L] != 0) {
+      return(epo)
+    }
+  }
+
   integer(0)
 }
 
 GuessMemtestEpoch_Ramp <- function(abf, dac) {
 
-  # What we find: V-shaped ramp
+  # What we find: holding lvl + V-shaped ramp + holding lvl
   #
-  # \         /
-  #  \      /
-  #   \   /
-  #    \/
+  # -----\         /-----
+  #       \      /
+  #        \   /
+  #         \/
+
+  meta <- get_meta(abf)
+  nepo <- nEpoch(abf, dac = dac)
+  epdac <- GetEpdac(abf, dac = dac)
+  holding <- meta$DAC$fDACHoldingLevel[dac]
+
+  for (epo in seq_len(nepo - 1L)) {
+    #assume starting from holding
+    if (epdac$nEpochType[epo] == 2 && epdac$nEpochType[epo + 1L] == 2 && epdac$fEpochInitLevel[epo + 1L] == holding) {
+      return(epo)
+    }
+  }
 
   integer(0)
 }

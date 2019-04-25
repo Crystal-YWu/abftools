@@ -8,13 +8,13 @@ baseline_als(y, lambda = 1e+06, p = 0.05, maxitr = 10L,
   converge_warning = FALSE)
 }
 \arguments{
-\item{y}{a numeric vector}
+\item{y}{a numeric vector, signals.}
 
-\item{lambda}{large numeric}
+\item{lambda}{a large numeric, determines smoothness.}
 
-\item{p}{numeric between (0, 1)}
+\item{p}{a numeric between (0, 1), determines asymeetry.}
 
-\item{maxitr}{integer maximum iteration}
+\item{maxitr}{an integer, maximum iteration.}
 
 \item{converge_warning}{whether to give a warning if not converged.}
 }
@@ -22,5 +22,8 @@ baseline_als(y, lambda = 1e+06, p = 0.05, maxitr = 10L,
 a numeric vector, baseline of y
 }
 \description{
-Ref: Paul H. C. Eilers, Hans F.M. Boelens, 2005
+Baseline Correction with Asymmetric Least Squares Smoothing
+}
+\references{
+Paul H. C. Eilers, Hans F.M. Boelens, 2005
 }

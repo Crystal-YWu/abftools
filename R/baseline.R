@@ -1,59 +1,116 @@
-#' Calculate baseline of a channel
+#' Calculate baseline of an episode
 #'
 #' @param abf an abf object.
-#' @param episode episodes to calculate baseline
+#' @param episode an episode to calculate baseline
 #' @param channel channel to calculate baseline
-#' @param epoch OPTIONAL, specific epoch to calculate baseline, if NULL all epochs are calculated.
-#' @param ... arguments passed to baseline_als
+#' @param by_epoch calculate baselines by epochs, if set to FALSE, the whole episode
+#' is used to calculate baselines, otherwise, baselines are calculated piece-by-piece
+#' by each epoch and then concatenated.
+#' @param dac dac channel if by_epoch is used.
+#' @param ... arguments passed to baseline_als, see \code{\link[abftools:baseline_als]{baseline_als()}} for details.
 #'
 #' @return baseline of the channel
 #' @export
 #'
-ChannelBaseline <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
-                            epoch = NULL, ...) {
+EpisodeBaseline <- function(abf, episode, channel, by_epoch = TRUE, dac = GetWaveformEnabledDAC(abf), ...) {
+
+  episode <- FirstElement(episode)
+  channel <- FirstElement(channel)
+
+  if (by_epoch) {
+    CheckArgs(abf, epi = episode, chan = channel, dac = dac)
+
+    epo <- GetEpochIntervals(abf, dac = dac)
+    intvs <- epo[, episode, ]
+    n_intvs <- ncol(intvs)
+    baselines <- lapply(seq_len(n_intvs), function(i) {
+      mask <- MaskIntv(intvs[, i])
+      y <- abf[mask, episode, channel]
+      baseline_als(y, ...)
+    })
+
+    intv1 <- Intv(startPos = 1L, endPos = intvs[1, 1] - 1L)
+    mask <- MaskIntv(intv1)
+    h1 <- abf[mask, episode, channel]
+
+    intv2 <- Intv(startPos = intvs[2, n_intvs] + 1L, endPos = nPts(abf))
+    mask <- MaskIntv(intv2)
+    h2 <- abf[mask, episode, channel]
+
+    c(h1, unlist(baselines), h2)
+
+  } else {
+    CheckArgs(abf, epi = episode, chan = channel)
+
+    y <- abf[, episode, channel]
+    baseline_als(y, ...)
+
+  }
+}
+
+#' Remove baseline of a channel.
+#'
+#' @details Avaiable methods for baseline removal are holding, interval and episode.
+#' The interval method evaluate mean baseline level from the given episode between intv,
+#' then subtract the value to every episode.
+#' The episode method calculates baseline by calling \code{\link[abftools:baseline_als]{baseline_als()}}.
+#' The holding method simply read holding level from DAC setting and subtract the
+#' value to every episode. This is usually desirable only for waveform channel.
+#'
+#' @param abf an abf object.
+#' @param channel a channel to perform baseline removal
+#' @param method method to use. See details.
+#' @param intv used in interval method. An interval to evaluate baseline level.
+#' @param episode used in interval and episode method. The episode to evaluate baseline.
+#' @param by_epoch used in episode method, see \code{\link[abftools:EpisodeBaseline]{EpisodeBaseline()}} for details.
+#' @param dac used in holding and episode method, waveform dac channel.
+#' @param ... used in episode method, passed to baseline_als, see \code{\link[abftools:baseline_als]{baseline_als()}} for details.
+#'
+#' @return an abf object.
+#' @export
+#'
+RemoveBaseline <- function(abf, channel, method = c("interval", "episode", "holding"),
+                           intv, episode, by_epoch = TRUE, dac = GetWaveformEnabledDAC(abf),
+                           ...) {
+
+  method <- match.arg(method)
 
   channel <- FirstElement(channel)
-  CheckArgs(abf, epi = episode, chan = channel, epo = epoch)
 
-  nepo <- nEpoch(abf)
-  npts <- nPts(abf)
-  nepi <- length(episode)
+  switch(method,
+         holding = CheckArgs(abf, chan = channel, dac = dac),
+         interval = CheckArgs(abf, epi = episode, chan = channel),
+         episode = CheckArgs(abf, epi = episode, chan = channel, dac = dac))
 
-  if (nepo) {
-    epoch_intv <- GetEpochIntervals(abf)
-  } else {
-    nepo <- 1L
-    epoch_intv <- array(c(1L, npts, npts), dim = c(3L, nepi, 1L))
-  }
+  bl <- switch(method,
+               holding = {
+                 meta <- get_meta(abf)
+                 meta$DAC$fDACHoldingLevel[dac]
+               },
+               interval = {
+                 episode <- FirstElement(episode)
+                 mask <- MaskIntv(intv)
+                 mean(abf[mask, episode, channel])
+               },
+               episode = {
+                 episode <- FirstElement(episode)
+                 EpisodeBaseline(abf, episode = episode, channel = channel,
+                                 by_epoch = by_epoch, dac = dac, ...)
+               })
+  abf[,, channel] <- abf[,, channel] - bl
 
-  mx <- abf[, , channel]
-  for (i in seq_len(nepi)) {
-    if (is.null(epoch)) {
-      for (epo in seq_len(nepo)) {
-        mask <- MaskIntv(epoch_intv[, episode[i], epo])
-        mx[mask, i] <- baseline_als(abf[mask, episode[i], channel], ...)
-      }
-    } else {
-      mask <- MaskIntv(epoch_intv[, episode[i], epoch])
-      mx[mask, i] <- baseline_als(abf[mask, episode[i], channel], ...)
-    }
-  }
-
-  epilabel <- DefaultEpiLabel(abf)
-  colnames(mx) <- epilabel[episode]
-
-  mx
+  abf
 }
 
 #' Baseline Correction with Asymmetric Least Squares Smoothing
 #'
-#' Ref: Paul H. C. Eilers, Hans F.M. Boelens, 2005
-#'
-#' @param y a numeric vector
-#' @param lambda large numeric
-#' @param p numeric between (0, 1)
-#' @param maxitr integer maximum iteration
+#' @param y a numeric vector, signals.
+#' @param lambda a large numeric, determines smoothness.
+#' @param p a numeric between (0, 1), determines asymeetry.
+#' @param maxitr an integer, maximum iteration.
 #' @param converge_warning whether to give a warning if not converged.
+#'
+#' @references Paul H. C. Eilers, Hans F.M. Boelens, 2005
 #'
 #' @return a numeric vector, baseline of y
 #' @export

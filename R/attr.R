@@ -547,3 +547,9 @@ nDAC <- function(abf) {
 
   GetNumOfDAC(abf)
 }
+
+nPtsHolding <- function(abf) {
+
+  npts <- nPts(abf)
+  npts %/% 64L
+}
