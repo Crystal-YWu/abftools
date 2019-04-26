@@ -113,7 +113,7 @@ GetMultiStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 #' @return an epoch number
 #' @export
 #'
-GeussMemtestEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf), type = c("step", "ramp")) {
+GuessMemtestEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf), type = c("step", "ramp")) {
 
   CheckArgs(abf, dac = dac)
   dac <- FirstElement(dac)
