@@ -101,7 +101,7 @@ GetMultiStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
   which(epdac$nEpochType == 1 & epdac$fEpochLevelInc != 0)
 }
 
-#' Guess first epoch that can perform a membrane test.
+#' Look for first epoch that can perform a membrane test.
 #'
 #' @param abf an abf object.
 #' @param dac dac channel.
@@ -113,59 +113,54 @@ GetMultiStepEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf)) {
 #' @return an epoch number
 #' @export
 #'
-GuessMemtestEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf), type = c("step", "ramp")) {
+FindMemtestEpoch <- function(abf, dac = GetWaveformEnabledDAC(abf), type = c("step", "ramp")) {
 
   CheckArgs(abf, dac = dac)
   dac <- FirstElement(dac)
   type <- match.arg(type)
 
   switch(type,
-         step = GuessMemtestEpoch_Step(abf, dac),
-         ramp = GuessMemtestEpoch_Ramp(abf, dac),
+         step = FindMemtestEpoch_Step(abf, dac),
+         ramp = FindMemtestEpoch_Ramp(abf, dac),
          integer(0))
 }
 
-GuessMemtestEpoch_Step <- function(abf, dac) {
+FindMemtestEpoch_Step <- function(abf, dac) {
 
-  # What we find: holding lvl + delta step + holding lvl
+  # What we find: holding lvl + delta step (+ holding lvl)
   #
   #        |------|
   #        |      |
   #  ______|      |______
   #
 
-  meta <- get_meta(abf)
   nepo <- nEpoch(abf, dac = dac)
   epdac <- GetEpdac(abf, dac = dac)
-  holding <- meta$DAC$fDACHoldingLevel[dac]
-
   for (epo in seq_len(nepo - 1L)) {
-    if (epdac$nEpochType[epo] == 1 && epdac$fEpochInitLevel[epo] == holding && epdac$fEpochLevelInc[epo] == 0 &&
-        epdac$nEpochType[epo + 1L] == 1 && epdac$fEpochInitLevel[epo + 1L] != holding || epdac$fEpochLevelInc[epo + 1L] != 0) {
-      return(epo)
+    if (epdac$nEpochType[epo] == 1 &&  epdac$fEpochLevelInc[epo] == 0 && epdac$nEpochType[epo + 1L] == 1 &&
+        epdac$fEpochInitLevel[epo + 1L] != epdac$fEpochInitLevel[epo] || epdac$fEpochLevelInc[epo + 1L] != 0) {
+      return(epo + 1L)
     }
   }
 
   integer(0)
 }
 
-GuessMemtestEpoch_Ramp <- function(abf, dac) {
+FindMemtestEpoch_Ramp <- function(abf, dac) {
 
-  # What we find: holding lvl + V-shaped ramp + holding lvl
+  # What we find: (holding lvl +) V-shaped ramp (+ holding lvl)
   #
   # -----\         /-----
   #       \      /
   #        \   /
   #         \/
 
-  meta <- get_meta(abf)
   nepo <- nEpoch(abf, dac = dac)
   epdac <- GetEpdac(abf, dac = dac)
-  holding <- meta$DAC$fDACHoldingLevel[dac]
 
   for (epo in seq_len(nepo - 1L)) {
     #assume starting from holding
-    if (epdac$nEpochType[epo] == 2 && epdac$nEpochType[epo + 1L] == 2 && epdac$fEpochInitLevel[epo + 1L] == holding) {
+    if (epdac$nEpochType[epo] == 2 && epdac$nEpochType[epo + 1L] == 2) {
       return(epo)
     }
   }
