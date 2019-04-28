@@ -281,6 +281,7 @@ sample1d <- function(x, ratio, func = NULL, ...) {
   if (is.null(func)) {
     return(x[idx])
   }
+  func <- match.fun(func)
 
   idx2 <- c(idx[2:nidx] - 1L, n)
   ans <- matrixStats::allocVector(length = nidx, value = 0)
@@ -304,6 +305,7 @@ sample1d_col <- function(x, ratio, colFunc = NULL, ...) {
   if (is.null(colFunc)) {
     return(x[idx])
   }
+  colFunc <- match.fun(colFunc)
 
   if (n %% ratio == 0) {
     dim(x) <- c(ratio, n %/% ratio)
@@ -361,6 +363,7 @@ sample3d_dim1_col <- function(x, ratio, colFunc = NULL, ...) {
   ans <- array(x[idx_smpl,,], dim = c(nsmpl, nd2, nd3))
 
   if (!is.null(colFunc)) {
+    colFunc <- match.fun(colFunc)
     if (nd1 %% ratio == 0L) {
       ncol <- nd1 %/% ratio
       for (id3 in seq_len(nd3)) {
