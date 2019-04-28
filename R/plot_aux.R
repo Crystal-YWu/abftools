@@ -41,14 +41,18 @@ GetYLimit <- function(abf, intv = NULL, curs = NULL, channel, blank = 0.0125) {
 #'
 #' @param abf an abf object.
 #' @param freq a frequency in Hz.
+#' @param sampling_rate sampling rate (in µs).
 #'
 #' @return an integer of **point**/**tick** count.
 #' @export
 #'
-FreqToTick <- function(abf, freq) {
+FreqToTick <- function(abf, freq, sampling_rate) {
 
   time <- 1e6 / freq
-  tick <- time / GetSamplingRate(abf)
+  if (missing(sampling_rate)) {
+    sampling_rate <- GetSamplingRate(abf)
+  }
+  tick <- time / sampling_rate
 
   ceiling(tick)
 }
@@ -58,20 +62,25 @@ FreqToTick <- function(abf, freq) {
 #' @param abf an abf object.
 #' @param tick a vector of integer.
 #' @param time_unit desired time unit.
+#' @param sampling_rate sampling rate (in µs).
 #'
 #' @return a vector of numeric.
 #' @export
 #'
-TickToTime <- function(abf, tick, time_unit = c("tick", "us", "ms", "s", "min", "hr")) {
+TickToTime <- function(abf, tick, time_unit = c("tick", "us", "ms", "s", "min", "hr"), sampling_rate) {
 
   time_unit <- match.arg(time_unit)
+
+  if (missing(sampling_rate)) {
+    sampling_rate <- GetSamplingRate(abf)
+  }
   time <- switch(time_unit,
                  tick = tick,
-                 us =  (tick - 1L) * GetSamplingIntv(abf),
-                 ms =  (tick - 1L) * GetSamplingIntv(abf) / 1000,
-                 s  =  (tick - 1L) * GetSamplingIntv(abf) / 1000 / 1000,
-                 min = (tick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60,
-                 hr =  (tick - 1L) * GetSamplingIntv(abf) / 1000 / 1000 / 60 / 60)
+                 us =  (tick - 1L) * sampling_rate,
+                 ms =  (tick - 1L) * sampling_rate / 1000,
+                 s  =  (tick - 1L) * sampling_rate / 1000 / 1000,
+                 min = (tick - 1L) * sampling_rate / 1000 / 1000 / 60,
+                 hr =  (tick - 1L) * sampling_rate / 1000 / 1000 / 60 / 60)
 
   time
 }
