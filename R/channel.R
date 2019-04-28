@@ -244,10 +244,10 @@ RsclChan <- function(abf, channel = GetAllChannels(abf),
     unit <- GetChannelUnit(abf)
     for (ch in channel) {
       abf[,, ch] <- abf[,, ch] * scale_factor(unit[ch], scale)
-      prefix <- parse_unit_prefix(unit[ch])
+      long_prefix <- parse_unit_prefix(unit[ch])
       suffix <- parse_unit_suffix(unit[ch])
-      if (prefix) {
-        if (scale == "noprefix") {
+      if (long_prefix) {
+        if (scale == "1") {
           prefix <- ""
         } else {
           prefix <- scale
