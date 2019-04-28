@@ -221,3 +221,131 @@ FindAllSamplingInterval <- function(abf_list, ...) {
   }
 }
 
+#' Find a step episode.
+#'
+#' This function compares the DAC level of given epoch to previous epoch, and find
+#' the episode with smallest step size.
+#'
+#' @param abf an abf object.
+#' @param epoch epoch id.
+#' @param dac DAC channel of waveform.
+#'
+#' @return an episode id.
+#' @export
+#'
+FindStepEpisode <- function(abf,
+                            epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
+                            dac = GetWaveformEnabledDAC(abf)) {
+
+  CheckArgs(abf, epo = epoch, dac = dac)
+
+  hold_epi <- step_epi_level(abf, epoch = epoch - 1L, dac = dac)
+  step_epi <- step_epi_level(abf, epoch = epoch, dac = dac)
+
+  #try negative direction
+  idx <- step_epi < hold_epi
+  if (!any(idx)) {
+    #negative direction failed, try positive direction
+    idx <- step_epi > hold_epi
+  }
+  if (any(idx)) {
+    if (idx[1]) {
+      epi <- max(which(idx))
+    } else {
+      epi <- min(which(idx))
+    }
+  } else {
+    epi <- NA
+  }
+
+  epi
+}
+
+#' Find a charging interval of given current channel.
+#'
+#' @details This function finds an interval of an episode that fits charging/discharging
+#' behaviour of an RC circuit.
+#' Since abf object records descrete data points, FindChargeInterval() may have
+#' numeric stability issues in some extreme cases. Increase peak_window and
+#' diff_window usually solves them. The default values of peak_window, diff_window
+#' are tested and should work most of the time.
+#' You can also provide a pre-calculated 1st derivative using argument dy. Please
+#' note that dy should only contains points within the epoch instead of a whole
+#' sweep.
+#'
+#' @param abf an abf object.
+#' @param epoch epoch to locate the interval.
+#' @param dac DAC channel of waveform.
+#' @param episode an episode to locate the interval.
+#' @param current_channel current channel.
+#' @param peak_window a window to locate peak.
+#' @param diff_window a window to calculate slope.
+#' @param dy 1st derivatives of current channel within the epoch.
+#'
+#' @return an interval.
+#' @export
+#'
+FindChargeInterval <- function(abf,
+                               epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
+                               dac = GetWaveformEnabledDAC(abf),
+                               episode = FindStepEpisode(abf, epoch = epoch, dac = dac),
+                               current_channel = GetFirstCurrentChan(abf),
+                               peak_window = 3L,
+                               diff_window = 5L,
+                               dy = NULL) {
+
+  if (is.character(epoch)) {
+    epoch <- GetEpochId(epoch)
+  }
+  epoch <- FirstElement(epoch)
+  dac <- FirstElement(dac)
+  episode <- FirstElement(episode)
+  current_channel <- FirstElement(current_channel)
+
+  CheckArgs(abf, epi = episode, chan = current_channel, epo = epoch, dac = dac)
+
+  epo <- GetEpochIntervals(abf, dac = dac)
+  intv <- epo[, episode, epoch]
+  mask <- MaskIntv(intv)
+
+  peak_window <- as.integer(peak_window)
+  stencil <- seq.int(-1, peak_window - 2L)
+  coefs <- stencil_coefs(stencil = stencil, order = 1L)
+  y <- abf[, episode, current_channel]
+  if (is.null(dy)) {
+    dy <- sapply(mask, function(idx) {
+      stencil_finite_diff(y, idx, stencil = stencil, order = 1, coefs = coefs)
+    })
+  }
+
+  n <- length(dy)
+
+  #first peak, look for sign change
+  idx_start <- NA
+  sign <- dy > 0
+  for (i in seq_len(n - 1L)) {
+    if (xor(sign[i], sign[i + 1L])) {
+      idx_start <- i + 1L
+      break
+    }
+  }
+
+  if (is.na(idx_start)) {
+    #no sign change
+    stop("Monotonic charging interval.")
+  }
+
+  #flat interval
+  diff_window <- as.integer(diff_window) * peak_window
+  dy <- sample1d_col_rolled(x = dy[seq.int(idx_start + diff_window + 1L, n)],
+                            ratio = diff_window,
+                            colFunc = colMeans)
+  idx_end <- idx_start + diff_window + which.min(abs(dy))
+
+  Intv(startPos = idx_start + intv[1] - 1L, endPos = idx_end + intv[1] - 1L)
+}
+
+#' @rdname FindChargeInterval
+#' @export
+#'
+FindDischargeInterval <- FindChargeInterval

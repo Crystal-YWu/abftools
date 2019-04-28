@@ -192,3 +192,10 @@ wf_biphsc <- function(len, Vin, Vhi, period, width) {
 
   rep(win, length.out = len)
 }
+
+step_epi_level <- function(abf, epoch, dac) {
+
+  epdac <- GetEpdac(abf, dac)
+  nepi <- nEpi(abf)
+  epdac$fEpochInitLevel[epoch] + (seq_len(nepi) - 1L) * epdac$fEpochLevelInc[epoch]
+}
