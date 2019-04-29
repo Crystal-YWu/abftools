@@ -9,7 +9,12 @@
 colSems <- function(df, na.rm = FALSE) {
 
   sds <- matrixStats::colSds(df, na.rm = na.rm)
-  sqn <- sqrt(length(sds))
+  if (na.rm) {
+    na <- is.na(df)
+    sqn <- sqrt(matrixStats::colSums2(!na))
+  } else {
+    sqn <- sqrt(nrow(df))
+  }
 
   sds / sqn
 }
