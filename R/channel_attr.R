@@ -3,6 +3,8 @@ IsCurrentUnit <- function(x) endsWith(toupper(x), "A") | grepl("AM", toupper(x),
 
 #' Get voltage channel id.
 #'
+#' If abf is a list of abf objects, returns common voltage channel id.
+#'
 #' @param abf an abf object or a list of abf objects.
 #'
 #' @return a vector of voltage channel id.
@@ -16,8 +18,8 @@ GetVoltageChan <- function(abf) {
   if (IsAbf(abf)) {
     ans <- f(abf)
   } else {
-    ans <- unique(sapply(abf, f))
-    if (length(ans) > 1L) {
+    ans <- Reduce(intersect, lapply(abf, f))
+    if (!length(ans)) {
       err_channel_config(abf)
     }
   }
@@ -26,6 +28,8 @@ GetVoltageChan <- function(abf) {
 }
 
 #' Get current channel id.
+#'
+#' If abf is a list of abf objects, returns common current channel id.
 #'
 #' @param abf an abf object or a list of abf objects.
 #'
@@ -40,8 +44,8 @@ GetCurrentChan <- function(abf) {
   if (IsAbf(abf)) {
     ans <- f(abf)
   } else {
-    ans <- unique(sapply(abf, f))
-    if (length(ans) > 1L) {
+    ans <- Reduce(intersect, lapply(abf, f))
+    if (!length(ans)) {
       err_channel_config(abf)
     }
   }

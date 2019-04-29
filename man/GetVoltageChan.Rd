@@ -13,5 +13,5 @@ GetVoltageChan(abf)
 a vector of voltage channel id.
 }
 \description{
-Get voltage channel id.
+If abf is a list of abf objects, returns common voltage channel id.
 }

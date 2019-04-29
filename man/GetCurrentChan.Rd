@@ -13,5 +13,5 @@ GetCurrentChan(abf)
 a vector of current channel id.
 }
 \description{
-Get current channel id.
+If abf is a list of abf objects, returns common current channel id.
 }
