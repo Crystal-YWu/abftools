@@ -99,6 +99,20 @@ AssertDac <- function(abf, dac) {
   }
 }
 
+AssertDim <- function(abf, d = NULL) {
+
+  if (!IsAbfList(abf)) {
+    TRUE
+  } else {
+    if (is.null(d)) {
+      test <- lapply(abf, dim)
+    } else {
+      test <- lapply(abf, function(x) dim(x)[d])
+    }
+    length(unique(test)) == 1L
+  }
+}
+
 CheckArgs <- function(abf, epi = NULL, chan = NULL, epo = NULL, dac = NULL,
                       ..., allow_list = FALSE) {
 
