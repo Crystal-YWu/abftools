@@ -31,8 +31,8 @@ AtchChan <- function(abf, channel_data,
   dim(new_abf) <- d
 
   #copy to data
-  nchan_old <- nChan(abf)
-  nchan_new <- nchan_old + 1L
+  nchan_old <- d[3]
+  nchan_new <- d[3] + 1L
 
   #copy meta information
   meta <- get_meta(abf)
@@ -55,12 +55,13 @@ AtchChan <- function(abf, channel_data,
   }
 
   #we should be good to go
-  ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
-               ChannelName = c(GetChannelName(abf), channel_name),
-               ChannelUnit = c(GetChannelUnit(abf), channel_unit),
-               ChannelDesc = c(GetChannelDesc(abf), channel_desc),
-               SamplingInterval = GetSamplingIntv(abf),
-               EpiAvail = GetEpiAvail(abf), meta = meta)
+  structure(new_abf, class = "abf", title = GetTitle(abf), mode = GetMode(abf),
+            ChannelName = c(GetChannelName(abf), channel_name),
+            ChannelUnit = c(GetChannelUnit(abf), channel_unit),
+            ChannelDesc = c(GetChannelDesc(abf), channel_desc),
+            SamplingInterval = GetSamplingIntv(abf),
+            EpiAvail = GetEpiAvail(abf),
+            meta = meta)
 }
 
 #' Attach a new channel to an abf object, by-ref like behaviour.
@@ -120,22 +121,6 @@ ReplaceChannel <- function(abf, channel_data, channel = 1L) {
       abf <- RplcChan(abf, channel_data, channel)
       invisible(abf)
     }))
-}
-
-AtchChan_unsafe <- function(abf, channel_data,
-                            channel_name, channel_unit, channel_desc = channel_name) {
-
-  d <- dim(abf)
-  d[3] <- d[3] + 1L
-  new_abf <- c(abf, channel_data)
-  dim(new_abf) <- d
-
-  ApplyAbfAttr(new_abf, title = GetTitle(abf), mode = GetMode(abf),
-               ChannelName = c(GetChannelName(abf), channel_name),
-               ChannelUnit = c(GetChannelUnit(abf), channel_unit),
-               ChannelDesc = c(GetChannelDesc(abf), channel_desc),
-               SamplingInterval = GetSamplingIntv(abf),
-               EpiAvail = GetEpiAvail(abf), meta = NULL)
 }
 
 #' Rescale channel unit.

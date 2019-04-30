@@ -151,13 +151,14 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TR
   nepi <- dim(data)[2]
   meta <- section
   meta$Header <- header
-  ApplyAbfAttr(data, title = abf_title, mode = op_mode,
-               ChannelName = chan_name,
-               ChannelUnit = chan_unit,
-               ChannelDesc = chan_desc,
-               SamplingInterval = sample_interval_us,
-               EpiAvail = rep(TRUE, nepi),
-               meta = meta)
+
+  structure(data, class = "abf", title = abf_title, mode = op_mode,
+            ChannelName = chan_name,
+            ChannelUnit = chan_unit,
+            ChannelDesc = chan_desc,
+            SamplingInterval = sample_interval_us,
+            EpiAvail = rep(TRUE, nepi),
+            meta = meta)
 }
 
 #' abf2_loadlist

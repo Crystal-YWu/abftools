@@ -1,57 +1,29 @@
-#define attr of an abf object
-ApplyAbfAttr <- function(x, class = "abf", title, mode,
-                         ChannelName, ChannelUnit, ChannelDesc,
-                         SamplingInterval, EpiAvail, meta = NULL) {
-
-  eval.parent(substitute({
-    attr(x, "class") <- class
-    attr(x, "title") <- title
-    attr(x, "mode") <- mode
-
-    attr(x, "ChannelName") <- ChannelName
-    attr(x, "ChannelUnit") <- ChannelUnit
-    attr(x, "ChannelDesc") <- ChannelDesc
-
-    attr(x, "SamplingInterval") <- SamplingInterval
-    attr(x, "EpiAvail") <- EpiAvail
-
-    if (!is.null(meta)) {
-      attr(x, "meta") <- meta
-    }
-
-    x
-  }))
-}
-
 #copy channel related attr
-CpChannelAttr <- function(x, abf, channel = NULL) {
+ApplyChannelAttr <- function(x, abf, channel = NULL) {
 
-  eval.parent(substitute({
-    if (is.null(channel)) {
-      attr(x, "ChannelName") <- GetChannelName(abf)
-      attr(x, "ChannelUnit") <- GetChannelUnit(abf)
-      attr(x, "ChannelDesc") <- GetChannelDesc(abf)
-    } else {
-      attr(x, "ChannelName") <- GetChannelName(abf)[channel]
-      attr(x, "ChannelUnit") <- GetChannelUnit(abf)[channel]
-      attr(x, "ChannelDesc") <- GetChannelDesc(abf)[channel]
-    }
+  if (is.null(channel)) {
+    attr(x, "ChannelName") <- GetChannelName(abf)
+    attr(x, "ChannelUnit") <- GetChannelUnit(abf)
+    attr(x, "ChannelDesc") <- GetChannelDesc(abf)
+  } else {
+    attr(x, "ChannelName") <- GetChannelName(abf)[channel]
+    attr(x, "ChannelUnit") <- GetChannelUnit(abf)[channel]
+    attr(x, "ChannelDesc") <- GetChannelDesc(abf)[channel]
+  }
 
-    x
-  }))
+  x
 }
 
-CpAbfAttr <- function(x, abf) {
+ApplyAbfAttr <- function(x, abf) {
 
-  eval.parent(substitute({
-    ApplyAbfAttr(x, title = GetTitle(abf), mode = GetMode(abf),
-                 ChannelName = GetChannelName(abf),
-                 ChannelUnit = GetChannelUnit(abf),
-                 ChannelDesc = GetChannelDesc(abf),
-                 SamplingInterval = GetSamplingIntv(abf),
-                 EpiAvail = GetEpiAvail(abf),
-                 meta = get_meta(abf))
-  }))
+  structure(x,
+            class = "abf", title = GetTitle(abf), mode = GetMode(abf),
+            ChannelName = GetChannelName(abf),
+            ChannelUnit = GetChannelUnit(abf),
+            ChannelDesc = GetChannelDesc(abf),
+            SamplingInterval = GetSamplingIntv(abf),
+            EpiAvail = GetEpiAvail(abf),
+            meta = get_meta(abf))
 }
 
 #' Get title of an abf object.
