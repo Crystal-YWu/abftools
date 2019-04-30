@@ -2,18 +2,23 @@
 % Please edit documentation in R/utils.R
 \name{colSems}
 \alias{colSems}
-\title{Calculate column standard error of measurements}
+\alias{rowSems}
+\title{Calculate column/row standard error of measurements}
 \usage{
-colSems(df, na.rm = FALSE)
+colSems(x, na.rm = FALSE, ...)
+
+rowSems(x, na.rm = FALSE, ...)
 }
 \arguments{
-\item{df}{a data frame of data frame like 2d data}
+\item{x}{an 2d numeric}
 
 \item{na.rm}{remove NAs}
+
+\item{...}{passed to colSds/rowSds()}
 }
 \value{
 calculated column sem
 }
 \description{
-Calculate column standard error of measurements
+Calculate column/row standard error of measurements
 }
