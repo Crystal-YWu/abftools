@@ -17,7 +17,7 @@ IVSummary <- function(abf_list, intv_list = NULL,
     err_class_abf_list()
   }
   CheckArgs(abf_list, chan = c(current_channel, voltage_channel), allow_list = TRUE)
-  intv_list <- CheckIntvList(abf_list, intv_list)
+  intv_list <- ExpandIntvList(abf_list, intv_list)
 
   current_means <- Episodic_colFunc(abf_list, intv_list, current_channel,
                                     colMeans, na.rm = TRUE)
@@ -84,7 +84,7 @@ IGVSummary <- function(abf, intv,
     stop("Episodes of abf do not match.")
   }
   n <- length(abf)
-  intv <- CheckIntvList(abf, intv)
+  intv <- ExpandIntvList(abf, intv)
 
   igv <- lapply(seq_len(n), function(idx) {
     do_igv(abf[[idx]], intv[[idx]], i_chan = current_channel, v_chan = voltage_channel)
@@ -209,7 +209,7 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
     err_class_abf_list()
   }
   CheckArgs(abf_list, chan = channel, allow_list = TRUE)
-  intv_list <- CheckIntvList(abf_list, intv_list)
+  intv_list <- ExpandIntvList(abf_list, intv_list)
 
   if (length(channel) == 1L) {
     ret <- t(Episodic_colFunc(abf_list, intv_list, channel, colMeans, na.rm = na.rm))

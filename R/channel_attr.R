@@ -1,13 +1,13 @@
 IsVoltageUnit <- function(x) endsWith(toupper(x), "V") | grepl("VO", toupper(x), fixed = TRUE)
 IsCurrentUnit <- function(x) endsWith(toupper(x), "A") | grepl("AM", toupper(x), fixed = TRUE)
 
-#' Get voltage channel id.
+#' Get voltage/current channel id.
 #'
-#' If abf is a list of abf objects, returns common voltage channel id.
+#' If abf is a list of abf objects, returns common voltage/current channel id.
 #'
 #' @param abf an abf object or a list of abf objects.
 #'
-#' @return a vector of voltage channel id.
+#' @return a vector of voltage/current channel id.
 #' @export
 #'
 GetVoltageChan <- function(abf) {
@@ -27,13 +27,7 @@ GetVoltageChan <- function(abf) {
   ans
 }
 
-#' Get current channel id.
-#'
-#' If abf is a list of abf objects, returns common current channel id.
-#'
-#' @param abf an abf object or a list of abf objects.
-#'
-#' @return a vector of current channel id.
+#' @rdname GetVoltageChan
 #' @export
 #'
 GetCurrentChan <- function(abf) {
@@ -53,11 +47,11 @@ GetCurrentChan <- function(abf) {
   ans
 }
 
-#' Get first voltage channel id.
+#' Get first voltage/current channel id.
 #'
 #' @param abf an abf object or a list of abf objects.
 #'
-#' @return an integer id of first voltage channel.
+#' @return an integer id of first voltage/current channel.
 #' @export
 #'
 GetFirstVoltageChan <- function(abf) {
@@ -66,11 +60,7 @@ GetFirstVoltageChan <- function(abf) {
   FirstElement(voltage_channel)
 }
 
-#' Get first current channel id.
-#'
-#' @param abf an abf object or a list of abf objects.
-#'
-#' @return an integer id of first current channel.
+#' @rdname GetFirstVoltageChan
 #' @export
 #'
 GetFirstCurrentChan <- function(abf) {

@@ -14,30 +14,16 @@ IsListOf <- function(x, cls) {
   }
 }
 
-IsListContains <- function(x, cls) {
-
-  if (!is.list(x)) {
-    FALSE
-  } else {
-    all(sapply(x, function(item) any(cls %in% class(item))))
-  }
-}
-
-AssertLength <- function(x, ..., explicit = NULL) {
+AssertLength <- function(x, ..., len = NULL) {
 
   args <- list(...)
   lenx <- length(x)
-  if (any(lenx == explicit)) {
-    return(TRUE)
-  }
-  for (i in seq_along(args)) {
-    len <- length(args[[i]])
-    if (lenx == len) {
-      return(TRUE)
-    }
-  }
 
-  FALSE
+  if (!is.null(len)) {
+    return(lenx == len)
+  }
+  cmp <- sapply(args, function(item) length(item) == lenx)
+  all(cmp)
 }
 
 AssertEpisode <- function(abf, episode) {
@@ -73,10 +59,10 @@ AssertEpoch <- function(abf, epoch, dac) {
   }
 
   f <- function(abf) {
-    ans <- sapply(dac, function(d) {
-      all(nEpoch(abf, d) >= epoch & epoch > 0L)
+    cmp <- sapply(dac, function(d) {
+      all(nEpoch(abf, d) >= epoch)
     })
-    length(epoch) && all(ans)
+    length(epoch) && all(epoch > 0) && all(cmp)
   }
 
   if (IsAbf(abf)) {
@@ -89,7 +75,7 @@ AssertEpoch <- function(abf, epoch, dac) {
 AssertDac <- function(abf, dac) {
 
   f <- function(abf) {
-    length(dac) && all(nDAC(abf) >= dac & dac > 0L)
+    length(dac) && all(dac > 0L) && all(nDAC(abf) >= dac)
   }
 
   if (IsAbf(abf)) {
@@ -136,18 +122,4 @@ CheckArgs <- function(abf, epi = NULL, chan = NULL, epo = NULL, dac = NULL,
   }
 
   TRUE
-}
-
-CheckIntvList <- function(abf, intv) {
-
-  if (is.null(intv)) {
-    ans <- lapply(abf, function(x) Intv(1L, nPts(x)))
-  } else {
-    ans <- ExpandList(intv, abf)
-    if (is.null(ans)) {
-      eval(substitute(err_assert_len(abf, intv, esc_eval = TRUE)))
-    }
-  }
-
-  ans
 }

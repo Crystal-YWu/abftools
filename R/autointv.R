@@ -2,23 +2,28 @@
 #'
 #' @param abf an abf object.
 #' @param episode the episodes to compare.
-#' @param channel the channel to compare, channel id is 1-based.
+#' @param channel the channel to compare, default assumes voltage clamp.
 #' @param epoch the epoch to compare.
 #' @param dac  the dac channel to evaluate waveform.
-#' @param delta allowed max deviation.
+#' @param delta allowed max deviation, default compares to median deviation.
 #' @param min_win OPTIONAL, minimum interval window size of the result.
-#' @param max_win OPTIONAL, maximum interval window size of the result.
 #'
 #' @return a list of intervals of which pass comparison.
 #' @export
 #'
-CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
-                        delta = NULL, min_win = NULL, max_win = NULL) {
+CmpWaveform <- function(abf,
+                        episode = GetAllEpisodes(abf),
+                        channel = GetFirstVoltageChan(abf),
+                        epoch = GetMultiStepEpoch(abf, dac),
+                        dac = GetWaveformEnabledDAC(abf),
+                        delta = NULL, min_win) {
 
   if (is.character(epoch)) {
     epoch <- GetEpochId(epoch)
   }
   epoch <- FirstElement(epoch)
+  channel <- FirstElement(channel)
+  dac <- FirstElement(dac)
 
   CheckArgs(abf, epi = episode, chan = channel, epo = epoch, dac = dac)
 
@@ -38,7 +43,7 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
       })
     }
   }
-  wf_cmp <- wf_delta <= allowed_delta_abs(wf, unlist(delta))
+  wf_cmp <- sweep(wf_delta, 2L, delta, "<=", check.margin = FALSE)
 
   if (nepi == 1L) {
     dim(epoch_intv) <- c(3L, 1L)
@@ -60,9 +65,6 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
       if (!is.null(min_win)) {
         tmp <- FilterMinIntervalSize(tmp, min_win)
       }
-      if (!is.null(max_win)) {
-        tmp <- FilterMaxIntervalSize(tmp, max_win)
-      }
     }
 
     ret[[epi]] <- tmp
@@ -71,16 +73,22 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
   ret
 }
 
-#' FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.
+#' FindSamplingInterval finds a stable interval for sampling current and voltage
+#' channel of an abf object.
 #'
-#' FindSamplingInterval is a convenient alternative to CmpWaveform, best suited
-#' to locate sampling intervals when using step voltage cmd waveform. Some common
-#' assumptions are made:
-#' 1. Waveform Cmd is outputing voltage command.
-#' 2. Waveform epochs are aligned, i.e. epoch duration incr is 0.
-#' 3. The function is looking for most stable voltage AND current channel.
-#' 4. The function prefers stability to the size of interval.
-#' 5. Intervals closer to the end of the epoch are preferred.
+#' @details This function finds a proper sampling interval to perform further
+#' calculations in a multi-step TEVC abf object. The waveform epochs should be
+#' aligned, i.e. epoch duration incr is 0. The function finds a proper sampling
+#' interval by:
+#'
+#' 1. Calling CmpWaveform() to find stable VOLTAGE channel, thus minimizing SEM
+#' along V axis.
+#'
+#' 2. Performing a binary search on CURRENT channel to find the most stable interval.
+#'
+#' 3. Applying a time-dependent penalty function to make the algorithm prefer
+#' intervals that are closer to the end of the epoch.
+#'
 #'
 #' @param abf an abf object.
 #' @param epoch the epoch to search, defaults to first multi-step epoch.
@@ -90,7 +98,8 @@ CmpWaveform <- function(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
 #' @param target_interval_size OPTIONAL, target size in **points** of the sampling interval.
 #' Default is 2x lowpass window.
 #' @param allowed_voltage_delta OPTIONAL, allowed max deviation of voltage.
-#' @param noisy_opt enable optimisation for noisy data by applying a lowpass filter to current channel.
+#' @param noisy_opt enable optimisation for noisy data by applying a Butterworth
+#' lowpass filter to current channel.
 #' @param lp_freq frequency of low-pass filter.
 #' @param lp_order order of low-pass filter.
 #'
@@ -188,7 +197,7 @@ FindSamplingInterval <- function(abf, epoch = NULL, dac = GetWaveformEnabledDAC(
                                       ratio = sr,
                                       colFunc = matrixStats::colSds))
   channel_var <- td_penalty(rep(channel_var, each = sr, length.out = npts),
-                            MaskIntv(GetEpochIntervals(abf)[, 1L, epoch]))
+                            MaskIntv(GetEpochIntervals(abf, dac = dac)[, 1L, epoch]))
 
   #INTERVAL
   best_score <- Inf

@@ -66,6 +66,26 @@ Intv <- function(startPos, endPos, len) {
   intv
 }
 
+#' Mask a time interval
+#'
+#' @param intv
+#'
+#' @return an integer vector
+#' @export
+#'
+MaskIntv <- function(intv) {
+  #TODO: A good solution to distinguish intv and curs
+
+  if (length(intv) == 2L) {
+    return(seq.int(intv[1], intv[2]))
+  }
+  if (length(intv) == 3L && (intv[2] - intv[1] + 1L == intv[3])) {
+    return(seq.int(intv[1], intv[2]))
+  }
+
+  intv
+}
+
 #' Set intervals, by-ref behaviour
 #'
 #' @param intv an interval.

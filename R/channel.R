@@ -20,7 +20,7 @@ AtchChan <- function(abf, channel_data,
 
   len1 <- length(abf[,, 1L])
   len2 <- length(channel_data)
-  if (!len1 == len2) {
+  if (len1 != len2) {
     eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
 
@@ -98,7 +98,7 @@ RplcChan <- function(abf, channel_data, channel = 1L) {
 
   len1 <- length(abf[,, 1L])
   len2 <- length(channel_data)
-  if (!len1 == len2) {
+  if (len1 != len2) {
     eval(substitute(err_wrong_dim(abf, channel_data, esc_eval = TRUE)))
   }
 

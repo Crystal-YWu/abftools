@@ -46,7 +46,6 @@ GetTitle <- function(abf) {
 
 #' Set title of an abf object, by-ref behaviour.
 #'
-#'
 #' @param abf an abf object, a list of abf objects are also supported.
 #' @param title the title to be set.
 #'
@@ -91,21 +90,6 @@ GetMode <- function(abf) {
   }
 }
 
-validate_channel <- function(abf, channel) {
-
-  if (is.null(channel)) {
-    return(TRUE)
-  }
-
-  if (IsAbf(abf)) {
-    AssertChannel(abf, channel)
-  } else if (IsAbfList(abf)) {
-    all(sapply(abf, function(x) AssertChannel(x, channel)))
-  } else {
-    err_class_abf()
-  }
-}
-
 #' Get names of channels.
 #'
 #' @param abf an abf object.
@@ -116,9 +100,7 @@ validate_channel <- function(abf, channel) {
 #'
 GetChannelName <- function(abf, channel = NULL) {
 
-  if (!validate_channel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   if (IsAbf(abf)) {
     if (is.null(channel)) {
@@ -127,7 +109,11 @@ GetChannelName <- function(abf, channel = NULL) {
       attr(abf, "ChannelName")[channel]
     }
   } else {
-    lapply(abf, GetChannelName, channel = channel)
+    if (is.null(channel)) {
+      lapply(abf, function(x) attr(x, "ChannelName"))
+    } else {
+      lapply(abf, function(x) attr(x, "ChannelName")[channel])
+    }
   }
 }
 
@@ -142,9 +128,7 @@ GetChannelName <- function(abf, channel = NULL) {
 #'
 SetChannelName <- function(abf, name, channel = 1L) {
 
-  if (!validate_channel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   if (IsAbf(abf)) {
     eval.parent(substitute({
@@ -172,9 +156,7 @@ SetChannelName <- function(abf, name, channel = 1L) {
 #'
 GetChannelUnit <- function(abf, channel = NULL) {
 
-  if (!validate_channel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   if (IsAbf(abf)) {
     if (is.null(channel)) {
@@ -183,7 +165,11 @@ GetChannelUnit <- function(abf, channel = NULL) {
       attr(abf, "ChannelUnit")[channel]
     }
   } else {
-    lapply(abf, GetChannelUnit, channel = channel)
+    if (is.null(channel)) {
+      lapply(abf, function(x) attr(x, "ChannelUnit"))
+    } else {
+      lapply(abf, function(x) attr(x, "ChannelUnit")[channel])
+    }
   }
 }
 
@@ -198,9 +184,7 @@ GetChannelUnit <- function(abf, channel = NULL) {
 #'
 SetChannelUnit <- function(abf, unit, channel = 1L) {
 
-  if (!validate_channel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   if (IsAbf(abf)) {
     eval.parent(substitute({
@@ -227,9 +211,7 @@ SetChannelUnit <- function(abf, unit, channel = 1L) {
 #'
 GetChannelDesc <- function(abf, channel = NULL) {
 
-  if (!validate_channel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   if (IsAbf(abf)) {
     if (is.null(channel)) {
@@ -238,7 +220,11 @@ GetChannelDesc <- function(abf, channel = NULL) {
       attr(abf, "ChannelDesc")[channel]
     }
   } else {
-    lapply(abf, GetChannelDesc, channel = channel)
+    if (is.null(channel)) {
+      lapply(abf, function(x) attr(x, "ChannelDesc"))
+    } else {
+      lapply(abf, function(x) attr(x, "ChannelDesc")[channel])
+    }
   }
 }
 
@@ -253,9 +239,7 @@ GetChannelDesc <- function(abf, channel = NULL) {
 #'
 SetChannelDesc <- function(abf, description, channel = 1L) {
 
-  if (!validate_channel(abf, channel)) {
-    err_channel()
-  }
+  CheckArgs(abf, chan = channel, allow_list = TRUE)
 
   if (IsAbf(abf)) {
     eval.parent(substitute({
@@ -285,7 +269,7 @@ GetSamplingIntv <- function(abf) {
   if (IsAbf(abf)) {
     attr(abf, "SamplingInterval")
   } else if (IsAbfList(abf)) {
-    lapply(abf, GetSamplingIntv)
+    lapply(abf, function(x) attr(x, "SamplingInterval"))
   } else {
     err_class_abf()
   }
@@ -310,11 +294,12 @@ GetEpiAvail <- function(abf) attr(abf, "EpiAvail")
 #'
 GetSynchArray <- function(abf) {
 
+  f <- function(abf) get_meta(abf)$SynchArray
+
   if (IsAbf(abf)) {
-    meta <- get_meta(abf)
-    meta$SynchArray
+    f(abf)
   } else if (IsAbfList(abf)) {
-    lapply(abf, GetSamplingIntv)
+    lapply(abf, f)
   } else {
     err_class_abf()
   }
@@ -332,7 +317,7 @@ GetNumOfChannel <- function(abf) {
   if (IsAbf(abf)) {
     dim(abf)[3]
   } else if (IsAbfList(abf)) {
-    lapply(abf, GetNumOfChannel)
+    lapply(abf, function(x) dim(x)[3])
   } else {
     err_class_abf()
   }
@@ -350,7 +335,7 @@ GetEpisodesPerChannel <- function(abf) {
   if (IsAbf(abf)) {
     dim(abf)[2]
   } else if (IsAbfList(abf)) {
-    lapply(abf, GetEpisodesPerChannel)
+    lapply(abf, function(x) dim(x)[2])
   } else {
     err_class_abf()
   }
@@ -368,7 +353,7 @@ GetPointsPerEpisode <- function(abf) {
   if (IsAbf(abf)) {
     dim(abf)[1]
   } else if (IsAbfList(abf)) {
-    lapply(abf, GetPointsPerEpisode)
+    lapply(abf, function(x) dim(x)[1])
   } else {
     err_class_abf()
   }
@@ -384,21 +369,23 @@ GetPointsPerEpisode <- function(abf) {
 #'
 GetPointsPerEvent <- function(abf, event = 1L) {
 
-  if (IsAbf(abf)) {
+  f <- function(abf) {
     mode <- GetMode(abf)
     if (mode != 1L) {
-      ans <- GetPointsPerEpisode(abf)
+      GetPointsPerEpisode(abf)
     } else {
       sync <- GetSynchArray(abf)
-      ans <- sync$lLength[event] %/% GetNumOfChannel(abf)
+      sync$lLength[event] %/% GetNumOfChannel(abf)
     }
+  }
+
+  if (IsAbf(abf)) {
+    f(abf)
   } else if (IsAbfList(abf)) {
-    ans <- lapply(abf, GetPointsPerEvent, event = event)
+    lapply(abf, f)
   } else {
     err_class_abf()
   }
-
-  ans
 }
 
 #' Get number of epochs.

@@ -36,7 +36,6 @@ AverageAbf <- function(abf_list, w = NULL) {
     ret <- ret / sum(w)
   }
 
-
   ret
 }
 
@@ -97,7 +96,7 @@ ApplyLowpass <- function(abf, chan, freq, order) {
   abf
 }
 
-#' Apply low-pass filter to an abf object.
+#' Apply Butterworth low-pass filter to an abf object.
 #'
 #' @param abf an abf object.
 #' @param channel the channel to apply filter.
