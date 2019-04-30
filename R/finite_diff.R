@@ -25,3 +25,12 @@ slope_spline <- function(y, x) {
   dy_dx$y
 }
 
+slope_stencil <- function(y, idx, stencil = seq.int(-1, 1)) {
+
+  coefs <- stencil_coefs(stencil = stencil, order = 1L)
+  dy <- sapply(idx, function(idx) {
+    stencil_finite_diff(y, x = idx, stencil = stencil, order = order, coefs = coefs)
+  })
+
+  dy
+}
