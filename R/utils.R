@@ -1,19 +1,36 @@
-#' Calculate column standard error of measurements
+#' Calculate column/row standard error of measurements
 #'
-#' @param df a data frame of data frame like 2d data
+#' @param x an 2d numeric
 #' @param na.rm remove NAs
+#' @param ... passed to colSds/rowSds()
 #'
 #' @return calculated column sem
 #' @export
 #'
-colSems <- function(df, na.rm = FALSE) {
+colSems <- function(x, na.rm = FALSE, ...) {
 
-  sds <- matrixStats::colSds(df, na.rm = na.rm)
+  sds <- matrixStats::colSds(x, na.rm = na.rm, ...)
   if (na.rm) {
-    na <- is.na(df)
+    na <- is.na(x)
     sqn <- sqrt(matrixStats::colSums2(!na))
   } else {
-    sqn <- sqrt(nrow(df))
+    sqn <- sqrt(nrow(x))
+  }
+
+  sds / sqn
+}
+
+#' @rdname colSems
+#' @export
+#'
+rowSems <- function(x, na.rm = FALSE, ...) {
+
+  sds <- matrixStats::rowSds(x, na.rm = na.rm, ...)
+  if (na.rm) {
+    na <- is.na(x)
+    sqn <- sqrt(matrixStats::rowSums2(!na))
+  } else {
+    sqn <- sqrt(ncol(x))
   }
 
   sds / sqn
