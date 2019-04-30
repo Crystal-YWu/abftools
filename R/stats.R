@@ -19,9 +19,9 @@ IVSummary <- function(abf_list, intv_list = NULL,
   CheckArgs(abf_list, chan = c(current_channel, voltage_channel), allow_list = TRUE)
   intv_list <- CheckIntvList(abf_list, intv_list)
 
-  current_means <- Episodic_ColFunc(abf_list, intv_list, current_channel,
+  current_means <- Episodic_colFunc(abf_list, intv_list, current_channel,
                                     colMeans, na.rm = TRUE)
-  voltage_means <- Episodic_ColFunc(abf_list, intv_list, voltage_channel,
+  voltage_means <- Episodic_colFunc(abf_list, intv_list, voltage_channel,
                                     colMeans, na.rm = TRUE)
 
   mean_current_means <- colMeans(current_means, na.rm = TRUE)
@@ -29,10 +29,10 @@ IVSummary <- function(abf_list, intv_list = NULL,
   sem_current_means <- colSems(current_means, na.rm = TRUE)
   sem_voltage_means <- colSems(voltage_means, na.rm = TRUE)
 
-  mean_current_means[which(is.nan(mean_current_means))] <- NA
-  mean_voltage_means[which(is.nan(mean_voltage_means))] <- NA
-  sem_current_means[which(is.nan(sem_current_means))] <- NA
-  sem_voltage_means[which(is.nan(sem_voltage_means))] <- NA
+  mean_current_means[is.nan(mean_current_means)] <- NA
+  mean_voltage_means[is.nan(mean_voltage_means)] <- NA
+  sem_current_means[is.nan(sem_current_means)] <- NA
+  sem_voltage_means[is.nan(sem_voltage_means)] <- NA
 
   nsamples <- rep(length(abf_list), length(mean_voltage_means))
 
@@ -40,7 +40,81 @@ IVSummary <- function(abf_list, intv_list = NULL,
                    mean_current_means, sem_current_means, nsamples)
   colnames(df) <- c("Voltage", "SEM Voltage", "Current", "SEM Current", "Num Samples")
 
-  CpChannelAttr(df, abf_list[[1]])
+  ApplyChannelAttr(df, abf_list[[1]])
+}
+
+do_igv <- function(abf, intv, i_chan, v_chan) {
+
+  force(i_chan)
+  force(v_chan)
+
+  if (anyNA(intv)) {
+    d <- dim(abf)
+    i <- rep(NA, d[2])
+    v <- i
+    g <- i
+  } else {
+    if (is.null(intv)) {
+      iv <- mapnd_col(abf, matrixStats::colMeans2)
+    } else {
+      mask <- MaskIntv(intv)
+      iv <- mapnd_col(abf[mask,,], matrixStats::colMeans2)
+    }
+    i <- iv[, i_chan]
+    v <- iv[, v_chan]
+    g <- slope_spline(i, v)
+  }
+
+  list(
+    i = i,
+    v = v,
+    g = g
+  )
+}
+
+IGVSummary <- function(abf, intv,
+                       current_channel = GetFirstCurrentChan(abf),
+                       voltage_channel = GetFirstVoltageChan(abf)) {
+
+  CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
+  if (!IsAbfList(abf)) {
+    abf <- list(abf)
+  }
+  if (!AssertDim(abf, 2)) {
+    stop("Episodes of abf do not match.")
+  }
+  n <- length(abf)
+  intv <- CheckIntvList(abf, intv)
+
+  igv <- lapply(seq_len(n), function(idx) {
+    do_igv(abf[[idx]], intv[[idx]], i_chan = current_channel, v_chan = voltage_channel)
+  })
+  igv <- mapply(do_igv, abf, intv,
+                MoreArgs = list(i_chan = current_channel,
+                                v_chan = voltage_channel),
+                SIMPLIFY = FALSE,
+                USE.NAMES = FALSE)
+
+  i <- sapply(igv, `[[`, "i")
+  g <- sapply(igv, `[[`, "g")
+  v <- sapply(igv, `[[`, "v")
+
+  #averaging conductance and calculating its SEM directly is very rigorous.
+  current <- matrixStats::rowMeans2(i, na.rm = TRUE)
+  conduct <- matrixStats::rowMeans2(g, na.rm = TRUE)
+  voltage <- matrixStats::rowMeans2(v, na.rm = TRUE)
+  current_sem <- rowSems(i, na.rm = TRUE)
+  conduct_sem <- rowSems(g, na.rm = TRUE)
+  voltage_sem <- rowSems(v, na.rm = TRUE)
+
+  df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n)
+  colnames(df) <- c("Voltage", "SEM Voltage",
+                    "Current", "SEM Current",
+                    "Conductance", "SEM Conductance",
+                    "Num Samples")
+  rownames(df) <- DefaultEpiLabel(nrow(df))
+
+  df
 }
 
 #' Sample abf object to reduce data points.
@@ -57,8 +131,11 @@ SmplAbf <- function(abf, sample_ratio, sample_func = NULL, ...) {
 
   CheckArgs(abf)
 
-  data <- samplend(abf, ratio = sample_ratio, func = sample_func, along = 1L, ...)
-  CpAbfAttr(data, abf)
+  data <-  ApplyAbfAttr(x = samplend(abf,
+                                     ratio = sample_ratio,
+                                     func = sample_func,
+                                     along = 1L, ...),
+                        abf = abf)
 
   old_samp_intv <- GetSamplingIntv(abf)
   new_samp_intv <- old_samp_intv * sample_ratio
@@ -135,12 +212,12 @@ MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
   intv_list <- CheckIntvList(abf_list, intv_list)
 
   if (length(channel) == 1L) {
-    ret <- t(Episodic_ColFunc(abf_list, intv_list, channel, colMeans, na.rm = na.rm))
+    ret <- t(Episodic_colFunc(abf_list, intv_list, channel, colMeans, na.rm = na.rm))
     if (ret.df) {
       ret <- as.data.frame(ret)
     }
   } else {
-    ret <- lapply(channel, function(x) t(Episodic_ColFunc(abf_list, intv_list,
+    ret <- lapply(channel, function(x) t(Episodic_colFunc(abf_list, intv_list,
                                                           channel = x, f = colMeans,
                                                           na.rm = na.rm)))
     if (ret.df) {
