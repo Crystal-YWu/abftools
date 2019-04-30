@@ -197,5 +197,12 @@ step_epi_level <- function(abf, epoch, dac) {
 
   epdac <- GetEpdac(abf, dac)
   nepi <- nEpi(abf)
-  epdac$fEpochInitLevel[epoch] + (seq_len(nepi) - 1L) * epdac$fEpochLevelInc[epoch]
+  epi_level <- epdac$fEpochInitLevel[epoch] + (seq_len(nepi) - 1L) * epdac$fEpochLevelInc[epoch]
+
+  meta <- get_meta(abf)
+  idx_unit <- meta$DAC$lDACChannelUnitsIndex[dac]
+  dac_unit <- meta$Strings[idx_unit]
+
+  #set unit prefix to "1"
+  epi_level * parse_unit_scale(dac_unit)
 }
