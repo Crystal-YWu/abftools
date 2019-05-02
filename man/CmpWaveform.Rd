@@ -4,25 +4,24 @@
 \alias{CmpWaveform}
 \title{Compare epoch waveform setting to a channel data.}
 \usage{
-CmpWaveform(abf, episode = GetAllEpisodes(abf), channel, epoch, dac,
-  delta = NULL, min_win = NULL, max_win = NULL)
+CmpWaveform(abf, episode = GetAllEpisodes(abf),
+  channel = GetFirstVoltageChan(abf), epoch = GetMultiStepEpoch(abf,
+  dac), dac = GetWaveformEnabledDAC(abf), delta = NULL, min_win)
 }
 \arguments{
 \item{abf}{an abf object.}
 
 \item{episode}{the episodes to compare.}
 
-\item{channel}{the channel to compare, channel id is 1-based.}
+\item{channel}{the channel to compare, default assumes voltage clamp.}
 
 \item{epoch}{the epoch to compare.}
 
 \item{dac}{the dac channel to evaluate waveform.}
 
-\item{delta}{allowed max deviation.}
+\item{delta}{allowed max deviation, default compares to median deviation.}
 
 \item{min_win}{OPTIONAL, minimum interval window size of the result.}
-
-\item{max_win}{OPTIONAL, maximum interval window size of the result.}
 }
 \value{
 a list of intervals of which pass comparison.

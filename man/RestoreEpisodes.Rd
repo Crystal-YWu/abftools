@@ -4,7 +4,7 @@
 \alias{RestoreEpisodes}
 \title{Restore previous removed episodes, by-ref behaviour.}
 \usage{
-RestoreEpisodes(abf, episodes)
+RestoreEpisodes(abf, episode = NULL)
 }
 \arguments{
 \item{abf}{an abf or a list of abf object.}

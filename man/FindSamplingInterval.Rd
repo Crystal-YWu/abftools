@@ -3,7 +3,8 @@
 \name{FindSamplingInterval}
 \alias{FindSamplingInterval}
 \alias{FindAllSamplingInterval}
-\title{FindSamplingInterval finds a stable interval for sampling current and voltage data of an abf object.}
+\title{FindSamplingInterval finds a stable interval for sampling current and voltage
+channel of an abf object.}
 \usage{
 FindSamplingInterval(abf, epoch = NULL,
   dac = GetWaveformEnabledDAC(abf),
@@ -30,7 +31,8 @@ Default is 2x lowpass window.}
 
 \item{allowed_voltage_delta}{OPTIONAL, allowed max deviation of voltage.}
 
-\item{noisy_opt}{enable optimisation for noisy data by applying a lowpass filter to current channel.}
+\item{noisy_opt}{enable optimisation for noisy data by applying a Butterworth
+lowpass filter to current channel.}
 
 \item{lp_freq}{frequency of low-pass filter.}
 
@@ -40,12 +42,20 @@ Default is 2x lowpass window.}
 a named vector of 3 numeric: interval start position, end position, length
 }
 \description{
-FindSamplingInterval is a convenient alternative to CmpWaveform, best suited
-to locate sampling intervals when using step voltage cmd waveform. Some common
-assumptions are made:
-1. Waveform Cmd is outputing voltage command.
-2. Waveform epochs are aligned, i.e. epoch duration incr is 0.
-3. The function is looking for most stable voltage AND current channel.
-4. The function prefers stability to the size of interval.
-5. Intervals closer to the end of the epoch are preferred.
+FindSamplingInterval finds a stable interval for sampling current and voltage
+channel of an abf object.
+}
+\details{
+This function finds a proper sampling interval to perform further
+calculations in a multi-step TEVC abf object. The waveform epochs should be
+aligned, i.e. epoch duration incr is 0. The function finds a proper sampling
+interval by:
+
+1. Calling CmpWaveform() to find stable VOLTAGE channel, thus minimizing SEM
+along V axis.
+
+2. Performing a binary search on CURRENT channel to find the most stable interval.
+
+3. Applying a time-dependent penalty function to make the algorithm prefer
+intervals that are closer to the end of the epoch.
 }

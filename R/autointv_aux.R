@@ -1,16 +1,3 @@
-allowed_delta_abs <- function(channel_data, delta) {
-
-  d <- dim(channel_data)
-  if (is.null(d)) {
-    ans <- rep_len(delta, length.out = length(channel_data))
-  } else {
-    delta <- rep_len(delta, length.out = d[2])
-    ans <- matrix(data = delta, nrow = d[1], ncol = d[2], byrow = TRUE)
-  }
-
-  ans
-}
-
 OverlapEpisodicIntv <- function(episodic_intv, npts) {
 
   ret <- rep(TRUE, npts)

@@ -2,16 +2,19 @@
 % Please edit documentation in R/channel_attr.R
 \name{GetFirstVoltageChan}
 \alias{GetFirstVoltageChan}
-\title{Get first voltage channel id.}
+\alias{GetFirstCurrentChan}
+\title{Get first voltage/current channel id.}
 \usage{
 GetFirstVoltageChan(abf)
+
+GetFirstCurrentChan(abf)
 }
 \arguments{
 \item{abf}{an abf object or a list of abf objects.}
 }
 \value{
-an integer id of first voltage channel.
+an integer id of first voltage/current channel.
 }
 \description{
-Get first voltage channel id.
+Get first voltage/current channel id.
 }

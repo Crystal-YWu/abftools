@@ -2,16 +2,19 @@
 % Please edit documentation in R/channel_attr.R
 \name{GetVoltageChan}
 \alias{GetVoltageChan}
-\title{Get voltage channel id.}
+\alias{GetCurrentChan}
+\title{Get voltage/current channel id.}
 \usage{
 GetVoltageChan(abf)
+
+GetCurrentChan(abf)
 }
 \arguments{
 \item{abf}{an abf object or a list of abf objects.}
 }
 \value{
-a vector of voltage channel id.
+a vector of voltage/current channel id.
 }
 \description{
-If abf is a list of abf objects, returns common voltage channel id.
+If abf is a list of abf objects, returns common voltage/current channel id.
 }

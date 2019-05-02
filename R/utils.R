@@ -66,6 +66,26 @@ Intv <- function(startPos, endPos, len) {
   intv
 }
 
+#' Mask a time interval
+#'
+#' @param intv
+#'
+#' @return an integer vector
+#' @export
+#'
+MaskIntv <- function(intv) {
+  #TODO: A good solution to distinguish intv and curs
+
+  if (length(intv) == 2L) {
+    return(seq.int(intv[1], intv[2]))
+  }
+  if (length(intv) == 3L && (intv[2] - intv[1] + 1L == intv[3])) {
+    return(seq.int(intv[1], intv[2]))
+  }
+
+  intv
+}
+
 #' Set intervals, by-ref behaviour
 #'
 #' @param intv an interval.
@@ -87,48 +107,4 @@ SetIntv <- function(intv, startPos, endPos) {
   eval.parent(substitute({
     intv <- Intv(startPos, endPos)
   }))
-}
-
-#' Apply a function over a list of abf objects.
-#'
-#' @param abf_list a list of abf objects.
-#' @param FUN the function to be applied to each episode of the abf objects.
-#' @param ... further arguments passed to FUN.
-#' @param channel channel of the abf objects to apply.
-#' @param intv OPTIONAL, the interval to apply FUN.
-#' @param gen_names whether to generate row names.
-#'
-#' @return a matrix, of which each row represents an episode and column represents an abf object in the list.
-#' @export
-#'
-abfapply <- function(abf_list, FUN, ..., channel = 1L, intv = NULL, gen_names = FALSE) {
-
-  if (!IsAbfList(abf_list)) {
-    err_class_abf_list()
-  }
-  channel <- FirstElement(unlist(channel))
-  for (tmp in abf_list) {
-    if (!AssertChannel(tmp ,channel)) {
-      err_channel()
-    }
-  }
-
-  intv <- ExpandList(intv, abf_list)
-  if (is.null(intv)) {
-    err_assert_len(intv, abf_list)
-  }
-
-  f <- WrapMappingFunc(FUN, channel = channel, abf_id_func = NULL, epi_id_func = NULL,
-                       chan_id_func = NULL, ...)
-  ret <- NULL
-  for (i in seq_along(abf_list)) {
-    ret <- cbind(ret, f(abf_list[[i]], intv[[i]]))
-  }
-  colnames(ret) <- unlist(GetTitle(abf_list))
-
-  if (gen_names) {
-    rownames(ret) <- DefaultEpiLabel(abf_list[[1]])
-  }
-
-  ret
 }

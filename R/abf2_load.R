@@ -117,7 +117,7 @@ abf2_load <- function(filename, folder = NULL, abf_title = NULL, short_desc = TR
     data <- tmp
 
   }
-  else if (op_mode == 2L | op_mode == 4L | op_mode == 5L) {
+  else if (op_mode == 2L || op_mode == 4L || op_mode == 5L) {
     #event-driven fixed-length (2), high-speed oscilloscope (4), waveform fixed-length (5)
 
     #check if data pts number match
@@ -176,21 +176,21 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
                           titlelist = NULL, short_desc = TRUE) {
 
   if (is.object(filelist) && is.list(filelist)) {
-    names(filelist) <- tolower(names(filelist))
+    names <- tolower(names(filelist))
     #filename
-    if ("filename" %in% names(filelist)) {
+    if ("filename" %in% names) {
       extracted <- filelist$filename
     } else
     #filenames
-    if ("filenames" %in% names(filelist)) {
+    if ("filenames" %in% names) {
       extracted <- filelist$filenames
     } else
     #file
-    if ("file" %in% names(filelist)) {
+    if ("file" %in% names) {
       extracted <- filelist$file
     } else
     #files
-    if ("files" %in% names(filelist)) {
+    if ("files" %in% names) {
       extracted <- filelist$files
     } else {
       #use first column directly
