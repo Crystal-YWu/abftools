@@ -14,23 +14,31 @@ stencil_finite_diff <- function(y, x, stencil, order, coefs = NULL) {
     coefs <- stencil_coefs(stencil = stencil, order = order)
   }
 
-  sum(coefs * y[x + stencil])
+  matrixStats::colSums2(sapply(x, function(x) y[x + stencil]) * coefs)
 }
 
 slope_spline <- function(y, x) {
 
-  #piecewise poly spline method
-  spl <- splines::interpSpline(x, y, bSpline = FALSE, period = NULL, ord = 4L)
-  dy_dx <- stats::predict(spl, x = x, deriv = 1)
-  dy_dx$y
+  idx_na <- is.na(y)
+
+  if (any(idx_na)) {
+    idx <- !idx_na
+    #interpSpline() does not support NA values
+    spl <- splines::interpSpline(x[idx], y[idx], bSpline = FALSE, period = NULL, ord = 4L)
+    dy_dx <- stats::predict(spl, x = x[idx], deriv = 1)
+    ans <- rep_len(NA, length(y))
+    ans[idx] <- dy_dx$y
+    ans
+  } else {
+    #piecewise poly spline method
+    spl <- splines::interpSpline(x, y, bSpline = FALSE, period = NULL, ord = 4L)
+    dy_dx <- stats::predict(spl, x = x, deriv = 1)
+    dy_dx$y
+  }
 }
 
 slope_stencil <- function(y, idx, stencil = seq.int(-1, 1)) {
 
   coefs <- stencil_coefs(stencil = stencil, order = 1L)
-  dy <- sapply(idx, function(idx) {
-    stencil_finite_diff(y, x = idx, stencil = stencil, order = order, coefs = coefs)
-  })
-
-  dy
+  stencil_finite_diff(y, idx, stencil = stencil, order = 1, coefs = coefs)
 }
