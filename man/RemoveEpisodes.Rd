@@ -4,12 +4,12 @@
 \alias{RemoveEpisodes}
 \title{Remove episodes from an abf object, by-ref behaviour.}
 \usage{
-RemoveEpisodes(abf, episodes)
+RemoveEpisodes(abf, episode)
 }
 \arguments{
 \item{abf}{an abf or a list of abf object.}
 
-\item{episodes}{episodes to remove.}
+\item{episode}{episodes to remove.}
 }
 \value{
 an abf object with desired episodes marked removed.

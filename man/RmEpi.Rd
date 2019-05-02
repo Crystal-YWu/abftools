@@ -4,12 +4,12 @@
 \alias{RmEpi}
 \title{Remove episodes from an abf object.}
 \usage{
-RmEpi(abf, episodes)
+RmEpi(abf, episode)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{episodes}{episodes to remove.}
+\item{episode}{episodes to remove.}
 }
 \value{
 an abf object with desired episodes marked removed.

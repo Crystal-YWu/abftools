@@ -41,8 +41,7 @@ max_avg_current <- function(abf) {
 }
 
 plot_iv <- function(abf, intv) {
-  p <- abf \%>\%
-          extract(MaskIntv(intv),,) \%>\%
+  p <- abf[MaskIntv(intv),,] \%>\%
           mapnd(func = "mean") \%>\%
           reduce_lastdim(names = c("current", "voltage")) \%>\%
           data.frame() \%>\%

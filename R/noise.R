@@ -46,7 +46,40 @@ DenoiseAbf <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
   abf
 }
 
+#' Apply Butterworth low-pass filter to an abf object.
+#'
+#' @param abf an abf object.
+#' @param channel the channel to apply filter.
+#' @param freq low-pass frequency.
+#' @param order filter order.
+#'
+#' @return an abf object.
+#' @export
+#'
+LowpassAbf <- function(abf, channel, freq = 75, order = 1L) {
+
+  CheckArgs(abf, channel, allow_list = TRUE)
+
+  if (IsAbf(abf)) {
+    ApplyLowpass(abf, chan = channel, freq = freq, order = order)
+  } else {
+    lapply(abf, ApplyLowpass, chan = channel, freq = freq, order = order)
+  }
+}
+
 denoise_wavshrink <- function(y, thresh.scale = 1.0, xform = "dwt", ...) {
 
   wmtsa::wavShrink(y, thresh.scale = thresh.scale, xform = xform, ...)
+}
+
+ApplyLowpass <- function(abf, chan, freq, order) {
+
+  bf <- signal::butter(order, 1 / (2*freq), "low")
+  ff <- function(x) signal::filter(bf, x)
+  for (ch in chan) {
+
+    abf[,, ch] <- mapnd(abf[,, ch], ff, along = 1L)
+  }
+
+  abf
 }

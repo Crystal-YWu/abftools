@@ -4,12 +4,12 @@
 \alias{ResEpi}
 \title{Restore previous removed episodes.}
 \usage{
-ResEpi(abf, episodes)
+ResEpi(abf, episode = NULL)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{episodes}{episodes to restore.}
+\item{episode}{episodes to restore.}
 }
 \value{
 an abf object.

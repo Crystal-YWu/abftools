@@ -4,12 +4,12 @@
 \alias{MskEpi}
 \title{Mask episodes with a value.}
 \usage{
-MskEpi(abf, episodes, value, channel = 1L)
+MskEpi(abf, episode, value, channel = 1L)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{episodes}{the episodes to mask.}
+\item{episode}{the episode to mask.}
 
 \item{value}{the value assigned to the episodes.}
 
