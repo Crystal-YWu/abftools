@@ -2,25 +2,41 @@
 % Please edit documentation in R/stats.R
 \name{IVSummary}
 \alias{IVSummary}
-\title{IVSummary calculates average current of a list of abf objects, within given intervals}
+\alias{IGVSummary}
+\title{Report I-V relationship of a list of abf objects.}
 \usage{
-IVSummary(abf_list, intv_list = NULL,
-  current_channel = GetFirstCurrentChan(abf_list),
-  voltage_channel = GetFirstVoltageChan(abf_list))
+IVSummary(abf, intv = NULL, conductance = FALSE,
+  current_channel = GetFirstCurrentChan(abf),
+  voltage_channel = GetFirstVoltageChan(abf), group = NULL)
+
+IGVSummary(abf, intv = NULL,
+  current_channel = GetFirstCurrentChan(abf),
+  voltage_channel = GetFirstVoltageChan(abf), group = NULL)
 }
 \arguments{
-\item{abf_list}{a list of abf objects.}
+\item{abf}{a list of abf objects.}
 
-\item{intv_list}{OPTIONAL, a list of intervals.}
+\item{intv}{OPTIONAL, a list of intervals.}
+
+\item{conductance}{Only used in IVSummary(), if TRUE, same as calling IGVSummary()}
 
 \item{current_channel}{current channel id, 1-based.}
 
 \item{voltage_channel}{voltage channel id, 1-based.}
+
+\item{group}{OPTIONAL, add a "Group" column to the returned data.frame.}
 }
 \value{
-a data frame containing calculated Voltage, SEM Voltage, Current,
-SEM Current and number of samples.
+a data.frame
 }
 \description{
-IVSummary calculates average current of a list of abf objects, within given intervals
+Report I-V relationship of a list of abf objects.
+}
+\details{
+This function calculates episodic mean values of current and voltage
+channels and thier corresponding SEMs given a list of abf objects.
+IGVSummary() also calulates conductance. However, while averaging conductances
+gives correct results, SEM of conducetance may not properly represent the actual
+errors. Though also reported in the returned data.frame, it is not suggested
+to plot SEM Conductance since it can be mis-interpreted in some cases.
 }

@@ -15,8 +15,8 @@ EpisodeBaseline(abf, episode, channel, by_epoch = TRUE,
 \item{channel}{channel to calculate baseline}
 
 \item{by_epoch}{calculate baselines by epochs, if set to FALSE, the whole episode
-is used to calculate baselines, otherwise, baselines are calculated piece-by-piece
-by each epoch and then concatenated.}
+is used to calculate baselines, otherwise, baselines are calculated epoch-by-epoch
+then concatenated.}
 
 \item{dac}{dac channel if by_epoch is used.}
 

@@ -3,7 +3,7 @@
 \name{GetEpiTag}
 \alias{GetEpiTag}
 \alias{GetChanTag}
-\title{Compose default episode/channel number tag.}
+\title{Compose default episode/channel number tag (used as column names).}
 \usage{
 GetEpiTag(episode)
 
@@ -18,7 +18,7 @@ GetChanTag(channel)
 a vector of characters
 }
 \description{
-Compose default episode/channel number tag.
+Compose default episode/channel number tag (used as column names).
 }
 \examples{
 epi_tag <- GetEpiTag(c(1,3,4,5))

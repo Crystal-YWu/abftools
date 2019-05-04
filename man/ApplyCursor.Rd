@@ -3,12 +3,18 @@
 \name{CursorX}
 \alias{CursorX}
 \alias{CursorY}
+\alias{ZeroCursor}
+\alias{ApplyZeroCursor}
 \alias{ApplyCursor}
 \title{Apply indicative cursors on plot.}
 \usage{
 CursorX(cursor, colour = "black")
 
 CursorY(cursor, colour = "black")
+
+ZeroCursor(colour = "black")
+
+ApplyZeroCursor(p, colour = "black")
 
 ApplyCursor(p, cursor_x = NULL, cursor_y = NULL, colour = "black")
 }

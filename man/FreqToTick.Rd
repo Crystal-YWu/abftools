@@ -4,14 +4,12 @@
 \alias{FreqToTick}
 \title{Calculate time span of a frequency}
 \usage{
-FreqToTick(abf, freq, sampling_rate)
+FreqToTick(freq, sampling_rate)
 }
 \arguments{
-\item{abf}{an abf object.}
-
 \item{freq}{a frequency in Hz.}
 
-\item{sampling_rate}{sampling rate (in µs).}
+\item{sampling_rate}{sampling rate (in µs), or an abf object that sampling rate is extracted from.}
 }
 \value{
 an integer of **point**/**tick** count.

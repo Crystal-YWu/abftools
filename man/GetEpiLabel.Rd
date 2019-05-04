@@ -5,7 +5,7 @@
 \alias{GetChanLabel}
 \alias{DefaultEpiLabel}
 \alias{DefaultChanLabel}
-\title{Compose labels for every episode/channel of an abf object}
+\title{Compose labels for every episode/channel of an abf object (used as labels).}
 \usage{
 GetEpiLabel(abf, style = "epi\%d")
 
@@ -24,5 +24,5 @@ DefaultChanLabel(abf)
 a vector of characters.
 }
 \description{
-Compose labels for every episode/channel of an abf object
+Compose labels for every episode/channel of an abf object (used as labels).
 }

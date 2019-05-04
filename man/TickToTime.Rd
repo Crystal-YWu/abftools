@@ -4,17 +4,15 @@
 \alias{TickToTime}
 \title{Convert tick (array index) to time unit.}
 \usage{
-TickToTime(abf, tick, time_unit = c("tick", "us", "ms", "s", "min",
-  "hr"), sampling_rate)
+TickToTime(tick, time_unit = c("tick", "us", "ms", "s", "min", "hr"),
+  sampling_rate)
 }
 \arguments{
-\item{abf}{an abf object.}
-
 \item{tick}{a vector of integer.}
 
 \item{time_unit}{desired time unit.}
 
-\item{sampling_rate}{sampling rate (in µs).}
+\item{sampling_rate}{sampling rate (in µs), or an abf object that sampling rate is extracted from.}
 }
 \value{
 a vector of numeric.
