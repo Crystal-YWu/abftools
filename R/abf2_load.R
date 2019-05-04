@@ -177,6 +177,7 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
 
   if (is.object(filelist) && is.list(filelist)) {
     names <- tolower(names(filelist))
+    names(filelist) <- names
     #filename
     if ("filename" %in% names) {
       extracted <- filelist$filename
@@ -199,7 +200,7 @@ abf2_loadlist <- function(filelist, folder = NULL, attach_ext = TRUE,
   } else {
     extracted <- filelist
   }
-  filelist <- as.character(extracted)
+  filelist <- as.character(extracted[!is.na(extracted)])
   if (attach_ext) {
     filelist <- lapply(filelist, function(x) AddSurfix(x, ".abf"))
   }

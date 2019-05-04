@@ -39,18 +39,17 @@ GetYLimit <- function(abf, intv = NULL, curs = NULL, channel, blank = 0.0125) {
 
 #' Calculate time span of a frequency
 #'
-#' @param abf an abf object.
 #' @param freq a frequency in Hz.
-#' @param sampling_rate sampling rate (in µs).
+#' @param sampling_rate sampling rate (in µs), or an abf object that sampling rate is extracted from.
 #'
 #' @return an integer of **point**/**tick** count.
 #' @export
 #'
-FreqToTick <- function(abf, freq, sampling_rate) {
+FreqToTick <- function(freq, sampling_rate) {
 
   time <- 1e6 / freq
-  if (missing(sampling_rate)) {
-    sampling_rate <- GetSamplingRate(abf)
+  if (IsAbf(sampling_rate)) {
+    sampling_rate <- GetSamplingRate(sampling_rate)
   }
   tick <- time / sampling_rate
 
@@ -59,20 +58,19 @@ FreqToTick <- function(abf, freq, sampling_rate) {
 
 #' Convert tick (array index) to time unit.
 #'
-#' @param abf an abf object.
 #' @param tick a vector of integer.
 #' @param time_unit desired time unit.
-#' @param sampling_rate sampling rate (in µs).
+#' @param sampling_rate sampling rate (in µs), or an abf object that sampling rate is extracted from.
 #'
 #' @return a vector of numeric.
 #' @export
 #'
-TickToTime <- function(abf, tick, time_unit = c("tick", "us", "ms", "s", "min", "hr"), sampling_rate) {
+TickToTime <- function(tick, time_unit = c("tick", "us", "ms", "s", "min", "hr"), sampling_rate) {
 
   time_unit <- match.arg(time_unit)
 
-  if (missing(sampling_rate)) {
-    sampling_rate <- GetSamplingRate(abf)
+  if (IsAbf(sampling_rate)) {
+    sampling_rate <- GetSamplingRate(sampling_rate)
   }
   time <- switch(time_unit,
                  tick = tick,
@@ -85,12 +83,11 @@ TickToTime <- function(abf, tick, time_unit = c("tick", "us", "ms", "s", "min", 
   time
 }
 
-
 #####################################
 
 GetAxisLabel <- function(desc, unit, style) sprintf(style, desc, unit)
 
-#' Compose labels for every episode/channel of an abf object
+#' Compose labels for every episode/channel of an abf object (used as labels).
 #'
 #' @param abf an abf object
 #' @param style a format string
@@ -143,7 +140,7 @@ DefaultChanLabel <- function(abf) {
   GetChanLabel(abf, style = "%s (%s)")
 }
 
-#' Compose default episode/channel number tag.
+#' Compose default episode/channel number tag (used as column names).
 #'
 #' @param episode episode numbers
 #' @param channel channel numbers

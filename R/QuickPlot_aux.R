@@ -6,8 +6,8 @@ ParseDataFrameIV <- function(df, has_id = FALSE) {
   }
   dict$Voltage <- c("voltage", "v")
   dict$Current <- c("current", "i")
-  dict$SEMC <- c("semc", "sem c", "semi", "sem i")
-  dict$SEMV <- c("semv", "sem v")
+  dict$SEMC <- c("semc", "sem c", "semi", "sem i", "sem_c")
+  dict$SEMV <- c("semv", "sem v", "sem_v")
 
   ExtractDataFrame(df, dict)
 }

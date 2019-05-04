@@ -21,11 +21,11 @@ CollectCh <- function(abf, channel, intv = NULL, curs = NULL, colour, time_unit,
   #remove NAs from cursor
   curs <- curs[!is.na(curs)]
   if (!is.null(intv)) {
-    intv_tu <- TickToTime(abf, intv, time_unit)
+    intv_tu <- TickToTime(intv, time_unit, sampling_rate = abf)
     p <- p + geom_vline(xintercept = intv_tu[1:2], linetype = "dashed")
   }
   if (!is.null(curs)) {
-    curs_tu <- TickToTime(abf, curs, time_unit)
+    curs_tu <- TickToTime(curs, time_unit, sampling_rate = abf)
     p <- p + geom_vline(xintercept = curs_tu, linetype = "dashed")
   }
 

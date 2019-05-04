@@ -146,7 +146,7 @@ FindSamplingInterval <- function(abf, epoch = NULL, dac = GetWaveformEnabledDAC(
                                  abs(epdac$fEpochLevelInc[epoch]))
   }
 
-  lp_interval_size <- FreqToTick(abf, freq = lp_freq)
+  lp_interval_size <- FreqToTick(freq = lp_freq, sampling_rate = abf)
   target_interval_size <- max(3L, ifelse(is.null(target_interval_size),
                                                  2L * lp_interval_size,
                                                  target_interval_size))
@@ -251,23 +251,34 @@ FindStepEpisode <- function(abf,
   hold_epi <- step_epi_level(abf, epoch = epoch - 1L, dac = dac)
   step_epi <- step_epi_level(abf, epoch = epoch, dac = dac)
 
-  #try negative direction
-  idx <- step_epi < hold_epi
-  if (!any(idx)) {
-    #negative direction failed, try positive direction
-    idx <- step_epi > hold_epi
-  }
-  if (any(idx)) {
-    if (idx[1]) {
-      epi <- max(which(idx))
+  idx_neg <- step_epi < hold_epi
+  if (any(idx_neg)) {
+    if (idx_neg[1]) {
+      epi_neg <- max(which(idx_neg))
     } else {
-      epi <- min(which(idx))
+      epi_neg <- min(which(idx_neg))
     }
   } else {
-    epi <- NA
+    epi_neg <- NULL
   }
 
-  epi
+  idx_pos <- step_epi > hold_epi
+  if (any(idx_pos)) {
+    if (idx_pos[1]) {
+      epi_pos <- max(which(idx_pos))
+    } else {
+      epi_pos <- min(which(idx_pos))
+    }
+  } else {
+    epi_pos <- NULL
+  }
+
+  epi <- c(epi_neg, epi_pos)
+  if (is.null(epi)) {
+    NA
+  } else {
+    epi
+  }
 }
 
 #' Find a charging interval of given current channel.
@@ -328,8 +339,6 @@ FindChargeInterval <- function(abf,
   }
 
   n <- length(dy)
-
-  #first peak, look for sign change
   idx_start <- NA
   sign <- dy > 0
   for (i in seq_len(n - 1L)) {
@@ -338,7 +347,6 @@ FindChargeInterval <- function(abf,
       break
     }
   }
-
   if (is.na(idx_start)) {
     #no sign change
     stop("Monotonic charging interval.")
@@ -347,11 +355,25 @@ FindChargeInterval <- function(abf,
   #flat interval
   diff_window <- as.integer(diff_window) * peak_window
   dy <- sample1d_col_rolled(x = dy[seq.int(idx_start + diff_window + 1L, n)],
-                            ratio = diff_window,
-                            colFunc = colMeans)
-  idx_end <- idx_start + diff_window + which.min(abs(dy))
+                                ratio = diff_window,
+                                colFunc = colMeans)
+  n <- length(dy)
+  idx_end <- NA
+  sign <- dy > 0
+  for (i in seq_len(n - 1L)) {
+    if (xor(sign[i], sign[i + 1L])) {
+      idx_end <- i + 1L
+      break
+    }
+  }
+  if (is.na(idx_end)) {
+    #no sign change
+    stop("Monotonic charging interval.")
+  }
+  idx_end <- idx_start + diff_window + idx_end
 
-  Intv(startPos = idx_start + intv[1] - 1L, endPos = idx_end + intv[1] - 1L)
+  Intv(startPos = idx_start + intv[1] - 1L,
+       endPos = idx_end + intv[1] - 1L)
 }
 
 #' @rdname FindChargeInterval
