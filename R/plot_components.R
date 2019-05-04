@@ -293,7 +293,26 @@ CursorX <- function(cursor, colour = "black") {
 #'
 CursorY <- function(cursor, colour = "black") {
 
-  geom_vline(yintercept = cursor, linetype = "dashed", colour = colour)
+  geom_hline(yintercept = cursor, linetype = "dashed", colour = colour)
+}
+
+#' @rdname ApplyCursor
+#' @export
+#'
+ZeroCursor <- function(colour = "black") {
+
+  list(
+    CursorX(cursor = 0.0, colour = colour),
+    CursorY(cursor = 0.0, colour = colour)
+  )
+}
+
+#' @rdname ApplyCursor
+#' @export
+#'
+ApplyZeroCursor <- function(p, colour = "black") {
+
+  p + ZeroCursor(colour = colour)
 }
 
 #' Apply indicative cursors on plot.

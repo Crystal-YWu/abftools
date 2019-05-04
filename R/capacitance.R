@@ -1,3 +1,13 @@
+#' Fit a current curve to a logistic aysmptotic model.
+#'
+#' Model:
+#' i = I0 + (Is - I0) * e^( -exp(lrc) * t )
+#'
+#' @param i current
+#' @param t time
+#'
+#' @return a list of fitted coefs, and fitted model itself.
+#'
 fit_charge_i <- function(i, t) {
 
   f <- stats::formula(I ~ SSasymp(t, Is, I0, lrc))
@@ -7,9 +17,20 @@ fit_charge_i <- function(i, t) {
   coefs <- stats::coef(fit)
   coefs["tao"] <- 1/exp(coefs["lrc"])
 
-  c(as.list(coefs), fitted = fit)
+  c(as.list(coefs), fitted = list(fit))
 }
 
+#' Fit a charging curve and calculate Rs, Rm, Cm
+#'
+#' @param i current episode
+#' @param intv_charge charging interval
+#' @param intv_hold hold interval
+#' @param delta_v delta voltage
+#' @param time_unit time unit to use.
+#' @param sampling_rate sampling ratio passed to TickToTime()
+#'
+#' @return a list of fitted results.
+#'
 fit_charge_cap <- function(i, intv_charge, intv_hold, delta_v,
                            time_unit = "tick", sampling_rate) {
 
@@ -48,7 +69,8 @@ fit_charge_cap <- function(i, intv_charge, intv_hold, delta_v,
 #' \code{\link[abftools:FindStepEpisode]{FindStepEpisode()}}, see help for more
 #' details.
 #'
-#' The returned data.frame contains membrane properties calculated, which are:
+#' Please also notice that all unit prefixes are converted to "1", thus the
+#' returned properties calculated are:
 #'
 #' Cm: membrane capacitance (in Farad)
 #'
@@ -62,7 +84,6 @@ fit_charge_cap <- function(i, intv_charge, intv_hold, delta_v,
 #'
 #' tao: RC time constant (in s)
 #'
-#'
 #' @param abf an abf object.
 #' @param intv interval of the CHARGING period.
 #' @param episode episode of the memtest.
@@ -74,11 +95,11 @@ fit_charge_cap <- function(i, intv_charge, intv_hold, delta_v,
 #' @return a data.frame
 #' @export
 #'
-StepMemtest <- function(abf, intv = NULL, episode = NULL,
-                        epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
-                        dac = GetWaveformEnabledDAC(abf),
-                        current_channel = GetFirstCurrentChan(abf),
-                        max_iter = 30L) {
+StepMemtestAbf <- function(abf, intv = NULL, episode = NULL,
+                           epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
+                           dac = GetWaveformEnabledDAC(abf),
+                           current_channel = GetFirstCurrentChan(abf),
+                           max_iter = 10L) {
 
   dac <- FirstElement(dac)
   current_channel <- FirstElement(current_channel)
@@ -90,7 +111,7 @@ StepMemtest <- function(abf, intv = NULL, episode = NULL,
 
   if (is.null(episode)) {
     episode <- FindStepEpisode(abf, epoch = epoch, dac = dac)
-    if (is.na(episode)) {
+    if (anyNA(episode)) {
       stop("Failed to find an episode suitable for charging current fitting.")
     }
   }
@@ -114,24 +135,36 @@ StepMemtest <- function(abf, intv = NULL, episode = NULL,
       #fit
       cap <- fit_charge_cap(i = y,
                             intv_charge = intv, intv_hold = intv_hold, delta_v = delta_v,
-                            time_unit = "s", sampling_rate = GetSamplingRate(abf))
+                            time_unit = "s", sampling_rate = abf)
 
     } else {
-
-      diff_window <- 5L
-      max_iter <- max_iter + diff_window
+      min_diff_window <- 5
+      diff_window <- min_diff_window
+      max_iter <- max_iter + min_diff_window
       #Calculate dy so we don't need to recalculate it every iteration
       dy <- slope_stencil(y, idx = MaskIntv(intv_epoch))
 
       while (TRUE) {
+
         #auto intv
-        intv <- FindChargeInterval(abf,
-                                   epoch = epoch,
-                                   dac = dac,
-                                   episode = episode,
-                                   current_channel = current_channel,
-                                   diff_window = diff_window, dy = dy)
+        intv <- tryCatch({
+          FindChargeInterval(abf,
+                             epoch = epoch,
+                             dac = dac,
+                             episode = episode,
+                             current_channel = current_channel,
+                             diff_window = diff_window, dy = dy)
+        }, error = function(e) {
+          NA
+        })
+        if (anyNA(intv)) {
+          cap <- rep(NA, 6)
+          warning(sprintf("%s: Failed to find a proper charging interval for episode %d. NAs return.",
+                          GetTitle(abf), episode))
+          break
+        }
         intv_hold <- Intv(endPos = intv_epoch[1] - 1L, len = intv[3])
+
         #fit
         cap <- tryCatch({
           fit_charge_cap(i = y,
@@ -142,21 +175,23 @@ StepMemtest <- function(abf, intv = NULL, episode = NULL,
             Rtot = -1
           )
         })
-
-        if (cap$Rtot < 0) {
+        if (cap$Rtot < 0 || cap$Rs < 0 || cap$Rm < 0) {
           #Is is not stable, increase diff_window
           diff_window <- diff_window + 1L
           if (diff_window >= max_iter) {
-            stop(sprintf("Failed to fit charging curve after %d iterations.", max_iter))
+            cap <- rep(NA, 6)
+            warning(sprintf("%s: Failed to fit charging curve after %d iterations for episode %d. NAs return.",
+                            GetTitle(abf), max_iter - min_diff_window, episode))
+            break
           }
         } else {
+          cap <- c(cap$Cm, cap$Rs, cap$Rm, cap$coefs$I0, cap$coefs$Is, cap$coefs$tao)
           break
         }
       }
-
     }
 
-    c(cap$Cm, cap$Rs, cap$Rm, cap$coefs$I0, cap$coefs$Is, cap$coefs$tao)
+    cap
   }
 
   ans <- as.data.frame(do.call(rbind, lapply(episode, do_fit_episode)),

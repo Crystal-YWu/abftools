@@ -63,6 +63,20 @@ print.abf <- function(x, ...) {
   mx
 }
 
+#' Replacing channel data.
+#'
+#' @param x an abf object.
+#' @param channel ADC channel id, 1-based.
+#' @param value channel data to replace the original.
+#'
+#' @return an abf object with the replaced channel.
+#' @export
+#'
+`[[<-.abf` <- function(x, channel, value) {
+
+  RplcChan(x, channel, value)
+}
+
 #' Convert a channel of an abf object to data.frame
 #'
 #' @param x an abf object.
@@ -78,19 +92,5 @@ as.data.frame.abf <- function(x, row.names = NULL, optional = FALSE, channel = 1
 
   mx <- x[[channel]]
 
-  as.data.frame(mx, row.names, optional, ...)
-}
-
-#' Replacing channel data.
-#'
-#' @param x an abf object.
-#' @param channel ADC channel id, 1-based.
-#' @param value channel data to replace the original.
-#'
-#' @return an abf object with the replaced channel.
-#' @export
-#'
-`[[<-.abf` <- function(x, channel, value) {
-
-  RplcChan(x, channel, value)
+  as.data.frame(mx, row.names = row.names, optional = optional, ...)
 }

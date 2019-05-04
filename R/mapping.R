@@ -110,7 +110,7 @@ MeltAbf <- function(abf, intv = NULL, channel = GetAllChannels(abf),
     if (along == "episode") {
       ep <- as.factor(matrix(epi, nrow = length(tick), ncol = nepi, byrow = TRUE))
       levels(ep) <- epi_id
-      time <- rep(TickToTime(abf, tick = tick, time_unit = time_unit), nepi)
+      time <- rep(TickToTime(tick = tick, time_unit = time_unit, sampling_rate = abf), nepi)
       if (is.null(abf_id_func)) {
         xcol <- list(
           Time = time,
@@ -133,7 +133,7 @@ MeltAbf <- function(abf, intv = NULL, channel = GetAllChannels(abf),
       #along channel
       ch <- as.factor(matrix(chan, nrow = length(tick), ncol = nchan, byrow = TRUE))
       levels(ch) <- chan_id
-      time <- rep(TickToTime(abf, tick = tick, time_unit = time_unit), nchan)
+      time <- rep(TickToTime(tick = tick, time_unit = time_unit, sampling_rate = abf), nchan)
       if (is.null(abf_id_func)) {
         xcol <- list(
           Time = time,
@@ -159,7 +159,7 @@ MeltAbf <- function(abf, intv = NULL, channel = GetAllChannels(abf),
     levels(ep) <- epi_id
     ch <- as.factor(matrix(chan, nrow = length(tick) * nepi, ncol = nchan, byrow = TRUE))
     levels(ch) <- chan_id
-    time <- rep(TickToTime(abf, tick = tick, time_unit = time_unit), nepi * nchan)
+    time <- rep(TickToTime(tick = tick, time_unit = time_unit, sampling_rate = abf), nepi * nchan)
     if (is.null(abf_id_func)) {
       xcol <- list(
         Time = time,
@@ -242,7 +242,7 @@ WrapMappingFuncAlong <- function(map_func, along = c("time", "episode", "channel
       #do not generate dim 1 if along time
       ans[[1]] <- NA
     } else {
-      ans[[1]] <- TickToTime(abf, tick = mask_time, time_unit = time_unit)
+      ans[[1]] <- TickToTime(tick = mask_time, time_unit = time_unit, sampling_rate = abf)
     }
     #dim 2
     if (is.null(epi_id_func)) {

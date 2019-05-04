@@ -4,8 +4,8 @@
 #' @param episode an episode to calculate baseline
 #' @param channel channel to calculate baseline
 #' @param by_epoch calculate baselines by epochs, if set to FALSE, the whole episode
-#' is used to calculate baselines, otherwise, baselines are calculated piece-by-piece
-#' by each epoch and then concatenated.
+#' is used to calculate baselines, otherwise, baselines are calculated epoch-by-epoch
+#' then concatenated.
 #' @param dac dac channel if by_epoch is used.
 #' @param ... arguments passed to baseline_als, see \code{\link[abftools:baseline_als]{baseline_als()}} for details.
 #'
@@ -69,14 +69,14 @@ EpisodeBaseline <- function(abf, episode, channel, by_epoch = TRUE, dac = GetWav
 #' @return an abf object.
 #' @export
 #'
-RemoveBaseline <- function(abf, channel, method = c("interval", "episode", "holding"),
-                           intv, episode, by_epoch = TRUE, dac = GetWaveformEnabledDAC(abf),
-                           ...) {
-
-  method <- match.arg(method)
+RmblAbf <- function(abf, channel, method = c("interval", "episode", "holding"),
+                    intv, episode, by_epoch = TRUE, dac = GetWaveformEnabledDAC(abf),
+                    ...) {
 
   channel <- FirstElement(channel)
+  CheckArgs(abf, chan = channel)
 
+  method <- match.arg(method)
   switch(method,
          holding = CheckArgs(abf, chan = channel, dac = dac),
          interval = CheckArgs(abf, chan = channel),
@@ -101,6 +101,29 @@ RemoveBaseline <- function(abf, channel, method = c("interval", "episode", "hold
   abf[,, channel] <- abf[,, channel] - bl
 
   abf
+}
+
+#' @rdname RmblAbf
+#' @export
+#'
+RemoveBaselineAbf <- function(abf, channel, method = c("interval", "episode", "holding"),
+                              intv, episode, by_epoch = TRUE, dac, ...) {
+
+  if (IsAbf(abf)) {
+    eval.parent(substitute({
+      abf <- RmblAbf(abf = abf, channel = channel, method = method, intv = intv,
+                     episode = episode, by_epoch = by_epoch, dac = dac, ...)
+      abf
+    }))
+  } else if (IsAbfList(abf)) {
+    eval.parent(substitute({
+      abf <- lapply(abf, RmblAbf, channel = channel, method = method, intv = intv,
+                    episode = episode, by_epoch = by_epoch, dac = dac, ...)
+      abf
+    }))
+  } else {
+    err_class_abf()
+  }
 }
 
 #' Baseline Correction with Asymmetric Least Squares Smoothing

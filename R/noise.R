@@ -12,9 +12,9 @@
 #' @return an abf object.
 #' @export
 #'
-DenoiseAbf <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
-                       by_epoch = TRUE, dac = GetWaveformEnabledDAC(abf),
-                       thresh.scale = 1.0, xform = "dwt", ...) {
+DnAbf <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
+                  by_epoch = TRUE, dac = GetWaveformEnabledDAC(abf),
+                  thresh.scale = 1.0, xform = "dwt", ...) {
 
   if (by_epoch) {
     CheckArgs(abf, epi = episode, chan = channel, dac = dac)
@@ -46,6 +46,29 @@ DenoiseAbf <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
   abf
 }
 
+#' @rdname DnAbf
+#' @export
+#'
+DenoiseAbf <- function(abf, episode, channel = 1L, by_epoch = TRUE, dac,
+                       thresh.scale = 1.0, xform = "dwt", ...) {
+
+  if (IsAbf(abf)) {
+    eval.parent(substitute({
+      abf <- DnAbf(abf, episode = episode, channel = channel, by_epoch = by_epoch,
+                   dac = dac, thresh.scale = thresh.scale, xform = xform, ...)
+      abf
+    }))
+  } else if (IsAbfList(abf)) {
+    eval.parent(substitute({
+      abf <- lapply(abf, DnAbf, episode = episode, channel = channel, by_epoch = by_epoch,
+                    dac = dac, thresh.scale = thresh.scale, xform = xform, ...)
+      abf
+    }))
+  } else {
+    err_class_abf()
+  }
+}
+
 #' Apply Butterworth low-pass filter to an abf object.
 #'
 #' @param abf an abf object.
@@ -56,25 +79,36 @@ DenoiseAbf <- function(abf, episode = GetAllEpisodes(abf), channel = 1L,
 #' @return an abf object.
 #' @export
 #'
-LowpassAbf <- function(abf, channel, freq = 75, order = 1L) {
+LpAbf <- function(abf, channel, freq = 75, order = 1L) {
 
-  CheckArgs(abf, channel, allow_list = TRUE)
+  CheckArgs(abf, chan = channel)
 
-  if (IsAbf(abf)) {
-    ApplyLowpass(abf, chan = channel, freq = freq, order = order)
-  } else {
-    lapply(abf, ApplyLowpass, chan = channel, freq = freq, order = order)
-  }
+  ApplyLowpass(abf, chan = channel, freq = freq, order = order)
 }
 
-denoise_wavshrink <- function(y, thresh.scale = 1.0, xform = "dwt", ...) {
+#' @rdname LpAbf
+#' @export
+#'
+LowpassAbf <- function(abf, channel, freq = 75, order = 1L) {
 
-  wmtsa::wavShrink(y, thresh.scale = thresh.scale, xform = xform, ...)
+  if (IsAbf(abf)) {
+    eval.parent(substitute({
+      abf <- LpAbf(abf, channel = channel, freq = freq, order = order)
+      abf
+    }))
+  } else if (IsAbfList(abf)) {
+    eval.parent(substitute({
+      abf <- lapply(abf, LpAbf, channel = channel, freq = freq, order = order)
+      abf
+    }))
+  } else {
+    err_class_abf()
+  }
 }
 
 ApplyLowpass <- function(abf, chan, freq, order) {
 
-  bf <- signal::butter(order, 1 / (2*freq), "low")
+  bf <- signal::butter(n = order, W = 1 / (2*freq), type = "low")
   ff <- function(x) signal::filter(bf, x)
   for (ch in chan) {
 
