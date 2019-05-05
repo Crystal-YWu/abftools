@@ -13,7 +13,7 @@ fit_charge_i <- function(i, t) {
   f <- stats::formula(I ~ SSasymp(t, Is, I0, lrc))
   df <- data.frame(I = i, t = t)
 
-  fit <- stats::nls(formula = f, data = df)
+  fit <- stats::nls(formula = f, data = df, control = stats::nls.control(minFactor = 1/2048))
   coefs <- stats::coef(fit)
   coefs["tao"] <- 1/exp(coefs["lrc"])
 
