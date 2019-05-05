@@ -33,20 +33,20 @@ assign_struct <- function(struct.def, n = 1L) {
 
     if ((tp == "int16") || (tp == "int32") || (tp == "int8") ||
         (tp == "int64") || (tp == "char") || (tp == "unused")) {
-      ans[[fd]] <- rep(0L, n)
+      ans[[fd]] <- vector(mode = "integer", length = n)
     }
     else if ((tp == "float") || (tp == "double")) {
-      ans[[fd]] <- rep(0.0, n)
+      ans[[fd]] <- vector(mode = "numeric", length = n)
     }
     else if (startsWith(tp, "uint") || (tp == "uchar")) {
       if (sizeof[tp] == 4) {
-        ans[[fd]] <- rep(0.0, n)
+        ans[[fd]] <- vector(mode = "numeric", length = n)
       } else {
-        ans[[fd]] <- rep(0L, n)
+        ans[[fd]] <- vector(mode = "integer", length = n)
       }
     }
     else if (tp == "string") {
-      ans[[fd]] <- rep("", n)
+      ans[[fd]] <- vector(mode = "character", length = n)
     }
     else {
       err_ctype(tp)
