@@ -178,12 +178,15 @@ PlotIVSummary <- function(ivs, conductance = "Conductance" %in% names(ivs),
                           error_bar = !conductance, zero_axes = TRUE, smooth = FALSE, ...) {
 
   if (is.list(ivs)) {
+    if (is.data.frame(ivs)) {
+      ivs <- list(ivs)
+    }
     if (IsListOf(ivs, "data.frame")) {
       if (!"Group" %in% names(ivs[[1]])) {
         warning("No groups defined in ivs, adding default groups.")
-        ivs <- lapply(seq_along(ivs), function(idx) {
+        for (idx in seq_along(ivs)) {
           ivs[[idx]]$Group <- paste0("grp", idx)
-        })
+        }
       }
       ivs <- do.call(rbind, ivs)
     } else {
@@ -191,7 +194,7 @@ PlotIVSummary <- function(ivs, conductance = "Conductance" %in% names(ivs),
     }
   }
 
-  xunit <- ivs$Unit_Voltage
+  xunit <- ivs$Unit_Voltage[1]
   if (conductance) {
     ycol <- "Conductance"
     ysem <- "SEM_Conductance"
@@ -249,7 +252,7 @@ PlotIVSummary <- function(ivs, conductance = "Conductance" %in% names(ivs),
   if (is.null(yunit)) {
     ylabel <- ycol
   } else {
-    ylabel <- GetAxisLabel(ysymb, yunit, sytle = "%s (%s)")
+    ylabel <- GetAxisLabel(ysymb, yunit, style = "%s (%s)")
   }
   if (!is.null(title)) {
     p <- p + labs(x = xlabel, y = ylabel, title = title)
