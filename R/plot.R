@@ -191,12 +191,17 @@ PlotIVSummary <- function(ivs, conductance = "Conductance" %in% names(ivs),
     }
   }
 
+  xunit <- ivs$Unit_Voltage
   if (conductance) {
     ycol <- "Conductance"
     ysem <- "SEM_Conductance"
+    yunit <- ivs$Unit_Conductance[1]
+    ysymb <- "G"
   } else {
     ycol <- "Current"
     ysem <- "SEM_Current"
+    yunit <- ivs$Unit_Current[1]
+    ysymb <- "I"
   }
 
   aes_args <- list(x = "Voltage", y = ycol)
@@ -236,10 +241,20 @@ PlotIVSummary <- function(ivs, conductance = "Conductance" %in% names(ivs),
     p <- p + geom_line()
   }
 
-  if (!is.null(title)) {
-    p <- p + labs(x = "Voltage", y = ycol, title = title)
+  if (is.null(xunit)) {
+    xlabel <- "Voltage"
   } else {
-    p <- p + labs(x = "Voltage", y = ycol)
+    xlabel <- GetAxisLabel("V", xunit, style = "%s (%s)")
+  }
+  if (is.null(yunit)) {
+    ylabel <- ycol
+  } else {
+    ylabel <- GetAxisLabel(ysymb, yunit, sytle = "%s (%s)")
+  }
+  if (!is.null(title)) {
+    p <- p + labs(x = xlabel, y = ylabel, title = title)
+  } else {
+    p <- p + labs(x = xlabel, y = ylabel)
   }
   p <- p + labs(colour = legend_title,
                 shape = legend_title,

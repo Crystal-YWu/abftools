@@ -76,6 +76,7 @@ do_igv <- function(abf, intv, i_chan, v_chan) {
 #' @param current_channel current channel id, 1-based.
 #' @param voltage_channel voltage channel id, 1-based.
 #' @param group OPTIONAL, add a "Group" column to the returned data.frame.
+#' @param unit whether to add unit columns to the returned data.frame.
 #'
 #' @return a data.frame
 #' @export
@@ -83,12 +84,12 @@ do_igv <- function(abf, intv, i_chan, v_chan) {
 IVSummary <- function(abf, intv = NULL, conductance = FALSE,
                       current_channel = GetFirstCurrentChan(abf),
                       voltage_channel = GetFirstVoltageChan(abf),
-                      group = NULL) {
+                      group = NULL, unit = FALSE) {
 
   if (conductance) {
     IGVSummary(abf, intv = intv,
                current_channel = current_channel, voltage_channel = voltage_channel,
-               group = group)
+               group = group, unit = unit)
   } else {
     CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
     if (!IsAbfList(abf)) {
@@ -107,23 +108,44 @@ IVSummary <- function(abf, intv = NULL, conductance = FALSE,
 
     i <- sapply(iv, `[[`, "i")
     v <- sapply(iv, `[[`, "v")
+    if (unit) {
+      i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
+      v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
+    }
 
     current <- matrixStats::rowMeans2(i, na.rm = TRUE)
     voltage <- matrixStats::rowMeans2(v, na.rm = TRUE)
     current_sem <- rowSems(i, na.rm = TRUE)
     voltage_sem <- rowSems(v, na.rm = TRUE)
 
-    if (is.null(group)) {
-      df <- data.frame(voltage, voltage_sem, current, current_sem, n)
-      colnames(df) <- c("Voltage", "SEM_Voltage",
-                        "Current", "SEM_Current",
-                        "Num_Samples")
-      rownames(df) <- DefaultEpiLabel(nrow(df))
+    if (unit) {
+      if (is.null(group)) {
+        df <- data.frame(voltage, voltage_sem, current, current_sem,
+                         n, v_unit, i_unit)
+        colnames(df) <- c("Voltage", "SEM_Voltage",
+                          "Current", "SEM_Current",
+                          "Num_Samples", "Unit_Voltage", "Unit_Current")
+        rownames(df) <- DefaultEpiLabel(nrow(df))
+      } else {
+        df <- data.frame(voltage, voltage_sem, current, current_sem,
+                         n, group, v_unit, i_unit)
+        colnames(df) <- c("Voltage", "SEM_Voltage",
+                          "Current", "SEM_Current",
+                          "Num_Samples", "Group", "Unit_Voltage", "Unit_Current")
+      }
     } else {
-      df <- data.frame(voltage, voltage_sem, current, current_sem, n, group)
-      colnames(df) <- c("Voltage", "SEM_Voltage",
-                        "Current", "SEM_Current",
-                        "Num_Samples", "Group")
+      if (is.null(group)) {
+        df <- data.frame(voltage, voltage_sem, current, current_sem, n)
+        colnames(df) <- c("Voltage", "SEM_Voltage",
+                          "Current", "SEM_Current",
+                          "Num_Samples")
+        rownames(df) <- DefaultEpiLabel(nrow(df))
+      } else {
+        df <- data.frame(voltage, voltage_sem, current, current_sem, n, group)
+        colnames(df) <- c("Voltage", "SEM_Voltage",
+                          "Current", "SEM_Current",
+                          "Num_Samples", "Group")
+      }
     }
 
     df
@@ -136,7 +158,7 @@ IVSummary <- function(abf, intv = NULL, conductance = FALSE,
 IGVSummary <- function(abf, intv = NULL,
                        current_channel = GetFirstCurrentChan(abf),
                        voltage_channel = GetFirstVoltageChan(abf),
-                       group = NULL) {
+                       group = NULL, unit = FALSE) {
 
   CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
   if (!IsAbfList(abf)) {
@@ -157,6 +179,17 @@ IGVSummary <- function(abf, intv = NULL,
   i <- sapply(igv, `[[`, "i")
   g <- sapply(igv, `[[`, "g")
   v <- sapply(igv, `[[`, "v")
+  if (unit) {
+    i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
+    v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
+    #compose g unit
+    i_scale <- parse_unit_scale(i_unit)
+    v_scale <- parse_unit_scale(v_unit)
+    #dI/dV
+    g_scale <- i_scale / v_scale
+    prefix <- get_unit_prefix(scale = g_scale, long_prefix = FALSE)
+    g_unit <- paste0(prefix, "S")
+  }
 
   current <- matrixStats::rowMeans2(i, na.rm = TRUE)
   #averaging conductance still makes sense even if voltage is not consistent,
@@ -170,20 +203,44 @@ IGVSummary <- function(abf, intv = NULL,
   conduct_sem <- rowSems(g, na.rm = TRUE)
   voltage_sem <- rowSems(v, na.rm = TRUE)
 
-  if (is.null(group)) {
-    df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n)
-    colnames(df) <- c("Voltage", "SEM_Voltage",
-                      "Current", "SEM_Current",
-                      "Conductance", "SEM_Conductance",
-                      "Num_Samples")
-    rownames(df) <- DefaultEpiLabel(nrow(df))
+  if (unit) {
+    if (is.null(group)) {
+      df <- data.frame(voltage, voltage_sem,
+                       current, current_sem,
+                       conduct, conduct_sem, n,
+                       v_unit, i_unit, g_unit)
+      colnames(df) <- c("Voltage", "SEM_Voltage",
+                        "Current", "SEM_Current",
+                        "Conductance", "SEM_Conductance",
+                        "Num_Samples", "Unit_Voltage", "Unit_Current", "Unit_Conductance")
+      rownames(df) <- DefaultEpiLabel(nrow(df))
+    } else {
+      df <- data.frame(voltage, voltage_sem,
+                       current, current_sem,
+                       conduct, conduct_sem, n, group,
+                       v_unit, i_unit, g_unit)
+      colnames(df) <- c("Voltage", "SEM_Voltage",
+                        "Current", "SEM_Current",
+                        "Conductance", "SEM_Conductance",
+                        "Num_Samples", "Group", "Unit_Voltage", "Unit_Current", "Unit_Conductance")
+    }
   } else {
-    df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n, group)
-    colnames(df) <- c("Voltage", "SEM_Voltage",
-                      "Current", "SEM_Current",
-                      "Conductance", "SEM_Conductance",
-                      "Num_Samples", "Group")
+    if (is.null(group)) {
+      df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n)
+      colnames(df) <- c("Voltage", "SEM_Voltage",
+                        "Current", "SEM_Current",
+                        "Conductance", "SEM_Conductance",
+                        "Num_Samples")
+      rownames(df) <- DefaultEpiLabel(nrow(df))
+    } else {
+      df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n, group)
+      colnames(df) <- c("Voltage", "SEM_Voltage",
+                        "Current", "SEM_Current",
+                        "Conductance", "SEM_Conductance",
+                        "Num_Samples", "Group")
+    }
   }
+
 
   df
 }

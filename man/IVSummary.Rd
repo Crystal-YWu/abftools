@@ -7,11 +7,13 @@
 \usage{
 IVSummary(abf, intv = NULL, conductance = FALSE,
   current_channel = GetFirstCurrentChan(abf),
-  voltage_channel = GetFirstVoltageChan(abf), group = NULL)
+  voltage_channel = GetFirstVoltageChan(abf), group = NULL,
+  unit = FALSE)
 
 IGVSummary(abf, intv = NULL,
   current_channel = GetFirstCurrentChan(abf),
-  voltage_channel = GetFirstVoltageChan(abf), group = NULL)
+  voltage_channel = GetFirstVoltageChan(abf), group = NULL,
+  unit = FALSE)
 }
 \arguments{
 \item{abf}{a list of abf objects.}
@@ -25,6 +27,8 @@ IGVSummary(abf, intv = NULL,
 \item{voltage_channel}{voltage channel id, 1-based.}
 
 \item{group}{OPTIONAL, add a "Group" column to the returned data.frame.}
+
+\item{unit}{whether to add unit columns to the returned data.frame.}
 }
 \value{
 a data.frame

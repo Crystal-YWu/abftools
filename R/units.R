@@ -76,6 +76,28 @@ parse_unit_scale <- function(unit) {
   ans
 }
 
+get_unit_prefix <- function(scale, long_prefix = FALSE) {
+
+  v <- as.integer(log10(scale) / 3)
+  if (long_prefix) {
+    if (v > 0) {
+      switch(v, "kilo", "mega", "Giga", "Tera")
+    } else if (v < 0) {
+      switch(-v, "milli", "micro", "nano", "pico")
+    } else {
+      ""
+    }
+  } else {
+    if (v > 0) {
+      switch(v, "k", "M", "G", "T")
+    } else if (v < 0) {
+      switch(-v, "m", "µ", "n", "p")
+    } else {
+      ""
+    }
+  }
+}
+
 #' Basic scaling of units.
 #'
 #' Scale x of unit to a new unit with different prefix
