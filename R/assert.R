@@ -20,10 +20,11 @@ AssertLength <- function(x, ..., len = NULL) {
   lenx <- length(x)
 
   if (!is.null(len)) {
-    return(lenx == len)
+    lenx == len
+  } else {
+    cmp <- sapply(args, length) == lenx
+    all(cmp)
   }
-  cmp <- sapply(args, function(item) length(item) == lenx)
-  all(cmp)
 }
 
 AssertEpisode <- function(abf, episode) {
