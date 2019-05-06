@@ -85,21 +85,23 @@ fit_charge_cap <- function(i, intv_charge, intv_hold, delta_v,
 #' tao: RC time constant (in s)
 #'
 #' @param abf an abf object.
-#' @param intv interval of the CHARGING period.
-#' @param episode episode of the memtest.
-#' @param epoch epoch of the memtest.
+#' @param intv_charge interval of the CHARGING period.
+#' @param episode episodes to calculate membrane properties.
+#' @param epoch epoch of the step pulse.
 #' @param dac DAC channel of Vcmd
 #' @param current_channel current channel.
 #' @param max_iter maximum iterations.
+#' @param report_all whether to report all calculated episodes or a best fitted one,
+#' useful for manual inspection.
 #'
 #' @return a data.frame
 #' @export
 #'
-StepMemtestAbf <- function(abf, intv = NULL, episode = NULL,
+StepMemtestAbf <- function(abf, intv_charge = NULL, episode = NULL,
                            epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
                            dac = GetWaveformEnabledDAC(abf),
                            current_channel = GetFirstCurrentChan(abf),
-                           max_iter = 10L) {
+                           max_iter = 10L, report_all = TRUE) {
 
   dac <- FirstElement(dac)
   current_channel <- FirstElement(current_channel)
@@ -121,6 +123,21 @@ StepMemtestAbf <- function(abf, intv = NULL, episode = NULL,
   delta_v <- level_charge - level_hold
   epo <- GetEpochIntervals(abf, dac)
 
+  if (report_all) {
+    avg <- FALSE
+  } else {
+    epi_delta <- delta_v[episode]
+    if (length(episode) > 1L && all(epi_delta[1] == epi_delta)) {
+      epi_avg <- mapnd_col(abf[, episode, current_channel, drop = FALSE],
+                           matrixStats::colMeans2, along = 2L)
+      episode <- episode[1]
+      abf[, episode, current_channel] <- epi_avg
+      avg <- TRUE
+    } else {
+      avg <- FALSE
+    }
+  }
+
   do_fit_episode <- function(episode) {
 
     delta_v <- delta_v[episode]
@@ -128,14 +145,14 @@ StepMemtestAbf <- function(abf, intv = NULL, episode = NULL,
     y <- abf[, episode, current_channel]
 
     #TODO: hold_intv depending of length of intv is very robust.
-    if (!is.null(intv)) {
+    if (!is.null(intv_charge)) {
 
       #manual intv
-      intv_hold <- Intv(endPos = intv_epoch[1] - 1L, len = intv[3])
+      intv_hold <- Intv(endPos = intv_epoch[1] - 1L, len = intv_charge[3])
       #fit
       cap <- fit_charge_cap(i = y,
-                            intv_charge = intv, intv_hold = intv_hold, delta_v = delta_v,
-                            time_unit = "s", sampling_rate = abf)
+                            intv_charge = intv_charge, intv_hold = intv_hold,
+                            delta_v = delta_v, time_unit = "s", sampling_rate = abf)
 
     } else {
       min_diff_window <- 5
@@ -194,8 +211,68 @@ StepMemtestAbf <- function(abf, intv = NULL, episode = NULL,
     cap
   }
 
-  ans <- as.data.frame(do.call(rbind, lapply(episode, do_fit_episode)),
-                       row.names = DefaultEpiLabel(abf)[episode])
+  ans <- as.data.frame(do.call(rbind, lapply(episode, do_fit_episode)), row.names = NULL)
   names(ans) <- c("Cm", "Rs", "Rm", "I0", "Is", "tao")
+
+  if (report_all) {
+    rnames <- DefaultEpiLabel(abf)[episode]
+    rownames(ans) <- rnames
+    ans
+  } else {
+    best_id <- which.max(ans$Rm / ans$Rs)
+    if (length(best_id)) {
+      ans[best_id, ]
+    } else {
+      ans[1, ] <- NA
+      ans
+    }
+  }
+}
+
+#' Report membrane properties by StepMemtestAbf() for a list of abf objects.
+#'
+#' @param abf a list of abf object.
+#' @param intv_charge interval of the charging period.
+#' @param episode episodes to calculate membrane properties.
+#' @param epoch epoch of the step pulse.
+#' @param dac DAC channel of Vcmd.
+#' @param current_channel current channel.
+#' @param max_iter max iterations.
+#'
+#' @return a data.frame
+#' @export
+#'
+StepMemtestSummary <- function(abf, intv_charge = NULL, episode = NULL,
+                               epoch = NULL, dac = NULL, current_channel = NULL,
+                               max_iter = 10L) {
+
+  CheckArgs(abf, epi = episode, chan = current_channel, epo = epoch, dac = dac, allow_list = TRUE)
+  if (IsAbf(abf)) {
+    abf <- list(abf)
+  }
+  n <- length(abf)
+  intv_charge <- MatchList(intv_charge, n)
+  episode <- MatchList(episode, n)
+  if (is.null(dac)) {
+    dac <- lapply(abf, GetWaveformEnabledDAC)
+  }
+  if (is.null(epoch)) {
+    epoch <- mapply(FindMemtestEpoch_Step, abf = abf, dac = dac,
+                    SIMPLIFY = FALSE, USE.NAMES = FALSE)
+  }
+  if (is.null(current_channel)) {
+    current_channel <- GetFirstCurrentChan(abf)
+  }
+
+  rnames <- names(abf)
+  if (is.null(rnames)) {
+    rnames <- GetTitle(abf)
+  }
+
+  ans <- do.call(rbind, mapply(StepMemtestAbf, abf = abf, intv_charge = intv_charge, episode = episode,
+                               epoch = epoch, dac = dac, current_channel = current_channel,
+                               MoreArgs = list(max_iter = max_iter, report_all = FALSE),
+                               SIMPLIFY = FALSE, USE.NAMES = FALSE))
+  row.names(ans) <- rnames
   ans
 }
