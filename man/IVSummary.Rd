@@ -7,12 +7,12 @@
 \usage{
 IVSummary(abf, intv = NULL, conductance = FALSE,
   current_channel = GetFirstCurrentChan(abf),
-  voltage_channel = GetFirstVoltageChan(abf), group = NULL,
+  voltage_channel = GetFirstVoltageChan(abf), group = NA,
   unit = FALSE)
 
 IGVSummary(abf, intv = NULL,
   current_channel = GetFirstCurrentChan(abf),
-  voltage_channel = GetFirstVoltageChan(abf), group = NULL,
+  voltage_channel = GetFirstVoltageChan(abf), group = NA,
   unit = FALSE)
 }
 \arguments{

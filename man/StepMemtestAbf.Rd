@@ -4,25 +4,29 @@
 \alias{StepMemtestAbf}
 \title{Calculate membrane properties from a step pulse membrane test.}
 \usage{
-StepMemtestAbf(abf, intv = NULL, episode = NULL,
+StepMemtestAbf(abf, intv_charge = NULL, episode = NULL,
   epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
   dac = GetWaveformEnabledDAC(abf),
-  current_channel = GetFirstCurrentChan(abf), max_iter = 10L)
+  current_channel = GetFirstCurrentChan(abf), max_iter = 10L,
+  report_all = TRUE)
 }
 \arguments{
 \item{abf}{an abf object.}
 
-\item{intv}{interval of the CHARGING period.}
+\item{intv_charge}{interval of the CHARGING period.}
 
-\item{episode}{episode of the memtest.}
+\item{episode}{episodes to calculate membrane properties.}
 
-\item{epoch}{epoch of the memtest.}
+\item{epoch}{epoch of the step pulse.}
 
 \item{dac}{DAC channel of Vcmd}
 
 \item{current_channel}{current channel.}
 
 \item{max_iter}{maximum iterations.}
+
+\item{report_all}{whether to report all calculated episodes or a best fitted one,
+useful for manual inspection.}
 }
 \value{
 a data.frame

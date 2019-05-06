@@ -84,7 +84,7 @@ do_igv <- function(abf, intv, i_chan, v_chan) {
 IVSummary <- function(abf, intv = NULL, conductance = FALSE,
                       current_channel = GetFirstCurrentChan(abf),
                       voltage_channel = GetFirstVoltageChan(abf),
-                      group = NULL, unit = FALSE) {
+                      group = NA, unit = FALSE) {
 
   if (conductance) {
     IGVSummary(abf, intv = intv,
@@ -99,7 +99,7 @@ IVSummary <- function(abf, intv = NULL, conductance = FALSE,
       stop("Episodes of abf do not match.")
     }
     n <- length(abf)
-    intv <- MatchList(intv, length(abf))
+    intv <- MatchList(intv, n)
 
     iv <- mapply(do_iv, abf, intv, MoreArgs = list(i_chan = current_channel,
                                                    v_chan = voltage_channel),
@@ -108,47 +108,27 @@ IVSummary <- function(abf, intv = NULL, conductance = FALSE,
 
     i <- sapply(iv, `[[`, "i")
     v <- sapply(iv, `[[`, "v")
-    if (unit) {
-      i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
-      v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
-    }
+    i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
+    v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
 
     current <- matrixStats::rowMeans2(i, na.rm = TRUE)
     voltage <- matrixStats::rowMeans2(v, na.rm = TRUE)
     current_sem <- rowSems(i, na.rm = TRUE)
     voltage_sem <- rowSems(v, na.rm = TRUE)
 
+    df <- data.frame(voltage, voltage_sem, current, current_sem, n, group, v_unit, i_unit)
+    names(df) <- c("Voltage", "SEM_Voltage", "Current", "SEM_Current", "Num_Samples",
+                   "Group", "Unit_Voltage", "Unit_Current")
+
+    cols <- seq_len(5)
+    if (!is.na(group)) {
+      cols <- c(cols, 6L)
+    }
     if (unit) {
-      if (is.null(group)) {
-        df <- data.frame(voltage, voltage_sem, current, current_sem,
-                         n, v_unit, i_unit)
-        colnames(df) <- c("Voltage", "SEM_Voltage",
-                          "Current", "SEM_Current",
-                          "Num_Samples", "Unit_Voltage", "Unit_Current")
-        rownames(df) <- DefaultEpiLabel(nrow(df))
-      } else {
-        df <- data.frame(voltage, voltage_sem, current, current_sem,
-                         n, group, v_unit, i_unit)
-        colnames(df) <- c("Voltage", "SEM_Voltage",
-                          "Current", "SEM_Current",
-                          "Num_Samples", "Group", "Unit_Voltage", "Unit_Current")
-      }
-    } else {
-      if (is.null(group)) {
-        df <- data.frame(voltage, voltage_sem, current, current_sem, n)
-        colnames(df) <- c("Voltage", "SEM_Voltage",
-                          "Current", "SEM_Current",
-                          "Num_Samples")
-        rownames(df) <- DefaultEpiLabel(nrow(df))
-      } else {
-        df <- data.frame(voltage, voltage_sem, current, current_sem, n, group)
-        colnames(df) <- c("Voltage", "SEM_Voltage",
-                          "Current", "SEM_Current",
-                          "Num_Samples", "Group")
-      }
+      cols <- c(cols, 7L, 8L)
     }
 
-    df
+    df[, cols]
   }
 }
 
@@ -158,7 +138,7 @@ IVSummary <- function(abf, intv = NULL, conductance = FALSE,
 IGVSummary <- function(abf, intv = NULL,
                        current_channel = GetFirstCurrentChan(abf),
                        voltage_channel = GetFirstVoltageChan(abf),
-                       group = NULL, unit = FALSE) {
+                       group = NA, unit = FALSE) {
 
   CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
   if (!IsAbfList(abf)) {
@@ -168,7 +148,7 @@ IGVSummary <- function(abf, intv = NULL,
     stop("Episodes of abf do not match.")
   }
   n <- length(abf)
-  intv <- MatchList(intv, length(abf))
+  intv <- MatchList(intv, n)
 
   igv <- mapply(do_igv, abf, intv,
                 MoreArgs = list(i_chan = current_channel,
@@ -179,17 +159,15 @@ IGVSummary <- function(abf, intv = NULL,
   i <- sapply(igv, `[[`, "i")
   g <- sapply(igv, `[[`, "g")
   v <- sapply(igv, `[[`, "v")
-  if (unit) {
-    i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
-    v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
-    #compose g unit
-    i_scale <- parse_unit_scale(i_unit)
-    v_scale <- parse_unit_scale(v_unit)
-    #dI/dV
-    g_scale <- i_scale / v_scale
-    prefix <- get_unit_prefix(scale = g_scale, long_prefix = FALSE)
-    g_unit <- paste0(prefix, "S")
-  }
+
+  i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
+  v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
+  #compose g unit
+  i_scale <- parse_unit_scale(i_unit)
+  v_scale <- parse_unit_scale(v_unit)
+  #dI/dV
+  g_scale <- i_scale / v_scale
+  g_unit <- paste0(get_unit_prefix(scale = g_scale, long_prefix = FALSE), "S")
 
   current <- matrixStats::rowMeans2(i, na.rm = TRUE)
   #averaging conductance still makes sense even if voltage is not consistent,
@@ -203,46 +181,182 @@ IGVSummary <- function(abf, intv = NULL,
   conduct_sem <- rowSems(g, na.rm = TRUE)
   voltage_sem <- rowSems(v, na.rm = TRUE)
 
+  df <- data.frame(voltage, voltage_sem,
+                   current, current_sem,
+                   conduct, conduct_sem, n, group,
+                   v_unit, i_unit, g_unit)
+  names(df) <- c("Voltage", "SEM_Voltage", "Current", "SEM_Current", "Conductance", "SEM_Conductance",
+                 "Num_Samples", "Group", "Unit_Voltage", "Unit_Current", "Unit_Conductance")
+
+  cols <- seq_len(7)
+  if (!is.na(group)) {
+    cols <- c(cols, 8L)
+  }
   if (unit) {
-    if (is.null(group)) {
-      df <- data.frame(voltage, voltage_sem,
-                       current, current_sem,
-                       conduct, conduct_sem, n,
-                       v_unit, i_unit, g_unit)
-      colnames(df) <- c("Voltage", "SEM_Voltage",
-                        "Current", "SEM_Current",
-                        "Conductance", "SEM_Conductance",
-                        "Num_Samples", "Unit_Voltage", "Unit_Current", "Unit_Conductance")
-      rownames(df) <- DefaultEpiLabel(nrow(df))
-    } else {
-      df <- data.frame(voltage, voltage_sem,
-                       current, current_sem,
-                       conduct, conduct_sem, n, group,
-                       v_unit, i_unit, g_unit)
-      colnames(df) <- c("Voltage", "SEM_Voltage",
-                        "Current", "SEM_Current",
-                        "Conductance", "SEM_Conductance",
-                        "Num_Samples", "Group", "Unit_Voltage", "Unit_Current", "Unit_Conductance")
-    }
-  } else {
-    if (is.null(group)) {
-      df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n)
-      colnames(df) <- c("Voltage", "SEM_Voltage",
-                        "Current", "SEM_Current",
-                        "Conductance", "SEM_Conductance",
-                        "Num_Samples")
-      rownames(df) <- DefaultEpiLabel(nrow(df))
-    } else {
-      df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem, n, group)
-      colnames(df) <- c("Voltage", "SEM_Voltage",
-                        "Current", "SEM_Current",
-                        "Conductance", "SEM_Conductance",
-                        "Num_Samples", "Group")
-    }
+    cols <- c(cols, 9L, 10L, 11L)
   }
 
+  df[, cols]
+}
 
-  df
+#' Report I-V relationship of a list of abf objects, with specific current/conductance.
+#'
+#' @param abf a list of abf objects.
+#' @param intv OPTIONAL, a list of intervals.
+#' @param memprops membrane properties, if NULL memprops will be calculated from StepMemtestSummary().
+#' @param conductance Only used in SpIVSummary(), if TRUE, same as calling SpIGVSummary()
+#' @param current_channel current channel id, 1-based.
+#' @param voltage_channel voltage channel id, 1-based.
+#' @param group OPTIONAL, add a "Group" column to the returned data.frame.
+#' @param unit whether to add unit columns to the returned data.frame.
+#' @param ... passed to StepmemtestSummary(), see \code{\link[abftools:StepMemtestSummary]{help}} for details.
+#'
+#' @return a data.frame
+#' @export
+#'
+SpIVSummary <- function(abf, intv = NULL, conductance = FALSE, memprops = NULL,
+                        current_channel = GetFirstCurrentChan(abf),
+                        voltage_channel = GetFirstVoltageChan(abf),
+                        group = NA, unit = FALSE, ...) {
+
+  if (conductance) {
+    SpIGVSummary(abf = abf, intv = intv, memprops = memprops,
+                 current_channel = current_channel, voltage_channel = voltage_channel,
+                 group = group, unit = unit, ...)
+  } else {
+    CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
+    if (!IsAbfList(abf)) {
+      abf <- list(abf)
+    }
+    if (!AssertDim(abf, 2)) {
+      stop("Episodes of abf do not match.")
+    }
+    n <- length(abf)
+    intv <- MatchList(intv, n)
+
+    if (is.null(memprops)) {
+      memprops <- StepMemtestSummary(abf = abf, current_channel = current_channel, ...)
+    }
+
+    iv <- mapply(do_iv, abf, intv, MoreArgs = list(i_chan = current_channel,
+                                                   v_chan = voltage_channel),
+                 SIMPLIFY = FALSE,
+                 USE.NAMES = FALSE)
+
+    i <- sapply(iv, `[[`, "i")
+    v <- sapply(iv, `[[`, "v")
+
+    i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
+    v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
+    i_scale <- parse_unit_scale(i_unit)
+
+    i_cm <- memprops$Cm / i_scale
+    spi <- sweep(i, 2, i_cm, FUN = "/")
+    spi_unit <- paste0(i_unit, "/", get_unit_prefix(scale = i_scale, long_prefix = FALSE), "F")
+
+    current <- matrixStats::rowMeans2(i, na.rm = TRUE)
+    sp_current <- matrixStats::rowMeans2(spi, na.rm = TRUE)
+    voltage <- matrixStats::rowMeans2(v, na.rm = TRUE)
+
+    current_sem <- rowSems(i, na.rm = TRUE)
+    sp_current_sem <- rowSems(spi, na.rm = TRUE)
+    voltage_sem <- rowSems(v, na.rm = TRUE)
+
+    df <- data.frame(voltage, voltage_sem, current, current_sem, sp_current, sp_current_sem,
+                     n, group, v_unit, i_unit, spi_unit)
+    names(df) <- c("Voltage", "SEM_Voltage", "Current", "SEM_Current", "SpCurrent", "SEM_SpCurrent",
+                   "Num_Samples", "Group", "Unit_Voltage", "Unit_Current", "Unit_SpCurrent")
+
+    cols <- seq_len(7)
+    if (!is.na(group)) {
+      cols <- c(cols, 8L)
+    }
+    if (unit) {
+      cols <- c(cols, 9L, 10L, 11L)
+    }
+
+    df[, cols]
+  }
+}
+
+#' @rdname SpIVSummary
+#' @export
+#'
+SpIGVSummary <- function(abf, intv = NULL, memprops = NULL,
+                         current_channel = GetFirstCurrentChan(abf),
+                         voltage_channel = GetFirstVoltageChan(abf),
+                         group = NA, unit = FALSE, ...) {
+
+  CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
+  if (!IsAbfList(abf)) {
+    abf <- list(abf)
+  }
+  if (!AssertDim(abf, 2)) {
+    stop("Episodes of abf do not match.")
+  }
+  n <- length(abf)
+  intv <- MatchList(intv, n)
+
+  if (is.null(memprops)) {
+    memprops <- StepMemtestSummary(abf = abf, current_channel = current_channel, ...)
+  }
+
+  igv <- mapply(do_igv, abf, intv,
+                MoreArgs = list(i_chan = current_channel,
+                                v_chan = voltage_channel),
+                SIMPLIFY = FALSE,
+                USE.NAMES = FALSE)
+
+  i <- sapply(igv, `[[`, "i")
+  g <- sapply(igv, `[[`, "g")
+  v <- sapply(igv, `[[`, "v")
+
+  i_unit <- GetChannelUnit(abf[[1]], channel = current_channel)
+  v_unit <- GetChannelUnit(abf[[1]], channel = voltage_channel)
+  #compose g unit
+  i_scale <- parse_unit_scale(i_unit)
+  v_scale <- parse_unit_scale(v_unit)
+  #dI/dV
+  g_scale <- i_scale / v_scale
+  g_unit <- paste0(get_unit_prefix(scale = g_scale, long_prefix = FALSE), "S")
+
+  i_cm <- memprops$Cm / i_scale
+  g_cm <- memprops$Cm / g_scale
+  spi <- sweep(i, 2, i_cm, FUN = "/")
+  spg <- sweep(g, 2, g_cm, FUN = "/")
+  spi_unit <- paste0(i_unit, "/", get_unit_prefix(i_scale), "F")
+  spg_unit <- paste0(g_unit, "/", get_unit_prefix(g_scale), "F")
+
+  current <- matrixStats::rowMeans2(i, na.rm = TRUE)
+  conduct <- matrixStats::rowMeans2(g, na.rm = TRUE)
+  voltage <- matrixStats::rowMeans2(v, na.rm = TRUE)
+
+  sp_current <- matrixStats::rowMeans2(spi, na.rm = TRUE)
+  sp_conduct <- matrixStats::rowMeans2(spg, na.rm = TRUE)
+
+  current_sem <- rowSems(i, na.rm = TRUE)
+  sp_current_sem <- rowSems(spi, na.rm = TRUE)
+  conduct_sem <- rowSems(g, na.rm = TRUE)
+  sp_conduct_sem <- rowSems(spg, na.rm = TRUE)
+  voltage_sem <- rowSems(v, na.rm = TRUE)
+
+  df <- data.frame(voltage, voltage_sem, current, current_sem, conduct, conduct_sem,
+                   sp_current, sp_current_sem, sp_conduct, sp_conduct_sem,
+                   n, group, v_unit, i_unit, g_unit, spi_unit, spg_unit)
+  names(df) <- c("Voltage", "SEM_Voltage", "Current", "SEM_Current", "Conductance", "SEM_Conductance",
+                 "SpCurrent", "SEM_SpCurrent", "SpConductance", "SEM_SpConductance",
+                 "Num_Samples", "Group",
+                 "Unit_Voltage", "Unit_Current", "Unit_Conductance", "Unit_SpCurrent", "Unit_SpConductance")
+
+  cols <- seq_len(11)
+  if (!is.na(group)) {
+    cols <- c(cols, 12L)
+  }
+  if (unit) {
+    cols <- c(cols, 13L, 14L, 15L, 16L, 17L)
+  }
+
+  df[, cols]
 }
 
 #' Calculate mean values of multiple abf objects
