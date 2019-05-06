@@ -32,7 +32,7 @@ SpIGVSummary(abf, intv = NULL, memprops = NULL,
 
 \item{unit}{whether to add unit columns to the returned data.frame.}
 
-\item{...}{passed to StepmemtestSummary(), \code{\link[abftools:StepmemtestSummary]{help}} for details.}
+\item{...}{passed to StepmemtestSummary(), see \code{\link[abftools:StepMemtestSummary]{help}} for details.}
 }
 \value{
 a data.frame
