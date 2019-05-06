@@ -5,7 +5,7 @@
 \title{Find a step episode.}
 \usage{
 FindStepEpisode(abf, epoch = FindMemtestEpoch(abf, dac = dac, type =
-  "step"), dac = GetWaveformEnabledDAC(abf))
+  "step"), dac = GetWaveformEnabledDAC(abf), eps = 1e-08)
 }
 \arguments{
 \item{abf}{an abf object.}
@@ -13,6 +13,8 @@ FindStepEpisode(abf, epoch = FindMemtestEpoch(abf, dac = dac, type =
 \item{epoch}{epoch id.}
 
 \item{dac}{DAC channel of waveform.}
+
+\item{eps}{an epsilon to compare fp values.}
 }
 \value{
 an episode id.

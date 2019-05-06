@@ -238,47 +238,25 @@ FindAllSamplingInterval <- function(abf_list, ...) {
 #' @param abf an abf object.
 #' @param epoch epoch id.
 #' @param dac DAC channel of waveform.
+#' @param eps an epsilon to compare fp values.
 #'
 #' @return an episode id.
 #' @export
 #'
 FindStepEpisode <- function(abf,
                             epoch = FindMemtestEpoch(abf, dac = dac, type = "step"),
-                            dac = GetWaveformEnabledDAC(abf)) {
+                            dac = GetWaveformEnabledDAC(abf), eps = 1e-8) {
 
   CheckArgs(abf, epo = epoch, dac = dac)
 
   hold_epi <- step_epi_level(abf, epoch = epoch - 1L, dac = dac)
   step_epi <- step_epi_level(abf, epoch = epoch, dac = dac)
 
-  idx_neg <- step_epi < hold_epi
-  if (any(idx_neg)) {
-    if (idx_neg[1]) {
-      epi_neg <- max(which(idx_neg))
-    } else {
-      epi_neg <- min(which(idx_neg))
-    }
-  } else {
-    epi_neg <- NULL
-  }
+  delta <- abs(step_epi - hold_epi)
+  delta[delta < eps] <- max(delta)
+  min_delta <- min(delta)
 
-  idx_pos <- step_epi > hold_epi
-  if (any(idx_pos)) {
-    if (idx_pos[1]) {
-      epi_pos <- max(which(idx_pos))
-    } else {
-      epi_pos <- min(which(idx_pos))
-    }
-  } else {
-    epi_pos <- NULL
-  }
-
-  epi <- c(epi_neg, epi_pos)
-  if (is.null(epi)) {
-    NA
-  } else {
-    epi
-  }
+  which((delta - min_delta) < eps)
 }
 
 #' Find a charging interval of given current channel.
