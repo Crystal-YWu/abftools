@@ -224,7 +224,7 @@ StepMemtestAbf <- function(abf, intv_charge = NULL, episode = NULL,
       ans[best_id, ]
     } else {
       ans[1, ] <- NA
-      ans
+      ans[1, ]
     }
   }
 }
