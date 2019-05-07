@@ -359,74 +359,64 @@ SpIGVSummary <- function(abf, intv = NULL, memprops = NULL,
   df[, cols]
 }
 
-#' Calculate mean values of multiple abf objects
+#' Calculate mean values of multiple abf objects and returns in wide format.
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list OPTIONAL, a list of intervals.
 #' @param channel channel id, 1-based.
-#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
 #' @param na.rm wheter to remove na values..
 #'
-#' @return A data.frame object.
+#' @return A data.frame object/list of data.frame if multiple channels are used.
 #' @export
 #'
-MultiMean <- function(abf_list, intv_list = NULL, channel = 1L, ret.df = TRUE,
-                      na.rm = TRUE) {
+ChannelMeanWide <- function(abf_list, intv_list = NULL, channel = 1L, na.rm = TRUE) {
 
   if (!IsAbfList(abf_list)) {
     err_class_abf_list()
   }
   CheckArgs(abf_list, chan = channel, allow_list = TRUE)
-  intv_list <- ExpandIntvList(abf_list, intv_list)
+  intv_list <- MatchList(intv_list, length(abf_list))
 
   if (length(channel) == 1L) {
-    ret <- t(Episodic_colFunc(abf_list, intv_list, channel, colMeans, na.rm = na.rm))
-    if (ret.df) {
-      ret <- as.data.frame(ret)
-    }
+    ret <- as.data.frame(t(Episodic_colFunc(abf_list = abf_list, intv_list = intv_list,
+                                            channel = channel, colFunc = matrixStats::colMeans2,
+                                            na.rm = na.rm)))
   } else {
-    ret <- lapply(channel, function(x) t(Episodic_colFunc(abf_list, intv_list,
-                                                          channel = x, f = colMeans,
-                                                          na.rm = na.rm)))
-    if (ret.df) {
-      ret <- lapply(ret, as.data.frame)
-    }
+    ret <- lapply(channel, function(x) as.data.frame(t(Episodic_colFunc(abf_list = abf_list, intv_list = intv_list,
+                                                                        channel = x, colFunc = matrixStats::colMeans,
+                                                                        na.rm = na.rm))))
     names(ret) <- GetChannelDesc(abf_list[[1]])[channel]
   }
 
   ret
 }
 
-#' Calculate mean currents of multiple abf objects
+#' Calculate mean current/voltage of multiple abf objects and return in wide format.
 #'
 #' @param abf_list a list of abf objects.
 #' @param intv_list OPTIONAL, a list of intervals.
-#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
-#' @param na.rm wheter to remove na values..
-#'
-#' @return A data.frame object.
-#' @export
-#'
-MultiMean_Current <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm = TRUE) {
-
-  channel <- GetFirstCurrentChan(abf_list)
-  MultiMean(abf_list, intv_list, channel, ret.df, na.rm)
-}
-
-#' Calculate mean voltages of multiple abf objects
-#'
-#' @param abf_list a list of abf objects.
-#' @param intv_list OPTIONAL, a list of intervals.
-#' @param ret.df whether to return a data.frame object, if set to FALSE a matrix is returned instead.
+#' @param current_channel current channel id.
+#' @param voltage_channel voltage channel id.
 #' @param na.rm wheter to remove na values.
 #'
 #' @return A data.frame object.
 #' @export
 #'
-MultiMean_Voltage <- function(abf_list, intv_list = NULL, ret.df = TRUE, na.rm =TRUE) {
+ISummaryWide <- function(abf_list, intv_list = NULL,
+                         current_channel = GetFirstCurrentChan(abf_list), na.rm = TRUE) {
 
-  channel <- GetFirstVoltageChan(abf_list)
-  MultiMean(abf_list, intv_list, channel, ret.df, na.rm)
+  ChannelMeanWide(abf_list = abf_list, intv_list = intv_list,
+                  channel = current_channel, na.rm = na.rm)
+}
+
+#' @rdname ISummaryWide
+#' @export
+#'
+VSummaryWide <- function(abf_list, intv_list = NULL,
+                         voltage_channel = GetFirstVoltageChan(abf_list), na.rm = TRUE) {
+
+  ChannelMeanWide(abf_list = abf_list, intv_list = intv_list,
+                  channel = voltage_channel, na.rm = na.rm)
 }
 
 
