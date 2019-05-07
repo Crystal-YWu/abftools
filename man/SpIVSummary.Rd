@@ -13,7 +13,7 @@ SpIVSummary(abf, intv = NULL, conductance = FALSE, memprops = NULL,
 SpIGVSummary(abf, intv = NULL, memprops = NULL,
   current_channel = GetFirstCurrentChan(abf),
   voltage_channel = GetFirstVoltageChan(abf), group = NA,
-  unit = FALSE, ...)
+  unit = FALSE, raw = FALSE, ...)
 }
 \arguments{
 \item{abf}{a list of abf objects.}
@@ -33,6 +33,8 @@ SpIGVSummary(abf, intv = NULL, memprops = NULL,
 \item{unit}{whether to add unit columns to the returned data.frame.}
 
 \item{...}{passed to StepmemtestSummary(), see \code{\link[abftools:StepMemtestSummary]{help}} for details.}
+
+\item{raw}{whether to return raw wide data.frame.}
 }
 \value{
 a data.frame

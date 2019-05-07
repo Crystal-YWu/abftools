@@ -77,6 +77,7 @@ do_igv <- function(abf, intv, i_chan, v_chan) {
 #' @param voltage_channel voltage channel id, 1-based.
 #' @param group OPTIONAL, add a "Group" column to the returned data.frame.
 #' @param unit whether to add unit columns to the returned data.frame.
+#' @param raw whether to return raw wide format.
 #'
 #' @return a data.frame
 #' @export
@@ -138,7 +139,7 @@ IVSummary <- function(abf, intv = NULL, conductance = FALSE,
 IGVSummary <- function(abf, intv = NULL,
                        current_channel = GetFirstCurrentChan(abf),
                        voltage_channel = GetFirstVoltageChan(abf),
-                       group = NA, unit = FALSE) {
+                       group = NA, unit = FALSE, raw = FALSE) {
 
   CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
   if (!IsAbfList(abf)) {
@@ -168,6 +169,34 @@ IGVSummary <- function(abf, intv = NULL,
   #dI/dV
   g_scale <- i_scale / v_scale
   g_unit <- paste0(get_unit_prefix(scale = g_scale, long_prefix = FALSE), "S")
+
+  if (raw) {
+    #values
+    current <- as.data.frame(i)
+    voltage <- as.data.frame(v)
+    conduct <- as.data.frame(g)
+    #id
+    id <- names(abf)
+    if (is.null(id)) {
+      id <- GetTitle(abf)
+    }
+    epi <- GetEpiLabel(nrow(current))
+    #colnames
+    names(current) <- id
+    names(voltage) <- id
+    names(conduct) <- id
+    #rownames
+    rownames(current) <- epi
+    rownames(voltage) <- epi
+    rownames(conduct) <- epi
+    return(
+      list(
+        Voltage = voltage,
+        Current = current,
+        Conduct = conduct
+      )
+    )
+  }
 
   current <- matrixStats::rowMeans2(i, na.rm = TRUE)
   #averaging conductance still makes sense even if voltage is not consistent,
@@ -209,6 +238,7 @@ IGVSummary <- function(abf, intv = NULL,
 #' @param voltage_channel voltage channel id, 1-based.
 #' @param group OPTIONAL, add a "Group" column to the returned data.frame.
 #' @param unit whether to add unit columns to the returned data.frame.
+#' @param raw whether to return raw wide data.frame.
 #' @param ... passed to StepmemtestSummary(), see \code{\link[abftools:StepMemtestSummary]{help}} for details.
 #'
 #' @return a data.frame
@@ -285,7 +315,7 @@ SpIVSummary <- function(abf, intv = NULL, conductance = FALSE, memprops = NULL,
 SpIGVSummary <- function(abf, intv = NULL, memprops = NULL,
                          current_channel = GetFirstCurrentChan(abf),
                          voltage_channel = GetFirstVoltageChan(abf),
-                         group = NA, unit = FALSE, ...) {
+                         group = NA, unit = FALSE, raw = FALSE, ...) {
 
   CheckArgs(abf, chan = c(current_channel, voltage_channel), allow_list = TRUE)
   if (!IsAbfList(abf)) {
@@ -326,6 +356,42 @@ SpIGVSummary <- function(abf, intv = NULL, memprops = NULL,
   spg <- sweep(g, 2, g_cm, FUN = "/")
   spi_unit <- paste0(i_unit, "/", get_unit_prefix(i_scale), "F")
   spg_unit <- paste0(g_unit, "/", get_unit_prefix(g_scale), "F")
+
+  if (raw) {
+    #values
+    current <- as.data.frame(i)
+    voltage <- as.data.frame(v)
+    conduct <- as.data.frame(g)
+    sp_current <- as.data.frame(spi)
+    sp_conduct <- as.data.frame(spg)
+    #id
+    id <- names(abf)
+    if (is.null(id)) {
+      id <- GetTitle(abf)
+    }
+    epi <- GetEpiLabel(nrow(current))
+    #colnames
+    names(current) <- id
+    names(voltage) <- id
+    names(conduct) <- id
+    names(sp_current) <- id
+    names(sp_conduct) <- id
+    #rownames
+    rownames(current) <- epi
+    rownames(voltage) <- epi
+    rownames(conduct) <- epi
+    rownames(sp_current) <- epi
+    rownames(sp_conduct) <- epi
+    return(
+      list(
+        Voltage = voltage,
+        Current = current,
+        Conduct = conduct,
+        SpCurrent = sp_current,
+        SpConduct = sp_conduct
+      )
+    )
+  }
 
   current <- matrixStats::rowMeans2(i, na.rm = TRUE)
   conduct <- matrixStats::rowMeans2(g, na.rm = TRUE)

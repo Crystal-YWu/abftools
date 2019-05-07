@@ -13,7 +13,7 @@ IVSummary(abf, intv = NULL, conductance = FALSE,
 IGVSummary(abf, intv = NULL,
   current_channel = GetFirstCurrentChan(abf),
   voltage_channel = GetFirstVoltageChan(abf), group = NA,
-  unit = FALSE)
+  unit = FALSE, raw = FALSE)
 }
 \arguments{
 \item{abf}{a list of abf objects.}
@@ -29,6 +29,8 @@ IGVSummary(abf, intv = NULL,
 \item{group}{OPTIONAL, add a "Group" column to the returned data.frame.}
 
 \item{unit}{whether to add unit columns to the returned data.frame.}
+
+\item{raw}{whether to return raw wide format.}
 }
 \value{
 a data.frame
