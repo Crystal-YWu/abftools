@@ -356,7 +356,7 @@ WrapMappingFunc <- function(map_func, channel,
                                   chan_id_func = chan_id_func,
                                   along = "time", ret.df = ret.df, ...)
 
-  ch_missing <- missing(channel)
+  ch_missing <- missing(channel) || is.null(channel)
   f <- function(abf, intv = NULL) {
     if (ch_missing) {
       f_along(abf, intv = intv)

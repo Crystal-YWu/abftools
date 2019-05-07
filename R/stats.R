@@ -397,26 +397,51 @@ ChannelMeanWide <- function(abf_list, intv_list = NULL, channel = 1L, na.rm = TR
 #' @param intv_list OPTIONAL, a list of intervals.
 #' @param current_channel current channel id.
 #' @param voltage_channel voltage channel id.
-#' @param na.rm wheter to remove na values.
+#' @param na.rm wheter to remove NA values.
 #'
 #' @return A data.frame object.
 #' @export
 #'
-ISummaryWide <- function(abf_list, intv_list = NULL,
+CurrentMeanWide <- function(abf_list, intv_list = NULL,
                          current_channel = GetFirstCurrentChan(abf_list), na.rm = TRUE) {
 
   ChannelMeanWide(abf_list = abf_list, intv_list = intv_list,
                   channel = current_channel, na.rm = na.rm)
 }
 
-#' @rdname ISummaryWide
+#' @rdname CurrentMeanWide
 #' @export
 #'
-VSummaryWide <- function(abf_list, intv_list = NULL,
+VoltageMeanWide <- function(abf_list, intv_list = NULL,
                          voltage_channel = GetFirstVoltageChan(abf_list), na.rm = TRUE) {
 
   ChannelMeanWide(abf_list = abf_list, intv_list = intv_list,
                   channel = voltage_channel, na.rm = na.rm)
+}
+
+#' Calculate mean values of multiple abf objects and return in long format.
+#'
+#' @param abf_list a list of abf objects.
+#' @param intv_list a list of mean intervals.
+#' @param channel channels to calculate.
+#' @param group additional grouping info added to columns.
+#' @param na.rm whether to remove NAs.
+#'
+#' @return data.frame
+#' @export
+#'
+ChannelMeanLong <- function(abf_list, intv_list = NULL, channel = NULL, group = NULL, na.rm = TRUE) {
+
+  f <- WrapMappingFunc(mean, channel = channel, abf_id_func = GetTitle, na.rm = na.rm)
+
+  intv_list <- MatchList(intv_list, length(abf_list))
+  ans <- mapply(f, abf_list, intv_list, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+  ans <- do.call(rbind, ans)
+  if (!is.null(group)) {
+    ans <- cbind(ans, group)
+  }
+
+  ans
 }
 
 
